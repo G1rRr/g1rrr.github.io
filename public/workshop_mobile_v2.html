@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>计件台账</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F6F3;
+  --surface:#FFFFFF;
+  --surface2:#F0EEE9;
+  --border:#E2DFD8;
+  --border-strong:#C8C4BB;
+  --text:#1A1916;
+  --text2:#6B6860;
+  --text3:#A8A49D;
+  --green:#1A7A52;
+  --green-bg:#E6F4ED;
+  --green-mid:#2FAF75;
+  --blue:#1558A8;
+  --blue-bg:#E6EEFA;
+  --amber:#8A5A00;
+  --amber-bg:#FDF3DC;
+  --red:#9B2020;
+  --red-bg:#FDEDED;
+  --r-sm:8px;
+  --r-md:12px;
+  --r-lg:16px;
+  --r-xl:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);font-size:15px;min-height:100vh}
+.app{max-width:430px;margin:0 auto;padding-bottom:88px;min-height:100vh}
+
+/* ── Top bar ── */
+.topbar{padding:20px 20px 0;display:flex;align-items:flex-start;justify-content:space-between}
+.topbar-title{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.topbar-sub{font-size:12px;color:var(--text3);margin-top:3px}
+.badge-saved{font-size:11px;font-weight:500;color:var(--green);background:var(--green-bg);padding:4px 10px;border-radius:20px;border:1px solid #C2E5D4;margin-top:4px;display:inline-block}
+
+/* ── Toast ── */
+#toast{margin:10px 20px 0;padding:12px 16px;border-radius:var(--r-md);font-size:14px;font-weight:500;display:none;border-width:1px;border-style:solid}
+.t-ok{background:var(--green-bg);color:var(--green);border-color:#C2E5D4}
+.t-err{background:var(--red-bg);color:var(--red);border-color:#F2C5C5}
+
+/* ── Section label ── */
+.slabel{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:22px 20px 10px}
+
+/* ── Card ── */
+.card{background:var(--surface);border-radius:var(--r-lg);border:1.5px solid var(--border);margin:0 20px 10px;overflow:hidden}
+.card-inner{padding:16px}
+
+/* ── Field rows inside card ── */
+.frow{display:flex;align-items:center;min-height:52px;padding:0 16px;border-bottom:1px solid var(--border);gap:12px}
+.frow:last-child{border-bottom:none}
+.flabel{font-size:13px;color:var(--text2);width:46px;flex-shrink:0;font-weight:500}
+.fval{flex:1;font-size:15px;font-weight:500}
+select,input[type=number],input[type=text]{font-size:15px;font-weight:500;font-family:inherit;border:none;background:none;color:var(--text);width:100%;outline:none;-webkit-appearance:none;appearance:none;padding:0}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23A8A49D' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 2px center;padding-right:20px}
+
+/* ── Hint strip ── */
+.hint{font-size:13px;font-weight:500;padding:10px 16px;border-radius:var(--r-md);margin:0 20px 6px;border:1px solid}
+.h-ok{background:var(--green-bg);color:var(--green);border-color:#C2E5D4}
+.h-warn{background:var(--amber-bg);color:var(--amber);border-color:#F0DCA0}
+.h-err{background:var(--red-bg);color:var(--red);border-color:#F2C5C5}
+.h-info{background:var(--blue-bg);color:var(--blue);border-color:#BDD3F5}
+
+/* ── Primary button ── */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 40px);margin:6px 20px 0;padding:16px;border-radius:var(--r-lg);border:none;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;letter-spacing:-.1px;transition:opacity .15s}
+.btn:active{opacity:.8;transform:scale(.99)}
+.btn-primary{background:var(--green-mid);color:#fff}
+.btn-blue{background:#1E6FD9;color:#fff}
+.btn-danger{background:var(--surface);color:var(--red);border:1.5px solid #F2C5C5}
+
+/* ── Stock mini cards ── */
+.stock-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 20px 6px}
+.sc{background:var(--surface);border-radius:var(--r-lg);border:1.5px solid var(--border);padding:14px}
+.sc-name{font-size:11px;font-weight:600;margin-bottom:4px}
+.sc-num{font-size:24px;font-weight:600;letter-spacing:-.5px;line-height:1}
+.sc-denom{font-size:12px;font-weight:400;color:var(--text3)}
+.prog{height:5px;background:var(--border);border-radius:5px;overflow:hidden;margin-top:8px}
+.prog-bar{height:5px;border-radius:5px;transition:width .4s}
+.bar-g{background:var(--green-mid)}
+.bar-a{background:#F0A020}
+.bar-r{background:#E24B4A}
+.sc-sub{font-size:11px;color:var(--text3);margin-top:5px}
+
+/* ── List items ── */
+.litem{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);gap:12px}
+.litem:last-child{border-bottom:none}
+.litem-main{flex:1;min-width:0}
+.litem-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.litem-sub{font-size:12px;color:var(--text2);margin-top:2px}
+
+/* ── Badge ── */
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;flex-shrink:0;border:1px solid}
+
+/* ── Del button ── */
+.del{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;font-weight:300}
+.del:active{color:var(--red)}
+
+/* ── Empty ── */
+.empty{color:var(--text3);font-size:13px;text-align:center;padding:24px 16px}
+
+/* ── Salary row ── */
+.srow{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 16px;border-bottom:1px solid var(--border);gap:8px}
+.srow:last-child{border-bottom:none}
+.srow-wage{font-size:20px;font-weight:600;color:var(--green);letter-spacing:-.3px;flex-shrink:0}
+
+/* ── Stat grid ── */
+.stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 20px 6px}
+.stat{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:14px 16px}
+.stat-val{font-size:24px;font-weight:600;letter-spacing:-.4px}
+.stat-lbl{font-size:11px;font-weight:500;color:var(--text3);margin-top:3px}
+
+/* ── Type config rows ── */
+.trow{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);gap:10px}
+.trow:last-child{border-bottom:none}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.trow-name{font-weight:600;font-size:14px;flex:1}
+.trow-detail{font-size:12px;color:var(--text2)}
+
+/* ── Pill tags ── */
+.tags{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px;margin-bottom:4px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--border);padding:6px 12px;border-radius:20px;font-size:13px;font-weight:500}
+.pill-del{background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;line-height:1;padding:0}
+
+/* ── Input standalone ── */
+.inp{width:100%;font-size:14px;font-weight:500;font-family:inherit;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-md);padding:12px 14px;color:var(--text);outline:none}
+.inp:focus{border-color:var(--green-mid)}
+.inp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:8px;padding:0 20px}
+.inp-row{display:flex;gap:8px;padding:0 20px;margin-bottom:6px}
+
+/* ── Divider ── */
+.div{height:1px;background:var(--border);margin:8px 20px}
+
+/* ── Stock type card ── */
+.stcard{padding:14px 16px;border-bottom:1px solid var(--border)}
+.stcard:last-child{border-bottom:none}
+.stcard-row{display:flex;justify-content:space-between;margin-bottom:8px}
+.stcard-nums{display:flex;gap:16px;margin-bottom:8px}
+.stcard-num{text-align:center}
+.stcard-num-val{font-size:16px;font-weight:600}
+.stcard-num-lbl{font-size:11px;color:var(--text3);margin-top:1px}
+
+/* ── Bottom nav ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1.5px solid var(--border);display:flex;z-index:100}
+.bnav-inner{max-width:430px;margin:0 auto;display:flex;width:100%}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 14px;cursor:pointer;border:none;background:none;color:var(--text3);font-size:10px;font-weight:600;font-family:inherit;letter-spacing:.02em}
+.ni svg{width:22px;height:22px;stroke-width:1.8}
+.ni.active{color:var(--green)}
+.ni-dot{width:4px;height:4px;border-radius:50%;background:var(--green);margin:0 auto;display:none}
+.ni.active .ni-dot{display:block}
+
+/* ── Screens ── */
+.screen{display:none;padding-bottom:4px}
+.screen.active{display:block}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">计件台账</div>
+      <div class="badge-saved">数据已保存本地</div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <!-- 领货 -->
+  <div id="s-take" class="screen active">
+    <div class="slabel">库存状态</div>
+    <div id="stock-mini"></div>
+
+    <div class="slabel">登记领货</div>
+    <div class="card">
+      <div class="frow"><span class="flabel">工人</span><div class="fval"><select id="tk-w"><option value="">选择工人</option></select></div></div>
+      <div class="frow"><span class="flabel">货型</span><div class="fval"><select id="tk-t" onchange="tkHint()"><option value="">选择货型</option></select></div></div>
+      <div class="frow"><span class="flabel">数量</span><div class="fval"><input type="number" id="tk-q" value="100" min="1" inputmode="numeric"></div></div>
+    </div>
+    <div id="tk-hint"></div>
+    <button class="btn btn-primary" onclick="doTake()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:18px;height:18px;stroke-width:2.2"><polyline points="20 6 9 17 4 12"/></svg>
+      记录领货
+    </button>
+
+    <div class="slabel">今日记录</div>
+    <div class="card" id="take-list"><div class="empty">暂无领货记录</div></div>
+  </div>
+
+  <!-- 交货 -->
+  <div id="s-return" class="screen">
+    <div class="slabel">登记交货</div>
+    <div class="card">
+      <div class="frow"><span class="flabel">工人</span><div class="fval"><select id="rt-w" onchange="rtHint()"><option value="">选择工人</option></select></div></div>
+      <div class="frow"><span class="flabel">货型</span><div class="fval"><select id="rt-t" onchange="rtHint()"><option value="">选择货型</option></select></div></div>
+      <div class="frow"><span class="flabel">数量</span><div class="fval"><input type="number" id="rt-q" value="100" min="1" inputmode="numeric"></div></div>
+    </div>
+    <div id="rt-hint"></div>
+    <button class="btn btn-primary" onclick="doReturn()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:18px;height:18px;stroke-width:2.2"><polyline points="20 6 9 17 4 12"/></svg>
+      记录交货
+    </button>
+
+    <div class="slabel">交货记录</div>
+    <div class="card" id="ret-list"><div class="empty">暂无交货记录</div></div>
+  </div>
+
+  <!-- 工资 -->
+  <div id="s-salary" class="screen">
+    <div class="slabel">按已交货件数计算</div>
+    <div class="card" id="salary-list"><div class="empty">暂无工人</div></div>
+    <div id="salary-total" style="text-align:right;font-size:14px;font-weight:600;color:var(--green);padding:10px 20px 0"></div>
+    <button class="btn btn-blue" style="margin-top:12px" onclick="exportXlsx()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:18px;height:18px;stroke-width:2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      导出 Excel
+    </button>
+  </div>
+
+  <!-- 总览 -->
+  <div id="s-stock" class="screen">
+    <div class="slabel">数据汇总</div>
+    <div class="stat-grid" id="sv-stats"></div>
+
+    <div class="slabel">货型库存</div>
+    <div class="card" id="sv-types"><div class="empty">暂无货型</div></div>
+
+    <div class="slabel">工人手持</div>
+    <div class="card" id="sv-workers"><div class="empty">暂无工人</div></div>
+
+    <button class="btn btn-blue" style="margin-top:12px" onclick="exportXlsx()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:18px;height:18px;stroke-width:2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      导出 Excel
+    </button>
+  </div>
+
+  <!-- 配置 -->
+  <div id="s-config" class="screen">
+    <div class="slabel">货型配置</div>
+    <div class="card" id="type-list"><div class="empty">暂无货型</div></div>
+
+    <div class="inp-grid" style="margin-top:10px">
+      <input class="inp" type="text" id="nt-name" placeholder="货型名称">
+      <input class="inp" type="number" id="nt-stock" placeholder="总库存" min="1" inputmode="numeric">
+    </div>
+    <div class="inp-grid">
+      <input class="inp" type="number" id="nt-rate" placeholder="单价 元/件" step="0.01" min="0.01" inputmode="decimal">
+      <button class="btn btn-primary" style="width:100%;margin:0;padding:12px" onclick="addType()">+ 添加货型</button>
+    </div>
+
+    <div class="slabel">工人名单</div>
+    <div class="tags" id="worker-tags"></div>
+    <div class="inp-row" style="margin-top:6px">
+      <input class="inp" type="text" id="nw-name" placeholder="输入姓名" style="flex:1">
+      <button class="btn btn-primary" style="width:auto;margin:0;padding:12px 18px;white-space:nowrap" onclick="addWorker()">添加</button>
+    </div>
+
+    <div class="slabel">数据管理</div>
+    <button class="btn btn-danger" onclick="clearAll()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:16px;height:16px;stroke-width:2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      清空所有数据
+    </button>
+    <div style="font-size:12px;color:var(--text3);text-align:center;margin:8px 20px 0">建议先导出 Excel 备份再清空</div>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bnav"><div class="bnav-inner">
+  <button class="ni active" onclick="showTab('take',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2M8 7V5a2 2 0 00-4 0v2"/><path d="M12 12v5M9.5 14.5L12 12l2.5 2.5"/></svg>
+    领货
+    <div class="ni-dot"></div>
+  </button>
+  <button class="ni" onclick="showTab('return',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 12l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
+    交货
+    <div class="ni-dot"></div>
+  </button>
+  <button class="ni" onclick="showTab('salary',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/><path d="M9.5 9.5a4 4 0 015 5"/></svg>
+    工资
+    <div class="ni-dot"></div>
+  </button>
+  <button class="ni" onclick="showTab('stock',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 17h7M17 14v7"/></svg>
+    总览
+    <div class="ni-dot"></div>
+  </button>
+  <button class="ni" onclick="showTab('config',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    配置
+    <div class="ni-dot"></div>
+  </button>
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const KEY='wt_v4';
+const PALETTES=[
+  {c:'#1D9E75',bg:'#E6F4ED',bd:'#B8E0CE'},
+  {c:'#1E6FD9',bg:'#E6EEFA',bd:'#BDD3F5'},
+  {c:'#C07010',bg:'#FDF3DC',bd:'#F0DCA0'},
+  {c:'#B03060',bg:'#FBEAF0',bd:'#F4C0D1'},
+  {c:'#7060D0',bg:'#EEEDFE',bd:'#CECBF6'},
+  {c:'#C04030',bg:'#FDEDED',bd:'#F2C5C5'},
+  {c:'#208060',bg:'#E1F5EE',bd:'#9FE1CB'},
+  {c:'#606060',bg:'#F1EFE8',bd:'#D3D1C7'},
+];
+let S={types:[{name:'A货',rate:.20,stock:500},{name:'B货',rate:.10,stock:500},{name:'C货',rate:.50,stock:500}],workers:[],takes:[],returns:[]};
+
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{const d=localStorage.getItem(KEY);if(d){const p=JSON.parse(d);if(p?.types)S=p}}catch(e){}}
+function gp(i){return PALETTES[i%PALETTES.length]}
+function fmt(){const n=new Date();return n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0')}
+
+let _tt;
+function toast(txt,ok=true){
+  const el=document.getElementById('toast');
+  el.textContent=txt;el.className=ok?'t-ok':'t-err';el.style.display='block';
+  clearTimeout(_tt);_tt=setTimeout(()=>el.style.display='none',3000);
+}
+
+function showTab(t,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+t).classList.add('active');
+  document.querySelectorAll('.ni').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(t==='take'){renderMini();refreshSels()}
+  if(t==='return'){refreshSels();rtHint()}
+  if(t==='salary')renderSalary();
+  if(t==='stock')renderStock();
+}
+
+function getLeft(ti){return S.types[ti].stock-S.takes.filter(x=>x.ti===ti).reduce((a,x)=>a+x.qty,0)}
+function getHold(wi,ti){
+  return S.takes.filter(x=>x.wi===wi&&x.ti===ti).reduce((a,x)=>a+x.qty,0)
+        -S.returns.filter(x=>x.wi===wi&&x.ti===ti).reduce((a,x)=>a+x.qty,0)
+}
+
+function refreshSels(){
+  ['tk-w','rt-w'].forEach(id=>{const s=document.getElementById(id),v=s.value;s.innerHTML='<option value="">选择工人</option>'+S.workers.map((w,i)=>`<option value="${i}"${i==v?' selected':''}>${w}</option>`).join('')});
+  ['tk-t','rt-t'].forEach(id=>{const s=document.getElementById(id),v=s.value;s.innerHTML='<option value="">选择货型</option>'+S.types.map((t,i)=>`<option value="${i}"${i==v?' selected':''}>${t.name}</option>`).join('')});
+}
+
+function renderMini(){
+  const el=document.getElementById('stock-mini');
+  if(!S.types.length){el.innerHTML='';return}
+  el.innerHTML='<div class="stock-grid">'+S.types.map((t,i)=>{
+    const left=getLeft(i),pct=Math.max(0,Math.min(100,left/t.stock*100));
+    const p=gp(i);
+    const bc=pct>40?'bar-g':pct>15?'bar-a':'bar-r';
+    const tc=pct>40?'var(--green)':pct>15?'var(--amber)':'var(--red)';
+    return `<div class="sc" style="border-color:${p.bd}">
+      <div class="sc-name" style="color:${p.c}">${t.name}</div>
+      <div class="sc-num" style="color:${tc}">${left}<span class="sc-denom"> / ${t.stock}</span></div>
+      <div class="prog"><div class="prog-bar ${bc}" style="width:${pct.toFixed(1)}%"></div></div>
+      <div class="sc-sub">仓库剩余</div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+function tkHint(){
+  const ti=parseInt(document.getElementById('tk-t').value);
+  const el=document.getElementById('tk-hint');
+  if(isNaN(ti)||!S.types[ti]){el.innerHTML='';return}
+  const left=getLeft(ti),pct=left/S.types[ti].stock*100;
+  const cls=pct>40?'h-ok':pct>15?'h-warn':'h-err';
+  el.innerHTML=`<div class="hint ${cls}">仓库剩余 ${left} 件</div>`;
+}
+
+function doTake(){
+  const wi=parseInt(document.getElementById('tk-w').value);
+  const ti=parseInt(document.getElementById('tk-t').value);
+  const qty=parseInt(document.getElementById('tk-q').value)||0;
+  if(isNaN(wi)){toast('请选择工人',false);return}
+  if(isNaN(ti)){toast('请选择货型',false);return}
+  if(qty<=0){toast('数量必须大于 0',false);return}
+  const left=getLeft(ti);
+  if(qty>left){toast(`仓库仅剩 ${left} 件，无法领取 ${qty} 件`,false);return}
+  S.takes.push({time:fmt(),wi,ti,qty});save();
+  renderTakeList();renderMini();tkHint();
+  toast(`${S.workers[wi]} 领取 ${S.types[ti].name} ${qty} 件`);
+}
+
+function renderTakeList(){
+  const el=document.getElementById('take-list');
+  if(!S.takes.length){el.innerHTML='<div class="empty">暂无领货记录</div>';return}
+  el.innerHTML=[...S.takes].reverse().map((t,ri)=>{
+    const i=S.takes.length-1-ri;
+    const p=gp(t.ti);
+    return `<div class="litem">
+      <span class="badge" style="background:${p.bg};color:${p.c};border-color:${p.bd}">${S.types[t.ti]?.name??'-'}</span>
+      <div class="litem-main">
+        <div class="litem-name">${S.workers[t.wi]??'-'}</div>
+        <div class="litem-sub">${t.time} · ${t.qty} 件</div>
+      </div>
+      <button class="del" onclick="delTake(${i})" aria-label="删除">×</button>
+    </div>`;
+  }).join('');
+}
+function delTake(i){S.takes.splice(i,1);save();renderTakeList();renderMini()}
+
+function rtHint(){
+  const wi=parseInt(document.getElementById('rt-w').value);
+  const ti=parseInt(document.getElementById('rt-t').value);
+  const el=document.getElementById('rt-hint');
+  if(isNaN(wi)||isNaN(ti)){el.innerHTML='';return}
+  const h=getHold(wi,ti);
+  el.innerHTML=`<div class="hint ${h>0?'h-info':'h-err'}">${S.workers[wi]} 手持 ${S.types[ti]?.name??''} ${h} 件</div>`;
+}
+
+function doReturn(){
+  const wi=parseInt(document.getElementById('rt-w').value);
+  const ti=parseInt(document.getElementById('rt-t').value);
+  const qty=parseInt(document.getElementById('rt-q').value)||0;
+  if(isNaN(wi)){toast('请选择工人',false);return}
+  if(isNaN(ti)){toast('请选择货型',false);return}
+  if(qty<=0){toast('数量必须大于 0',false);return}
+  const h=getHold(wi,ti);
+  if(qty>h){toast(`手持仅 ${h} 件，无法交回 ${qty} 件`,false);return}
+  S.returns.push({time:fmt(),wi,ti,qty});save();
+  renderRetList();rtHint();
+  toast(`${S.workers[wi]} 交回 ${S.types[ti].name} ${qty} 件`);
+}
+
+function renderRetList(){
+  const el=document.getElementById('ret-list');
+  if(!S.returns.length){el.innerHTML='<div class="empty">暂无交货记录</div>';return}
+  el.innerHTML=[...S.returns].reverse().map(r=>{
+    const p=gp(r.ti);
+    return `<div class="litem">
+      <span class="badge" style="background:${p.bg};color:${p.c};border-color:${p.bd}">${S.types[r.ti]?.name??'-'}</span>
+      <div class="litem-main">
+        <div class="litem-name">${S.workers[r.wi]??'-'}</div>
+        <div class="litem-sub">${r.time} · ${r.qty} 件</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSalary(){
+  const el=document.getElementById('salary-list');
+  if(!S.workers.length){el.innerHTML='<div class="empty">暂无工人</div>';return}
+  let total=0;
+  el.innerHTML=S.workers.map((w,wi)=>{
+    let wage=0,holdTotal=0;
+    const detail=S.types.map((t,ti)=>{
+      const ret=S.returns.filter(r=>r.wi===wi&&r.ti===ti).reduce((a,r)=>a+r.qty,0);
+      holdTotal+=getHold(wi,ti);wage+=ret*t.rate;
+      return ret>0?`${t.name} ${ret}件`:'';
+    }).filter(Boolean).join(' · ')||'暂无交货';
+    total+=wage;
+    return `<div class="srow">
+      <div>
+        <div style="font-weight:600;font-size:15px">${w}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:3px">${detail}</div>
+        ${holdTotal>0?`<div style="font-size:12px;color:var(--amber);margin-top:2px">手持未交 ${holdTotal} 件</div>`:''}
+      </div>
+      <div class="srow-wage">¥${wage.toFixed(2)}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('salary-total').textContent=`合计应付 ¥${total.toFixed(2)}`;
+}
+
+function renderStock(){
+  let tO=0,tR=0,tW=0;
+  S.types.forEach((t,ti)=>{const o=S.takes.filter(x=>x.ti===ti).reduce((a,x)=>a+x.qty,0),r=S.returns.filter(x=>x.ti===ti).reduce((a,x)=>a+x.qty,0);tO+=o;tR+=r;tW+=r*t.rate});
+  document.getElementById('sv-stats').innerHTML=`
+    <div class="stat"><div class="stat-val">${tO}</div><div class="stat-lbl">总领出件数</div></div>
+    <div class="stat"><div class="stat-val">${tR}</div><div class="stat-lbl">总交回件数</div></div>
+    <div class="stat"><div class="stat-val">${tO-tR}</div><div class="stat-lbl">工人手持</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--green)">¥${tW.toFixed(2)}</div><div class="stat-lbl">已结工资</div></div>`;
+
+  const te=document.getElementById('sv-types');
+  te.innerHTML=S.types.map((t,ti)=>{
+    const out=S.takes.filter(x=>x.ti===ti).reduce((a,x)=>a+x.qty,0);
+    const ret=S.returns.filter(x=>x.ti===ti).reduce((a,x)=>a+x.qty,0);
+    const left=t.stock-out,pct=Math.max(0,Math.min(100,left/t.stock*100));
+    const p=gp(ti);
+    const bc=pct>40?'bar-g':pct>15?'bar-a':'bar-r';
+    const tc=pct>40?'var(--green)':pct>15?'var(--amber)':'var(--red)';
+    return `<div class="stcard">
+      <div class="stcard-row">
+        <span class="badge" style="background:${p.bg};color:${p.c};border-color:${p.bd}">${t.name}</span>
+        <span style="font-size:13px;color:var(--text2)">¥${t.rate}/件</span>
+      </div>
+      <div class="stcard-nums">
+        <div class="stcard-num"><div class="stcard-num-val">${out}</div><div class="stcard-num-lbl">已领出</div></div>
+        <div class="stcard-num"><div class="stcard-num-val">${ret}</div><div class="stcard-num-lbl">已交回</div></div>
+        <div class="stcard-num"><div class="stcard-num-val">${out-ret}</div><div class="stcard-num-lbl">手持中</div></div>
+        <div class="stcard-num"><div class="stcard-num-val" style="color:${tc}">${left}</div><div class="stcard-num-lbl">仓库剩</div></div>
+      </div>
+      <div class="prog"><div class="prog-bar ${bc}" style="width:${pct.toFixed(1)}%"></div></div>
+    </div>`;
+  }).join('')||'<div class="empty">暂无货型</div>';
+
+  const we=document.getElementById('sv-workers');
+  if(!S.workers.length){we.innerHTML='<div class="empty">暂无工人</div>';return}
+  we.innerHTML=S.workers.map((w,wi)=>{
+    let total=0;
+    const detail=S.types.map((t,ti)=>{const h=getHold(wi,ti);total+=h;return h>0?`${t.name} ${h}件`:''}).filter(Boolean).join('、')||'无';
+    return `<div class="srow"><div><div style="font-weight:600">${w}</div><div style="font-size:12px;color:var(--text2);margin-top:3px">${detail}</div></div><div style="font-size:18px;font-weight:600">${total}<span style="font-size:12px;font-weight:400;color:var(--text3)">件</span></div></div>`;
+  }).join('');
+}
+
+function renderTypeList(){
+  const el=document.getElementById('type-list');
+  if(!S.types.length){el.innerHTML='<div class="empty">暂无货型</div>';return}
+  el.innerHTML=S.types.map((t,i)=>{
+    const p=gp(i);
+    return `<div class="trow">
+      <span class="dot" style="background:${p.c}"></span>
+      <span class="trow-name">${t.name}</span>
+      <span class="trow-detail">¥${t.rate}/件 · ${t.stock}件</span>
+      <button class="del" onclick="removeType(${i})" aria-label="删除">×</button>
+    </div>`;
+  }).join('');
+}
+function addType(){
+  const name=document.getElementById('nt-name').value.trim();
+  const rate=parseFloat(document.getElementById('nt-rate').value)||0;
+  const stock=parseInt(document.getElementById('nt-stock').value)||0;
+  if(!name||rate<=0||stock<=0){toast('请填写货型名、单价和库存',false);return}
+  S.types.push({name,rate,stock});save();
+  document.getElementById('nt-name').value='';
+  document.getElementById('nt-rate').value='';
+  document.getElementById('nt-stock').value='';
+  renderTypeList();refreshSels();toast('已添加：'+name);
+}
+function removeType(i){
+  if(S.takes.some(x=>x.ti===i)||S.returns.some(x=>x.ti===i)){toast('已有记录，无法删除',false);return}
+  S.types.splice(i,1);
+  S.takes=S.takes.map(x=>({...x,ti:x.ti>i?x.ti-1:x.ti}));
+  S.returns=S.returns.map(x=>({...x,ti:x.ti>i?x.ti-1:x.ti}));
+  save();renderTypeList();refreshSels();toast('已删除');
+}
+
+function renderWorkerTags(){
+  document.getElementById('worker-tags').innerHTML=S.workers.map((w,i)=>`
+    <span class="pill">${w}<button class="pill-del" onclick="removeWorker(${i})" aria-label="删除">×</button></span>`).join('');
+}
+function addWorker(){
+  const name=document.getElementById('nw-name').value.trim();
+  if(!name){toast('请输入姓名',false);return}
+  if(S.workers.includes(name)){toast('该工人已存在',false);return}
+  S.workers.push(name);save();
+  document.getElementById('nw-name').value='';
+  renderWorkerTags();refreshSels();toast('已添加：'+name);
+}
+function removeWorker(i){
+  if(S.takes.some(x=>x.wi===i)||S.returns.some(x=>x.wi===i)){toast('已有记录，无法删除',false);return}
+  S.workers.splice(i,1);save();renderWorkerTags();refreshSels();
+}
+function clearAll(){
+  if(!confirm('确定清空所有数据？此操作不可恢复。'))return;
+  S={types:[],workers:[],takes:[],returns:[]};save();
+  renderTypeList();renderWorkerTags();refreshSels();renderTakeList();renderRetList();toast('已清空');
+}
+
+function exportXlsx(){
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['时间','工人','货型','数量'],...S.takes.map(t=>[t.time,S.workers[t.wi]??'',S.types[t.ti]?.name??'',t.qty])]),'领货记录');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['时间','工人','货型','数量'],...S.returns.map(r=>[r.time,S.workers[r.wi]??'',S.types[r.ti]?.name??'',r.qty])]),'交货记录');
+  const sh=['工人',...S.types.map(t=>t.name+'已交'),'应得工资','手持未交'];
+  const sr=S.workers.map((w,wi)=>{let wage=0,hold=0;const cols=S.types.map((t,ti)=>{const r=S.returns.filter(x=>x.wi===wi&&x.ti===ti).reduce((a,x)=>a+x.qty,0);hold+=getHold(wi,ti);wage+=r*t.rate;return r});return[w,...cols,+wage.toFixed(2),hold]});
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([sh,...sr]),'工资汇总');
+  const d=new Date(),fn=`台账_${d.getFullYear()}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}.xlsx`;
+  XLSX.writeFile(wb,fn);toast('已导出 '+fn);
+}
+
+load();
+renderTypeList();renderWorkerTags();refreshSels();renderTakeList();renderRetList();renderMini();
+</script>
+</body>
+</html>
