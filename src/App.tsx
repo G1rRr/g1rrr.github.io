@@ -588,7 +588,7 @@ const MeihuaDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         [ Close ]
       </button>
 
-      <div className="relative z-10 flex flex-col items-center gap-4 md:gap-8 max-h-[90vh] overflow-y-auto py-4" onClick={(e) => e.stopPropagation()}>
+      <div className="relative z-10 flex flex-col items-center gap-4 md:gap-8" onClick={(e) => e.stopPropagation()}>
         {/* 梅花 SVG */}
         <svg width="200" height="200" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_60px_rgba(255,0,128,0.4)] w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] md:w-[280px] md:h-[280px] flex-shrink-0">
           <defs>
