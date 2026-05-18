@@ -588,9 +588,9 @@ const MeihuaDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         [ Close ]
       </button>
 
-      <div className="relative z-10 flex flex-col items-center gap-8" onClick={(e) => e.stopPropagation()}>
-        {/* 超大漫画风梅花 SVG */}
-        <svg width="240" height="240" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_60px_rgba(255,0,128,0.4)] w-[200px] h-[200px] md:w-[320px] md:h-[320px]">
+      <div className="relative z-10 flex flex-col items-center gap-4 md:gap-8 max-h-[90vh] overflow-y-auto py-4" onClick={(e) => e.stopPropagation()}>
+        {/* 梅花 SVG */}
+        <svg width="200" height="200" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_60px_rgba(255,0,128,0.4)] w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] md:w-[280px] md:h-[280px] flex-shrink-0">
           <defs>
             <path id="petal" d="M160 45 C148 25 130 18 118 30 C100 48 102 72 118 86 C134 100 148 92 160 80" stroke="#FF0080" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="white" />
           </defs>
