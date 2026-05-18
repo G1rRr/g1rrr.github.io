@@ -17,8 +17,13 @@ const GlobalStyles = () => (
       background-color: var(--c-blue);
       color: var(--c-white);
       font-family: 'Space Grotesk', sans-serif;
-      cursor: none;
       overflow-x: hidden;
+    }
+    @media (pointer: fine) {
+      body { cursor: none; }
+    }
+    @media (pointer: coarse) {
+      body { cursor: auto; }
     }
 
     h1, h2, h3, h4, h5, h6, .font-syne {
@@ -133,6 +138,14 @@ const CustomCursor = () => {
     };
   }, []);
 
+  // 移动端隐藏自定义光标
+  const [isTouch, setIsTouch] = useState(false);
+  useEffect(() => {
+    setIsTouch(window.matchMedia('(pointer: coarse)').matches);
+  }, []);
+
+  if (isTouch) return null;
+
   return (
     <>
       <div
@@ -185,7 +198,7 @@ const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: 
 // --- Hero ---
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-10 px-6">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 pb-8 px-4 md:pt-20 md:pb-10 md:px-6">
       {/* 霓虹粉曲线 */}
       <svg className="absolute left-0 top-[35%] w-full h-64 pointer-events-none opacity-80 z-0 pink-glow" preserveAspectRatio="none" viewBox="0 0 1440 200" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path className="path-drawing" d="M-100 100 C 200 -50, 400 250, 720 100 C 1040 -50, 1200 200, 1600 100" stroke="#FF0080" strokeWidth="6" strokeLinecap="round" />
@@ -196,24 +209,24 @@ const Hero = () => {
       </div>
 
       <div className="relative z-10 max-w-6xl w-full mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-        <div className="md:col-span-8 space-y-6">
+        <div className="md:col-span-8 space-y-4 md:space-y-6">
           <Reveal>
-            <p className="text-[#FF0080] font-mono tracking-[0.3em] text-sm md:text-base uppercase flex items-center gap-2">
+            <p className="text-[#FF0080] font-mono tracking-[0.2em] md:tracking-[0.3em] text-xs md:text-base uppercase flex items-center gap-2">
               <span className="inline-flex w-3 h-3 rounded-full bg-[#FF0080] breathe-dot mr-2 align-middle" /> PORTFOLIO 2026
             </p>
           </Reveal>
           <Reveal delay={150}>
-            <h1 className="text-7xl md:text-9xl lg:text-[11rem] leading-[0.85] font-extrabold font-syne text-white mix-blend-difference">
+            <h1 className="text-5xl md:text-8xl lg:text-[11rem] leading-[0.9] md:leading-[0.85] font-extrabold font-syne text-white mix-blend-difference">
               G<span className="text-[#FF0080]">1</span>rRr
             </h1>
           </Reveal>
           <Reveal delay={300}>
-            <div className="flex gap-6 pt-6">
-              <a href="#projects" className="bg-white text-[#0000FF] px-8 py-4 font-bold font-syne uppercase tracking-wider border-2 border-transparent hover:border-white hover:bg-transparent hover:text-white transition-all duration-300 inline-block">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-6 pt-4 md:pt-6">
+              <a href="#projects" className="bg-white text-[#0000FF] px-6 md:px-8 py-3 md:py-4 text-sm md:text-base font-bold font-syne uppercase tracking-wider border-2 border-transparent hover:border-white hover:bg-transparent hover:text-white transition-all duration-300 inline-block text-center">
                 探索项目
               </a>
-              <a href="https://github.com/G1rRr" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-8 py-4 font-bold uppercase tracking-wider text-white border-2 border-[#FF0080] hover:bg-[#FF0080] transition-all duration-300 group">
-                GitHub <ArrowUpRight className="group-hover:rotate-45 transition-transform duration-300"/>
+              <a href="https://github.com/G1rRr" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-6 md:px-8 py-3 md:py-4 text-sm md:text-base font-bold uppercase tracking-wider text-white border-2 border-[#FF0080] hover:bg-[#FF0080] transition-all duration-300 group">
+                GitHub <ArrowUpRight className="group-hover:rotate-45 transition-transform duration-300 w-4 h-4"/>
               </a>
             </div>
           </Reveal>
@@ -237,8 +250,8 @@ const Hero = () => {
 const Marquee = () => {
   const text = " G1rRr ✦ MeihuaBOT ✦ JanusBOT ✦ AI Startup Survival ✦ Workshop Manager ✦ AI Product Cognition System ✦ ";
   return (
-    <div className="w-full bg-[#FF0080] text-white py-5 border-y border-white/20 overflow-hidden relative flex z-10">
-      <div className="animate-marquee font-syne font-bold text-xl md:text-3xl tracking-widest uppercase">
+    <div className="w-full bg-[#FF0080] text-white py-3 md:py-5 border-y border-white/20 overflow-hidden relative flex z-10">
+      <div className="animate-marquee font-syne font-bold text-lg md:text-3xl tracking-wide md:tracking-widest uppercase">
         {text}{text}{text}
       </div>
     </div>
@@ -256,18 +269,18 @@ const About = ({ onOpenJanus, onOpenCognition, onOpenMeihua }: { onOpenJanus: ()
   };
 
   return (
-    <section id="projects" className="relative bg-white text-black py-32 px-6 overflow-hidden">
+    <section id="projects" className="relative bg-white text-black py-20 md:py-32 px-4 md:px-6 overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.04]">
         <span className="text-[18vw] font-syne font-black text-[#0000FF] leading-none">G1rRr</span>
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-center">
           {/* 左：大名字 */}
           <Reveal>
             <div>
-              <p className="font-mono text-[#FF0080] uppercase tracking-[0.3em] text-sm mb-6">// Identity</p>
-              <h2 className="text-7xl md:text-8xl lg:text-[9rem] font-syne font-black text-[#0000FF] leading-[0.9]">
+              <p className="font-mono text-[#FF0080] uppercase tracking-[0.3em] text-xs md:text-sm mb-4 md:mb-6">// Identity</p>
+              <h2 className="text-5xl md:text-8xl lg:text-[9rem] font-syne font-black text-[#0000FF] leading-[0.9]">
                 G1rRr
               </h2>
             </div>
@@ -289,7 +302,7 @@ const About = ({ onOpenJanus, onOpenCognition, onOpenMeihua }: { onOpenJanus: ()
                 const itemContent = (
                   <>
                     <span className="font-mono text-[#FF0080] text-sm">0{i + 1}</span>
-                    <span className="font-syne font-bold text-2xl md:text-3xl uppercase group-hover:text-[#FF0080] transition-colors">{name}</span>
+                    <span className="font-syne font-bold text-lg md:text-3xl uppercase group-hover:text-[#FF0080] transition-colors">{name}</span>
                     {isClickable && <ArrowUpRight className="w-5 h-5 ml-auto text-[#FF0080] opacity-0 group-hover:opacity-100 transition-opacity" />}
                   </>
                 );
@@ -327,7 +340,7 @@ const About = ({ onOpenJanus, onOpenCognition, onOpenMeihua }: { onOpenJanus: ()
 // --- Footer：G1rRr 收束 ---
 const Footer = () => {
   return (
-    <footer className="bg-[#0000FF] border-t border-white/10 text-white pt-24 pb-12 px-6 relative overflow-hidden">
+    <footer className="bg-[#0000FF] border-t border-white/10 text-white pt-16 md:pt-24 pb-8 md:pb-12 px-4 md:px-6 relative overflow-hidden">
       {/* 背景 G1rRr 字纹 */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.04]">
         <span className="text-[15vw] font-syne font-black text-white leading-none">G1rRr</span>
@@ -340,7 +353,7 @@ const Footer = () => {
           <p className="font-mono text-[#FF0080] uppercase tracking-[0.3em] mb-4">// End Transmission</p>
         </Reveal>
         <Reveal delay={100}>
-          <span className="text-5xl md:text-8xl font-syne font-black tracking-tighter hover:text-[#FF0080] transition-colors duration-500">
+          <span className="text-3xl md:text-8xl font-syne font-black tracking-tighter hover:text-[#FF0080] transition-colors duration-500">
             G1rRr
           </span>
         </Reveal>
@@ -577,7 +590,7 @@ const MeihuaDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       <div className="relative z-10 flex flex-col items-center gap-8" onClick={(e) => e.stopPropagation()}>
         {/* 超大漫画风梅花 SVG */}
-        <svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_60px_rgba(255,0,128,0.4)]">
+        <svg width="240" height="240" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_60px_rgba(255,0,128,0.4)] w-[200px] h-[200px] md:w-[320px] md:h-[320px]">
           <defs>
             <path id="petal" d="M160 45 C148 25 130 18 118 30 C100 48 102 72 118 86 C134 100 148 92 160 80" stroke="#FF0080" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="white" />
           </defs>
@@ -611,7 +624,7 @@ const MeihuaDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           ))}
         </svg>
 
-        <h2 className="text-6xl md:text-8xl font-syne font-black text-white tracking-tight">
+        <h2 className="text-4xl md:text-8xl font-syne font-black text-white tracking-tight">
           MeihuaBOT
         </h2>
 
@@ -620,14 +633,14 @@ const MeihuaDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           href="https://www.coze.cn/s/SNzo0AZVc6o/"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 px-8 py-3 border-2 border-white text-white font-syne font-bold uppercase tracking-wider hover:bg-[#FF0080] hover:border-[#FF0080] transition-all duration-300"
+          className="mt-4 px-6 md:px-8 py-3 border-2 border-white text-white font-syne font-bold text-sm md:text-base uppercase tracking-wider hover:bg-[#FF0080] hover:border-[#FF0080] transition-all duration-300 text-center"
         >
           立即体验 <ArrowUpRight className="inline w-4 h-4 ml-1" />
         </a>
         <p className="font-mono text-white/50 text-xs tracking-[0.2em] mt-2">微信公众号：MeihuaBOT</p>
 
-        <div className="mt-12 pt-8 border-t border-white/10 w-full text-center">
-          <span className="text-4xl md:text-5xl font-syne font-black text-white/30 hover:text-[#FF0080] transition-colors duration-500">G<span className="text-[#FF0080]">1</span>rRr</span>
+        <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-white/10 w-full text-center">
+          <span className="text-2xl md:text-5xl font-syne font-black text-white/30 hover:text-[#FF0080] transition-colors duration-500">G<span className="text-[#FF0080]">1</span>rRr</span>
         </div>
       </div>
     </div>
