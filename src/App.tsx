@@ -588,9 +588,9 @@ const MeihuaDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         [ Close ]
       </button>
 
-      <div className="relative z-10 flex flex-col items-center gap-4 md:gap-8" onClick={(e) => e.stopPropagation()}>
+      <div className="relative z-10 flex flex-col items-center gap-3 md:gap-5" onClick={(e) => e.stopPropagation()}>
         {/* 梅花 SVG */}
-        <svg width="200" height="200" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_60px_rgba(255,0,128,0.4)] w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] md:w-[280px] md:h-[280px] flex-shrink-0">
+        <svg width="180" height="180" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_60px_rgba(255,0,128,0.4)] w-[130px] h-[130px] sm:w-[160px] sm:h-[160px] md:w-[220px] md:h-[220px] flex-shrink-0">
           <defs>
             <path id="petal" d="M160 45 C148 25 130 18 118 30 C100 48 102 72 118 86 C134 100 148 92 160 80" stroke="#FF0080" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="white" />
           </defs>
@@ -624,23 +624,23 @@ const MeihuaDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           ))}
         </svg>
 
-        <h2 className="text-4xl md:text-8xl font-syne font-black text-white tracking-tight">
+        <h2 className="text-2xl md:text-7xl font-syne font-black text-white tracking-tight flex-shrink-0">
           MeihuaBOT
         </h2>
 
-        <p className="font-mono text-[#FF0080] text-sm uppercase tracking-[0.3em]">AI 决策助手</p>
+        <p className="font-mono text-[#FF0080] text-xs md:text-sm uppercase tracking-[0.3em]">AI 决策助手</p>
         <a
           href="https://www.coze.cn/s/SNzo0AZVc6o/"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 px-6 md:px-8 py-3 border-2 border-white text-white font-syne font-bold text-sm md:text-base uppercase tracking-wider hover:bg-[#FF0080] hover:border-[#FF0080] transition-all duration-300 text-center"
+          className="px-5 md:px-8 py-2.5 md:py-3 border-2 border-white text-white font-syne font-bold text-sm uppercase tracking-wider hover:bg-[#FF0080] hover:border-[#FF0080] transition-all duration-300 text-center"
         >
           立即体验 <ArrowUpRight className="inline w-4 h-4 ml-1" />
         </a>
-        <p className="font-mono text-white/50 text-xs tracking-[0.2em] mt-2">微信公众号：MeihuaBOT</p>
+        <p className="font-mono text-white/50 text-[10px] md:text-xs tracking-[0.2em]">微信公众号：MeihuaBOT</p>
 
-        <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-white/10 w-full text-center">
-          <span className="text-2xl md:text-5xl font-syne font-black text-white/30 hover:text-[#FF0080] transition-colors duration-500">G<span className="text-[#FF0080]">1</span>rRr</span>
+        <div className="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-white/10 w-full text-center">
+          <span className="text-xl md:text-4xl font-syne font-black text-white/30 hover:text-[#FF0080] transition-colors duration-500">G<span className="text-[#FF0080]">1</span>rRr</span>
         </div>
       </div>
     </div>
