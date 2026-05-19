@@ -365,7 +365,9 @@ const CrabWalker = () => {
       PX = getPX(window.innerWidth);
       const barW = canvas.parentElement?.clientWidth ?? window.innerWidth;
       const GW = Math.ceil(barW / PX);
-      const GH = 22;
+      const isMobile = window.innerWidth < 600;
+      const GH = isMobile ? 18 : 22;
+      const SKY_H = isMobile ? 9 : 12;
       canvas.width = barW;
       canvas.height = GH * PX;
 
@@ -373,7 +375,6 @@ const CrabWalker = () => {
       ctx.clearRect(0, 0, barW, GH * PX);
 
       // ═══════ 天空 ═══════
-      const SKY_H = 12;
       for (let y = 0; y < SKY_H; y++) {
         const ratio = y / SKY_H;
         const r = Math.round(ratio * 255);
@@ -401,16 +402,18 @@ const CrabWalker = () => {
         p(cx + dx, cy, WHITE, 0.5); p(cx + 1 + dx, cy, WHITE, 0.5); p(cx + 2 + dx, cy, WHITE, 0.5);
         p(cx - 1 + dx, cy - 1, WHITE, 0.3); p(cx + 3 + dx, cy - 1, WHITE, 0.3);
       };
-      drawCloud(6, 3, 0);
-      drawCloud(GW - 20, 5, 2);
-      drawCloud(Math.floor(GW * 0.5), 1, 4);
+      if (!isMobile) {
+        drawCloud(6, 3, 0);
+        drawCloud(GW - 20, 5, 2);
+        drawCloud(Math.floor(GW * 0.5), 1, 4);
+      }
 
       // ═══════ 海洋 ═══════
       const SEA_L = Math.floor(GW * 0.65), SEA_T = SKY_H;
       for (let y = SEA_T; y < GH - 3; y++)
         for (let x = SEA_L; x < GW; x++)
           p(x, y, `rgb(${(y - SEA_T) * 15},${(y - SEA_T) * 15},${180 + (y - SEA_T) * 15})`);
-      for (let wave = 0; wave < 3; wave++) {
+      for (let wave = 0; wave < (isMobile ? 2 : 3); wave++) {
         const wy = SEA_T + 1 + wave * 3 + Math.round(Math.sin(t * 0.04 + wave) * 1);
         for (let x = SEA_L; x < GW; x++)
           if ((x + Math.round(Math.sin(x * 0.3 + t * 0.03))) % 6 < 2) p(x, wy, WHITE, 0.5);
@@ -645,7 +648,7 @@ const About = ({ onOpenJanus, onOpenCognition, onOpenMeihua }: { onOpenJanus: ()
           <Reveal>
             <div>
               <p className="font-mono text-[#FF0080] uppercase tracking-[0.3em] text-xs md:text-sm mb-4 md:mb-6">// Identity</p>
-              <h2 className="text-5xl md:text-8xl lg:text-[9rem] font-syne font-black text-[#0000FF] leading-[0.9]">
+              <h2 className="text-5xl md:text-8xl lg:text-[9rem] font-syne font-black text-[#0000FF] hover:text-[#FF0080] transition-colors duration-500 leading-[0.9]">
                 G1rRr
               </h2>
             </div>
