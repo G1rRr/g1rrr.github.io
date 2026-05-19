@@ -246,14 +246,363 @@ const Hero = () => {
   );
 };
 
-// --- 跑马灯 ---
-const Marquee = () => {
-  const text = " G1rRr ✦ MeihuaBOT ✦ JanusBOT ✦ AI Startup Survival ✦ Workshop Manager ✦ AI Product Cognition System ✦ ";
+// --- 粗野主义沙滩：三只螃蟹 ---
+const CrabWalker = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const BODY = [
+    [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+    [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+    [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+    [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+    [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+    [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+    [0,0,0,1,0,1,0,0,1,0,1,0,0,0],
+    [0,0,0,1,0,1,0,0,1,0,1,0,0,0],
+  ];
+  const BODY_H = 8, BODY_W = 14;
+  const EYE_L = { x: 4, y: 1 }, EYE_R = { x: 9, y: 1 };
+  const CRAB = '#CD6E58';
+  const BLACK = '#000';
+  const PX = 10;
+  const BLUE = '#0000FF';
+  const PINK = '#FF0080';
+  const WHITE = '#FFFFFF';
+
+  type Eyes = 'forward' | 'right' | 'left' | 'blink' | 'down';
+
+  const HEART = [[1,0,1],[1,1,1],[0,1,0]];
+  const STAR = [[0,1,0],[1,1,1],[0,1,0]];
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    let raf: number;
+    let tick = 0;
+    let mx = -100, my = -100;
+    let anim: { crab: number; start: number } | null = null;
+    const ANIM_LENS = [0, 35, 35, 20, 55]; // 螃蟹1-4的动画帧数
+    // 存储螃蟹实时位置
+    const crabPos = { c1x: 0, c1y: 0, c2x: 0, c2y: 0, c3x: 0, c3y: 0, c4x: 0, c4y: 0 };
+
+    const onMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mx = (e.clientX - rect.left) / PX;
+      my = (e.clientY - rect.top) / PX;
+    };
+    const onLeave = () => { mx = -100; my = -100; };
+    const onClick = (e: MouseEvent) => {
+      if (anim) return;
+      const rect = canvas.getBoundingClientRect();
+      const cx = (e.clientX - rect.left) / PX;
+      const cy = (e.clientY - rect.top) / PX;
+      const near = (bx: number, by: number) => Math.abs(cx - (bx + 7)) < 9 && Math.abs(cy - (by + 4)) < 7;
+      if (near(crabPos.c1x, crabPos.c1y)) anim = { crab: 1, start: tick };
+      else if (near(crabPos.c4x, crabPos.c4y)) anim = { crab: 4, start: tick };
+      else if (near(crabPos.c2x, crabPos.c2y)) anim = { crab: 2, start: tick };
+      else if (near(crabPos.c3x, crabPos.c3y)) anim = { crab: 3, start: tick };
+    };
+    canvas.addEventListener('mousemove', onMove);
+    canvas.addEventListener('mouseleave', onLeave);
+    canvas.addEventListener('click', onClick);
+
+    const p = (gx: number, gy: number, c: string, a?: number) => {
+      if (a !== undefined) ctx.globalAlpha = a;
+      ctx.fillStyle = c;
+      ctx.fillRect(gx * PX, gy * PX, PX, PX);
+      if (a !== undefined) ctx.globalAlpha = 1;
+    };
+
+    const drawClawd = (ox: number, oy: number, eyes: Eyes) => {
+      for (let r = 0; r < BODY_H; r++)
+        for (let c = 0; c < BODY_W; c++)
+          if (BODY[r][c]) p(ox + c, oy + r, CRAB);
+      if (eyes !== 'blink') {
+        const dx = eyes === 'right' ? 1 : eyes === 'left' ? -1 : 0;
+        const dy = eyes === 'down' ? 1 : 0;
+        p(ox + EYE_L.x + dx, oy + EYE_L.y + dy, BLACK);
+        p(ox + EYE_R.x + dx, oy + EYE_R.y + dy, BLACK);
+      }
+    };
+
+    // 挥钳子（在身体旁加像素）
+    const drawWave = (ox: number, oy: number, side: 'left' | 'right') => {
+      if (side === 'right') { p(ox + 13, oy + 1, CRAB); p(ox + 14, oy, CRAB); }
+      else { p(ox, oy + 1, CRAB); p(ox - 1, oy, CRAB); }
+    };
+
+    const drawBlush = (ox: number, oy: number, a: number) => {
+      p(ox + 3, oy + 2, PINK, a * 0.5);
+      p(ox + 10, oy + 2, PINK, a * 0.5);
+    };
+
+    const drawHeart = (hx: number, hy: number, a: number) => {
+      for (let r = 0; r < 3; r++)
+        for (let c = 0; c < 3; c++)
+          if (HEART[r][c]) p(hx + c, hy + r, PINK, a);
+    };
+
+    const drawStar = (sx: number, sy: number, a: number) => {
+      for (let r = 0; r < 3; r++)
+        for (let c = 0; c < 3; c++)
+          if (STAR[r][c]) p(sx + c, sy + r, PINK, a);
+    };
+
+    const render = () => {
+      const barW = canvas.parentElement?.clientWidth ?? window.innerWidth;
+      const GW = Math.ceil(barW / PX);
+      const GH = 24;
+      canvas.width = barW;
+      canvas.height = GH * PX;
+
+      const t = tick;
+      ctx.clearRect(0, 0, barW, GH * PX);
+
+      // ═══════ 天空 ═══════
+      const SKY_H = 12;
+      for (let y = 0; y < SKY_H; y++) {
+        const ratio = y / SKY_H;
+        const r = Math.round(ratio * 255);
+        const g = Math.round(ratio * 255);
+        const b = 255;
+        for (let x = 0; x < GW; x++) p(x, y, `rgb(${r},${g},${b})`);
+      }
+
+      // ═══════ 太阳 + 呼吸 ═══════
+      const sunX = GW - 10, sunY = 2;
+      for (let r = 0; r < 5; r++)
+        for (let c = 0; c < 5; c++)
+          if (!(r === 0 && c === 0) && !(r === 0 && c === 4) && !(r === 4 && c === 0) && !(r === 4 && c === 4))
+            p(sunX + c, sunY + r, PINK);
+      // 光晕粒子
+      for (let i = 0; i < 3; i++) {
+        const pr = sunX + 2 + Math.round(Math.cos(t * 0.08 + i * 2) * 3);
+        const pc = sunY + 2 + Math.round(Math.sin(t * 0.08 + i * 2) * 3);
+        p(pr, pc, PINK, 0.35);
+      }
+
+      // ═══════ 几何云朵（缓慢飘动） ═══════
+      const drawCloud = (cx: number, cy: number, drift: number) => {
+        const dx = Math.round(Math.sin(t * 0.02 + drift) * 2);
+        p(cx + dx, cy, WHITE, 0.5); p(cx + 1 + dx, cy, WHITE, 0.5); p(cx + 2 + dx, cy, WHITE, 0.5);
+        p(cx - 1 + dx, cy - 1, WHITE, 0.3); p(cx + 3 + dx, cy - 1, WHITE, 0.3);
+      };
+      drawCloud(6, 3, 0);
+      drawCloud(GW - 20, 5, 2);
+      drawCloud(Math.floor(GW * 0.5), 1, 4);
+
+      // ═══════ 海洋 ═══════
+      const SEA_L = Math.floor(GW * 0.65), SEA_T = SKY_H;
+      for (let y = SEA_T; y < GH - 3; y++)
+        for (let x = SEA_L; x < GW; x++)
+          p(x, y, `rgb(${(y - SEA_T) * 15},${(y - SEA_T) * 15},${180 + (y - SEA_T) * 15})`);
+      for (let wave = 0; wave < 3; wave++) {
+        const wy = SEA_T + 1 + wave * 3 + Math.round(Math.sin(t * 0.04 + wave) * 1);
+        for (let x = SEA_L; x < GW; x++)
+          if ((x + Math.round(Math.sin(x * 0.3 + t * 0.03))) % 6 < 2) p(x, wy, WHITE, 0.5);
+      }
+
+      // ═══════ 沙滩 ═══════
+      const SAND_T = SKY_H + 3;
+      for (let y = SAND_T; y < GH; y++) p(0, y, WHITE);
+      for (let y = SAND_T; y < GH; y++)
+        for (let x = 0; x < SEA_L; x++) {
+          if (y === SAND_T) p(x, y, BLACK);
+          else if (y === SAND_T + 1) p(x, y, BLUE, 0.3);
+          else if ((x + y) % 8 === 0) p(x, y, BLUE, 0.08);
+        }
+
+      // ═══════ 椰子树 ═══════
+      const TX = 5, TY = SAND_T - 7;
+      for (let r = 0; r < 8; r++)
+        for (let c = 0; c < 3; c++)
+          p(TX + c, TY + r, (c === 0 || c === 2 || r === 7) ? BLACK : BLUE, (c === 0 || c === 2 || r === 7) ? 1 : 0.4);
+      const crown = [
+        [0,0,0,0,0,0,1,1,0,0,0,0,0,0],
+        [0,0,0,0,1,1,1,1,1,1,0,0,0,0],
+        [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+        [0,0,1,1,1,1,1,1,1,1,1,1,0,0],
+        [0,0,1,1,1,0,0,0,0,0,1,1,0,0],
+      ];
+      for (let r = 0; r < crown.length; r++)
+        for (let c = 0; c < 14; c++)
+          if (crown[r][c]) p(TX - 5 + c, TY - 5 + r, r < 2 ? PINK : BLUE);
+      p(TX, TY - 2, BLACK); p(TX + 1, TY - 2, BLACK);
+
+      // ═══════ 螃蟹 1：马里奥跳 (1/4) ═══════
+      const c1BaseX = TX + 4, c1BaseY = SAND_T - 7;
+      crabPos.c1x = c1BaseX; crabPos.c1y = c1BaseY;
+      const c1Look: Eyes = mx > c1BaseX + 7 ? 'right' : mx < c1BaseX ? 'left' : mx < 0 ? 'down' : 'forward';
+      const c1x = c1BaseX + (mx > 0 && Math.abs(mx - c1BaseX) < 15 ? Math.round((mx - c1BaseX) * 0.15) : 0);
+      let c1y = c1BaseY + Math.round(Math.sin(t * 0.05) * 0.3);
+      // 点击动画：马里奥跳
+      if (anim && anim.crab === 1) {
+        const ap = (t - anim.start) / ANIM_LENS[anim.crab]; // 0..1
+        if (ap < 1) {
+          const jumpH = Math.round(Math.sin(ap * Math.PI) * 8); // 抛物线跳跃
+          c1y = c1BaseY - jumpH;
+          if (ap < 0.3) drawStar(c1x + 3, c1y - 2, 1); // 起跳星星
+        }
+        if (ap >= 1) anim = null;
+      }
+      drawClawd(c1x, c1y, (anim && anim.crab === 1) ? 'forward' : t % 45 < 3 ? 'blink' : t % 90 < 60 ? c1Look : 'forward');
+      if (mx > 0 && Math.abs(mx - c1BaseX) < 10 && Math.abs(my - c1BaseY) < 8)
+        drawWave(c1x, c1y, t % 20 < 10 ? 'right' : 'left');
+
+      // ═══════ 螃蟹 4：打游戏 ═══════
+      const c4x = Math.floor(GW * 0.26), c4y = SAND_T - 7;
+      crabPos.c4x = c4x; crabPos.c4y = c4y;
+      const c4Bounce = Math.round(Math.sin(t * 0.04) * 0.4);
+      const c4MouseNear = mx > 0 && Math.abs(mx - (c4x + 7)) < 10 && Math.abs(my - (c4y + 4)) < 10;
+      const c4LookMouse = c4MouseNear && mx > c4x + 7 ? 'right' : c4MouseNear ? 'left' : 'forward';
+      const c4Look: Eyes = c4MouseNear && t % 25 < 2 ? 'blink' : c4LookMouse;
+      // 点击动画：吸入游戏机
+      let c4Sucked = false;
+      if (anim && anim.crab === 4) {
+        const ap = (t - anim.start) / ANIM_LENS[anim.crab];
+        if (ap < 1) {
+          if (ap < 0.5) {
+            // 吸入阶段：螃蟹缩小并向屏幕移动
+            const suckT = ap * 2; // 0..1
+            const sx = c4x + Math.round(suckT * 16); // 移向屏幕
+            const sy = c4y + Math.round(suckT * 4);
+            const scale = 1 - suckT; // 缩小
+            if (scale > 0) {
+              ctx.globalAlpha = scale;
+              drawClawd(sx, sy + c4Bounce, 'forward');
+              ctx.globalAlpha = 1;
+            }
+            c4Sucked = true;
+          } else {
+            // 弹出阶段：从屏幕中弹出来
+            const popT = (ap - 0.5) * 2;
+            const px = c4x + 16 - Math.round(popT * 16);
+            const py = c4y + 4 - Math.round(popT * 4);
+            const pscale = popT;
+            ctx.globalAlpha = pscale;
+            drawClawd(px, py + c4Bounce, 'forward');
+            ctx.globalAlpha = 1;
+            if (popT > 0.8) drawStar(c4x + 10, c4y - 2, 0.7);
+          }
+        }
+        if (ap >= 1) anim = null;
+      }
+      // 游戏机
+      const gc = { x: c4x + 14, y: c4y + 3 };
+      p(gc.x, gc.y, BLACK); p(gc.x + 1, gc.y, BLACK); p(gc.x + 2, gc.y, BLACK); p(gc.x + 3, gc.y, BLACK);
+      p(gc.x, gc.y + 1, BLACK); p(gc.x + 3, gc.y + 1, BLACK);
+      p(gc.x, gc.y + 2, BLACK); p(gc.x + 1, gc.y + 2, BLACK); p(gc.x + 2, gc.y + 2, BLACK); p(gc.x + 3, gc.y + 2, BLACK);
+      const screenFlash = (anim && anim.crab === 4) ? '#FF0080' : c4MouseNear ? (t % 8 < 2 ? '#FF8888' : '#88FF88') : (t % 40 < 6 ? '#88FF88' : '#88CCFF');
+      p(gc.x + 1, gc.y + 1, screenFlash); p(gc.x + 2, gc.y + 1, screenFlash);
+      const btnRate = c4MouseNear ? 6 : 18;
+      if (t % btnRate < 4) { p(gc.x + 3, gc.y + 2, PINK); }
+      if (t % (btnRate * 0.7) < 3) { p(gc.x + 3, gc.y - 1, BLUE); p(gc.x + 2, gc.y - 1, BLUE); }
+      // 正常显示（非吸入动画时）
+      if (!c4Sucked) {
+        drawClawd(c4x, c4y + c4Bounce, c4Look);
+        if (c4MouseNear && Math.abs(mx - (c4x + 7)) < 5)
+          drawWave(c4x, c4y + c4Bounce, t % 16 < 8 ? 'right' : 'left');
+        const winPhase = t % 120;
+        if (winPhase > 100) {
+          const jumpH = Math.round(Math.sin((winPhase - 100) * 0.12) * 2);
+          drawClawd(c4x, c4y + c4Bounce - jumpH, 'forward');
+          if (winPhase > 105 && winPhase < 115) drawStar(c4x + 12, c4y - 3, 0.5);
+        }
+      }
+
+      // ═══════ 螃蟹 3：海里 ═══════
+      const c3BaseX = Math.floor(GW * 0.75), c3BaseY = SEA_T + 3;
+      crabPos.c3x = c3BaseX + Math.round(Math.sin(t * 0.03) * 4); crabPos.c3y = c3BaseY;
+      const c3ChaseX = mx > 0 && mx > SEA_L ? Math.round((mx - c3BaseX) * 0.08) : 0;
+      const c3ChaseY = mx > 0 && mx > SEA_L ? Math.round((my - c3BaseY) * 0.06) : 0;
+      const c3x = c3BaseX + c3ChaseX + Math.round(Math.sin(t * 0.03) * 4);
+      let c3y = c3BaseY + c3ChaseY + Math.round(Math.sin(t * 0.05) * 1);
+      const c3NearMouse = mx > 0 && Math.abs(mx - c3x) < 8 && Math.abs(my - c3y) < 6;
+      // 点击动画：跳出水面
+      let c3Jumping = false;
+      if (anim && anim.crab === 3) {
+        const ap = (t - anim.start) / ANIM_LENS[anim.crab];
+        if (ap < 1) {
+          c3Jumping = true;
+          const jumpH = Math.round(Math.sin(ap * Math.PI) * 12);
+          c3y = c3BaseY - jumpH;
+          // 水花
+          for (let i = 0; i < 8; i++)
+            p(c3x + Math.round(Math.random() * 14), c3BaseY - 1 + Math.round(Math.random() * 2), WHITE, 0.8);
+          if (ap > 0.3 && ap < 0.7) drawStar(c3x + 5, c3y - 2, 0.7);
+        }
+        if (ap >= 1) anim = null;
+      }
+      if (!c3Jumping) {
+        drawClawd(c3x, c3y, t % 30 < 3 ? 'blink' : c3NearMouse ? 'right' : 'forward');
+        if (c3NearMouse)
+          for (let i = 0; i < 4; i++)
+            p(c3x + Math.round(Math.random() * 14), c3y - 1 - Math.round(Math.random() * 2), WHITE, 0.6);
+      } else {
+        drawClawd(c3x, c3y, 'forward');
+      }
+      if (t % 10 < 3 && !c3Jumping) { p(c3x - 1, c3y - 1, WHITE, 0.7); p(c3x + 14, c3y - 1, WHITE, 0.7); }
+
+      // ═══════ 螃蟹 2：害羞 ═══════
+      const c2BaseX = Math.floor(GW * 0.50), c2BaseY = SAND_T - 6;
+      crabPos.c2x = c2BaseX; crabPos.c2y = c2BaseY;
+      const mouseNear = mx > 0 && Math.abs(mx - (c2BaseX + 7)) < 12 && Math.abs(my - (c2BaseY + 4)) < 10;
+      const c2Dodge = mouseNear ? Math.round((c2BaseX - mx) * 0.3) : 0;
+      const c2x = c2BaseX + c2Dodge;
+      const c2y = c2BaseY + Math.round(Math.sin(t * 0.07) * 0.4);
+      const blushAlpha = mouseNear ? 0.7 + Math.sin(t * 0.15) * 0.2 : 0.4 + Math.sin(t * 0.09) * 0.15;
+      drawClawd(c2x, c2y, mouseNear ? 'right' : 'down');
+      drawBlush(c2x, c2y, blushAlpha);
+      // 点击动画：爱心爆炸
+      let c2HeartBurst = false;
+      if (anim && anim.crab === 2) {
+        const ap = (t - anim.start) / ANIM_LENS[anim.crab];
+        if (ap < 1) {
+          c2HeartBurst = true;
+          // 周围一圈爱心
+          for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2 + ap * 2;
+            const dist = 4 + ap * 8;
+            const hx = c2x + 7 + Math.round(Math.cos(angle) * dist);
+            const hy = c2y + 2 + Math.round(Math.sin(angle) * dist);
+            const ha = ap < 0.2 ? ap / 0.2 : ap > 0.7 ? (1 - ap) / 0.3 : 1;
+            drawHeart(hx, hy, ha * 0.7);
+          }
+          // 还冒汗滴
+          p(c2x + 13, c2y, PINK, 0.6);
+          p(c2x + 13, c2y + 1, PINK, 0.4);
+        }
+        if (ap >= 1) anim = null;
+      }
+      // 正常爱心
+      if (!c2HeartBurst) {
+        const heartInterval = mouseNear ? 28 : 55;
+        const hp2 = t % heartInterval;
+        if (hp2 < heartInterval - 7 && hp2 > 5) {
+          const hx = c2x + 11 + Math.round(hp2 * 0.06);
+          const hy = c2y - 3 - Math.round(hp2 * 0.12);
+          const ha = hp2 < 8 ? hp2 / 8 : hp2 > heartInterval - 15 ? (heartInterval - 7 - hp2) / 8 : 0.8;
+          drawHeart(hx, hy, ha);
+        }
+      }
+
+      tick++;
+      raf = requestAnimationFrame(render);
+    };
+
+    raf = requestAnimationFrame(render);
+    return () => {
+      cancelAnimationFrame(raf);
+      canvas.removeEventListener('mousemove', onMove);
+      canvas.removeEventListener('mouseleave', onLeave);
+      canvas.removeEventListener('click', onClick);
+    };
+  }, []);
+
   return (
-    <div className="w-full bg-[#FF0080] text-white py-3 md:py-5 border-y border-white/20 overflow-hidden relative flex z-10">
-      <div className="animate-marquee font-syne font-bold text-lg md:text-3xl tracking-wide md:tracking-widest uppercase">
-        {text}{text}{text}
-      </div>
+    <div className="w-full bg-[#0000FF] overflow-hidden relative flex z-10">
+      <canvas ref={canvasRef} className="block w-full cursor-none" style={{ imageRendering: 'pixelated' }} />
     </div>
   );
 };
@@ -661,7 +1010,7 @@ export default function App() {
       {showMeihua && <MeihuaDialog onClose={() => setShowMeihua(false)} />}
       <div className="drop-in" style={{ animationDelay: '0s' }}><Hero /></div>
       <div className="drop-in" style={{ animationDelay: '0.12s' }}><About onOpenJanus={() => setShowJanus(true)} onOpenCognition={() => setShowCognition(true)} onOpenMeihua={() => setShowMeihua(true)} /></div>
-      <div className="drop-in" style={{ animationDelay: '0.22s' }}><Marquee /></div>
+      <div className="drop-in" style={{ animationDelay: '0.22s' }}><CrabWalker /></div>
       <div className="drop-in" style={{ animationDelay: '0.32s' }}><Footer /></div>
     </div>
   );
