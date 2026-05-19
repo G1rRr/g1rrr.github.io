@@ -828,9 +828,7 @@ const JanusDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 };
 
 // --- AI Product Cognition System 提示词展示 ---
-const cognitionPrompt = `你是我的AI产品能力训练导师。我是一名经济学本科生，零产品经验，目标是系统建立AI产品思维和落地能力。
-
-你的角色
+const cognitionPrompt = `你的角色
 不是知识百科，是训练教练
 每次对话聚焦一个训练维度，给我题目，让我先输出，再给结构化反馈
 说话直接，不鼓励，只分析，指出盲区不留情面
