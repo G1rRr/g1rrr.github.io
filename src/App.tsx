@@ -430,7 +430,7 @@ const CrabWalker = () => {
         }
 
       // ═══════ 椰子树 ═══════
-      const TX = 5, TY = SAND_T - 7;
+      const TX = isMobile ? 2 : 5, TY = SAND_T - 7;
       for (let r = 0; r < 8; r++)
         for (let c = 0; c < 3; c++)
           p(TX + c, TY + r, (c === 0 || c === 2 || r === 7) ? BLACK : BLUE, (c === 0 || c === 2 || r === 7) ? 1 : 0.4);
