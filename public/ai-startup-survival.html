@@ -260,7 +260,21 @@ let BW,BH;
 function resizeBg(){BW=bgc.width=window.innerWidth;BH=bgc.height=window.innerHeight;drawStaticBg();}
 window.addEventListener('resize',resizeBg);resizeBg();
 function drawStaticBg(){
-  bx.fillStyle='#FFFFFF';bx.fillRect(0,0,BW,BH);
+  bx.fillStyle='#FCFCFA';bx.fillRect(0,0,BW,BH);
+  // 纸纹肌理
+  for(let i=0;i<Math.floor(BW*BH/800);i++){
+    const x=Math.random()*BW,y=Math.random()*BH;
+    bx.fillStyle=`rgba(0,0,0,${Math.random()*.02})`;
+    bx.fillRect(x,y,Math.random()*3+1,Math.random()*3+1);
+  }
+  // 顶部淡蓝渐变
+  const g=bx.createLinearGradient(0,0,0,BH*.35);
+  g.addColorStop(0,'rgba(0,0,255,0.03)');g.addColorStop(1,'transparent');
+  bx.fillStyle=g;bx.fillRect(0,0,BW,BH*.35);
+  // 右下淡粉渐变
+  const g2=bx.createLinearGradient(0,BH*.7,0,BH);
+  g2.addColorStop(0,'transparent');g2.addColorStop(1,'rgba(255,0,128,0.02)');
+  bx.fillStyle=g2;bx.fillRect(0,BH*.7,BW,BH*.3);
 }
 
 /* ── GAME LOGIC ── */
@@ -544,7 +558,6 @@ const ACTS=[
   {id:'a4',name:'安全审查',cost:1,desc:'烧5M，降可信度+自主度风险'},
   {id:'a5',name:'公关维护',cost:1,desc:'信任+8，烧5M，降舆论风险'},
   {id:'a6',name:'开放新功能',cost:1,desc:'热度+12，用户涨，风险全线上升'},
-  {id:'a7',name:'裁员降本',cost:1,desc:'回血5M，信任-8，用户跑一批'},
 ];
 
 let GS=null,EVS=[],EV_IDX=0,CHOSEN=null,SHOW_CONS=false,SUB='events',AP_USED=0,SHOW_RANK=false;
@@ -637,7 +650,7 @@ function doActById(id){
   else if(id==='a4'){GS.cash-=5;GS.hype=apH(GS.hype,-3);GS.risks=rd(GS.risks,[-8,0,-8,0,-5]);}
   else if(id==='a5'){GS.trust=apT(GS.trust,8);GS.cash-=5;GS.risks=rd(GS.risks,[0,0,0,-10,-3]);}
   else if(id==='a6'){GS.hype=apH(GS.hype,12);GS.users=Math.floor(GS.users*1.15+300);GS.risks=rd(GS.risks,[8,8,8,10,5]);}
-  else if(id==='a7'){GS.cash+=5;GS.trust=apT(GS.trust,-8);GS.users=Math.max(100,GS.users-1000);GS.risks=rd(GS.risks,[0,0,0,12,5]);}
+  /* a7 removed */
   AP_USED+=act.cost;render();
 }
 function doChoice(ci){
