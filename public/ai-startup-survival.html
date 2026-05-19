@@ -20,7 +20,7 @@
 html,body{height:100%;background:var(--paper);}
 body{color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
 #app{max-width:660px;margin:0 auto;padding:24px 20px 80px;min-height:100vh;position:relative;z-index:1;}
-#bgCanvas{position:fixed;inset:0;pointer-events:none;z-index:0;background:#0f0f24;}
+#bgCanvas{position:fixed;inset:0;pointer-events:none;z-index:0;background:#FFFFFF;}
 
 /* SETUP */
 #setup{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:88vh;text-align:center;position:relative;}
@@ -260,26 +260,7 @@ let BW,BH;
 function resizeBg(){BW=bgc.width=window.innerWidth;BH=bgc.height=window.innerHeight;drawStaticBg();}
 window.addEventListener('resize',resizeBg);resizeBg();
 function drawStaticBg(){
-  // 深色绒布渐变 — 卡片游戏风格
-  const g= bx.createLinearGradient(0,0,BW*0.4,BH*1.2);
-  g.addColorStop(0,'#1a1a3a');g.addColorStop(0.5,'#151530');g.addColorStop(1,'#0f0f24');
-  bx.fillStyle=g;bx.fillRect(0,0,BW,BH);
-  // 微妙网格纹理
-  bx.fillStyle='rgba(255,255,255,0.015)';
-  for(let x=0;x<BW;x+=60)bx.fillRect(x,0,1,BH);
-  for(let y=0;y<BH;y+=60)bx.fillRect(0,y,BW,1);
-  // 绒毛斑点
-  const n=Math.floor(BW*BH/6000);
-  for(let i=0;i<n;i++){
-    const x=Math.random()*BW,y=Math.random()*BH;
-    bx.beginPath();bx.arc(x,y,Math.random()*2+.5,0,Math.PI*2);
-    bx.fillStyle=`rgba(255,255,255,${Math.random()*.03+.01})`;
-    bx.fill();
-  }
-  // 底部粉色微光
-  const g2=bx.createLinearGradient(0,BH-60,0,BH);
-  g2.addColorStop(0,'transparent');g2.addColorStop(1,'rgba(255,0,128,0.06)');
-  bx.fillStyle=g2;bx.fillRect(0,BH-60,BW,60);
+  bx.fillStyle='#FFFFFF';bx.fillRect(0,0,BW,BH);
 }
 
 /* ── GAME LOGIC ── */
