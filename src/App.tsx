@@ -467,7 +467,7 @@ const CrabWalker = () => {
         drawWave(c1x, c1y, t % 20 < 10 ? 'right' : 'left');
 
       // ═══════ 螃蟹 4：打游戏 ═══════
-      const c4x = Math.floor(GW * 0.31), c4y = SAND_T - 7;
+      const c4x = Math.floor(GW * (isMobile ? 0.30 : 0.31)), c4y = SAND_T - 7;
       crabPos.c4x = c4x; crabPos.c4y = c4y;
       const c4Bounce = Math.round(Math.sin(t * 0.04) * 0.4);
       const c4MouseNear = mx > 0 && Math.abs(mx - (c4x + 7)) < 10 && Math.abs(my - (c4y + 4)) < 10;
@@ -505,7 +505,7 @@ const CrabWalker = () => {
         if (ap >= 1) anim = null;
       }
       // 游戏机
-      const gc = { x: c4x + 14, y: c4y + 3 };
+      const gc = { x: c4x + (isMobile ? 12 : 14), y: c4y + 3 };
       p(gc.x, gc.y, BLACK); p(gc.x + 1, gc.y, BLACK); p(gc.x + 2, gc.y, BLACK); p(gc.x + 3, gc.y, BLACK);
       p(gc.x, gc.y + 1, BLACK); p(gc.x + 3, gc.y + 1, BLACK);
       p(gc.x, gc.y + 2, BLACK); p(gc.x + 1, gc.y + 2, BLACK); p(gc.x + 2, gc.y + 2, BLACK); p(gc.x + 3, gc.y + 2, BLACK);
@@ -561,7 +561,7 @@ const CrabWalker = () => {
       if (t % 10 < 3 && !c3Jumping) { p(c3x - 1, c3y - 1, WHITE, 0.7); p(c3x + 14, c3y - 1, WHITE, 0.7); }
 
       // ═══════ 螃蟹 2：害羞 ═══════
-      const c2BaseX = Math.floor(GW * 0.55), c2BaseY = SAND_T - 6;
+      const c2BaseX = Math.floor(GW * (isMobile ? 0.54 : 0.55)), c2BaseY = SAND_T - 6;
       crabPos.c2x = c2BaseX; crabPos.c2y = c2BaseY;
       const mouseNear = mx > 0 && Math.abs(mx - (c2BaseX + 7)) < 12 && Math.abs(my - (c2BaseY + 4)) < 10;
       const c2Dodge = mouseNear ? Math.round((c2BaseX - mx) * 0.3) : 0;
