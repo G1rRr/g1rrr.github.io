@@ -409,7 +409,7 @@ const CrabWalker = () => {
       }
 
       // ═══════ 海洋 ═══════
-      const SEA_L = Math.floor(GW * 0.65), SEA_T = SKY_H;
+      const SEA_L = Math.floor(GW * 0.70), SEA_T = SKY_H;
       for (let y = SEA_T; y < GH - 3; y++)
         for (let x = SEA_L; x < GW; x++)
           p(x, y, `rgb(${(y - SEA_T) * 15},${(y - SEA_T) * 15},${180 + (y - SEA_T) * 15})`);
@@ -467,7 +467,7 @@ const CrabWalker = () => {
         drawWave(c1x, c1y, t % 20 < 10 ? 'right' : 'left');
 
       // ═══════ 螃蟹 4：打游戏 ═══════
-      const c4x = Math.floor(GW * 0.26), c4y = SAND_T - 7;
+      const c4x = Math.floor(GW * 0.31), c4y = SAND_T - 7;
       crabPos.c4x = c4x; crabPos.c4y = c4y;
       const c4Bounce = Math.round(Math.sin(t * 0.04) * 0.4);
       const c4MouseNear = mx > 0 && Math.abs(mx - (c4x + 7)) < 10 && Math.abs(my - (c4y + 4)) < 10;
@@ -528,7 +528,7 @@ const CrabWalker = () => {
       }
 
       // ═══════ 螃蟹 3：海里 ═══════
-      const c3BaseX = Math.floor(GW * 0.75), c3BaseY = SEA_T + 3;
+      const c3BaseX = Math.floor(GW * 0.80), c3BaseY = SEA_T + 3;
       crabPos.c3x = c3BaseX + Math.round(Math.sin(t * 0.03) * 4); crabPos.c3y = c3BaseY;
       const c3ChaseX = mx > 0 && mx > SEA_L ? Math.round((mx - c3BaseX) * 0.08) : 0;
       const c3ChaseY = mx > 0 && mx > SEA_L ? Math.round((my - c3BaseY) * 0.06) : 0;
@@ -561,7 +561,7 @@ const CrabWalker = () => {
       if (t % 10 < 3 && !c3Jumping) { p(c3x - 1, c3y - 1, WHITE, 0.7); p(c3x + 14, c3y - 1, WHITE, 0.7); }
 
       // ═══════ 螃蟹 2：害羞 ═══════
-      const c2BaseX = Math.floor(GW * 0.50), c2BaseY = SAND_T - 6;
+      const c2BaseX = Math.floor(GW * 0.55), c2BaseY = SAND_T - 6;
       crabPos.c2x = c2BaseX; crabPos.c2y = c2BaseY;
       const mouseNear = mx > 0 && Math.abs(mx - (c2BaseX + 7)) < 12 && Math.abs(my - (c2BaseY + 4)) < 10;
       const c2Dodge = mouseNear ? Math.round((c2BaseX - mx) * 0.3) : 0;
