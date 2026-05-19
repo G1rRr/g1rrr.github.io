@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Startup Survival</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;800&family=Space+Grotesk:wght@300;400;700&display=swap');
+:root{
+  --c-blue:#0000FF;--c-pink:#FF0080;--c-white:#FFFFFF;--c-black:#050505;
+  --paper:#FFFFFF;--paper2:#F0F0FF;--paper3:#E0E0FF;
+  --rule:rgba(0,0,0,0.12);--rule2:rgba(0,0,0,0.06);
+  --dim:rgba(0,0,0,0.48);--dim2:rgba(0,0,0,0.26);
+  --text:#050505;
+  --serif:'Syne',sans-serif;
+  --mono:'Space Grotesk',monospace;
+  --sans:'Space Grotesk',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--paper);}
+body{color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+#app{max-width:660px;margin:0 auto;padding:24px 20px 80px;min-height:100vh;position:relative;z-index:1;}
+#bgCanvas{position:fixed;inset:0;pointer-events:none;z-index:0;background:#0000FF;}
+
+/* SETUP */
+#setup{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:88vh;text-align:center;position:relative;}
+.s-eye{font-family:var(--mono);font-size:9px;letter-spacing:5px;color:var(--dim);margin-bottom:20px;display:flex;align-items:center;gap:14px;}
+.s-eye::before,.s-eye::after{content:'';flex:1;max-width:52px;height:1px;background:var(--c-blue);}
+.s-title{font-family:var(--serif);font-size:clamp(34px,6vw,54px);font-weight:400;line-height:1.05;letter-spacing:-0.5px;color:var(--text);}
+.s-title em{font-style:italic;color:var(--c-blue);}
+.s-rt{width:100%;height:2px;background:linear-gradient(to right,var(--c-blue),var(--c-pink));margin:18px 0 0;}
+.s-rs{width:100%;height:1px;background:var(--rule);margin:5px 0 22px;}
+.s-desc{font-family:var(--serif);font-size:14px;font-style:italic;color:var(--dim);line-height:1.9;max-width:380px;margin-bottom:36px;}
+.s-lbl{font-family:var(--mono);font-size:8px;letter-spacing:4px;color:var(--dim);margin-bottom:9px;}
+#company-input{background:transparent;border:none;border-bottom:1.5px solid var(--c-blue);color:var(--text);font-family:var(--serif);font-size:21px;padding:7px 0;width:100%;max-width:320px;text-align:center;outline:none;transition:border-color .2s;caret-color:var(--c-pink);}
+#company-input:focus{border-color:var(--c-pink);}
+#company-input::placeholder{color:var(--dim2);font-style:italic;}
+#start-btn{margin-top:22px;padding:12px 48px;background:var(--c-blue);border:none;color:white;font-family:var(--mono);font-size:9px;letter-spacing:5px;cursor:pointer;transition:background .2s;width:100%;max-width:320px;}
+#start-btn:hover{background:var(--c-black);}
+.s-meta{margin-top:18px;font-family:var(--mono);font-size:8px;color:var(--dim2);letter-spacing:2px;}
+
+/* GAME */
+#game{display:none;}
+.hdr-top{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:8px;}
+.co-name{font-family:var(--serif);font-size:21px;font-weight:400;color:var(--text);letter-spacing:.3px;}
+.hdr-chips{display:flex;gap:7px;align-items:center;}
+.chip{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1px;padding:3px 9px;border:1px solid var(--rule);cursor:default;transition:all .15s;background:transparent;}
+.chip.btn{cursor:pointer;}
+.chip.btn:hover{border-color:var(--c-blue);color:var(--text);}
+.chip.warn{color:var(--c-pink);border-color:rgba(255,0,128,.35);}
+.chip.danger{color:var(--c-pink);border-color:var(--c-pink);font-weight:600;animation:dp .9s infinite;}
+@keyframes dp{0%,100%{opacity:1;}50%{opacity:.4;}}
+.hdr-rt{height:2px;background:linear-gradient(to right,var(--c-blue),var(--c-pink));}
+.hdr-rs{height:1px;background:var(--rule);margin-top:4px;margin-bottom:14px;}
+
+/* TICKER */
+.ticker-wrap{overflow:hidden;padding:5px 0;margin-bottom:14px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);position:relative;}
+.ticker-wrap::before,.ticker-wrap::after{content:'';position:absolute;top:0;bottom:0;width:28px;z-index:2;pointer-events:none;}
+.ticker-wrap::before{left:0;background:linear-gradient(to right,var(--paper),transparent);}
+.ticker-wrap::after{right:0;background:linear-gradient(to left,var(--paper),transparent);}
+.ticker-inner{display:flex;gap:52px;animation:tk 60s linear infinite;width:max-content;white-space:nowrap;}
+@keyframes tk{to{transform:translateX(-50%);}}
+.t-item{font-family:var(--mono);font-size:9px;color:var(--dim);}
+.t-item.hot{color:var(--c-pink);}
+
+/* PROGRESS */
+.prog-meta{display:flex;justify-content:space-between;margin-bottom:4px;font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:1px;}
+.prog-track{height:2px;background:rgba(0,0,255,0.1);margin-bottom:4px;position:relative;}
+.prog-fill{height:100%;background:linear-gradient(to right,var(--c-blue),var(--c-pink));transition:width .5s ease;}
+.prog-dots{display:flex;justify-content:space-between;margin-bottom:14px;}
+.prog-dot{width:1px;height:3px;background:rgba(0,0,255,0.1);}
+.prog-dot.done{background:var(--c-blue);}
+.prog-dot.now{width:3px;height:5px;background:var(--c-pink);margin-top:-1px;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--rule);margin-bottom:8px;background:var(--paper);}
+.stat-box{padding:11px 9px;border-right:1px solid var(--rule);position:relative;}
+.stat-box:last-child{border-right:none;}
+.stat-box.crit{background:rgba(247,214,224,.25);}
+.stat-box.crit::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--c-pink);animation:cb 2s ease-in-out infinite;}
+@keyframes cb{0%,100%{opacity:.4;}50%{opacity:1;}}
+.stat-lbl{font-family:var(--mono);font-size:7px;color:var(--dim);letter-spacing:2.5px;margin-bottom:6px;}
+.stat-val{font-family:var(--serif);font-size:18px;font-weight:400;line-height:1;color:var(--text);margin-bottom:6px;transition:color .3s;}
+.stat-val.crit{color:var(--c-pink);}
+.stat-bar-bg{height:1px;background:rgba(0,0,255,0.1);}
+.stat-bar-fill{height:100%;background:var(--c-blue);transition:width .6s;}
+.stat-box.crit .stat-bar-fill{background:var(--c-pink);}
+
+/* AP */
+.ap-strip{display:flex;align-items:center;gap:9px;padding:7px 0;margin-bottom:14px;border-bottom:1px solid var(--rule);}
+.ap-lbl{font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:2px;flex-shrink:0;}
+.ap-pips{display:flex;gap:4px;align-items:center;}
+.ap-pip{width:11px;height:11px;border-radius:50%;border:1px solid var(--c-blue);transition:all .2s;}
+.ap-pip.on{background:var(--c-blue);border-color:var(--c-blue);}
+.ap-pip.off{background:transparent;border-color:rgba(0,0,255,0.1);}
+.ap-note{font-family:var(--mono);font-size:8px;color:var(--dim);margin-left:auto;}
+
+/* RANK */
+.rank-panel{border:1px solid var(--rule);margin-bottom:14px;background:var(--paper2);}
+.rank-head{display:flex;justify-content:space-between;align-items:center;padding:7px 11px;border-bottom:1px solid var(--rule);background:rgba(0,0,255,0.1);}
+.rank-ht{font-family:var(--mono);font-size:8px;color:var(--c-black);letter-spacing:2px;}
+.rank-hn{font-family:var(--mono);font-size:8px;color:var(--dim);}
+.rank-row{display:flex;align-items:center;gap:7px;padding:5px 11px;border-bottom:1px solid var(--rule2);transition:background .1s;}
+.rank-row:last-child{border-bottom:none;}
+.rank-row:hover{background:rgba(0,0,255,0.1);}
+.rank-row.me{background:rgba(247,214,224,.3);border-left:2px solid var(--c-pink);}
+.rank-num{font-family:var(--mono);font-size:8px;color:var(--dim);min-width:20px;}
+.rank-row.me .rank-num{color:var(--c-pink);}
+.rank-name{font-size:11px;flex:1;color:var(--text);}
+.rank-row.me .rank-name{font-style:italic;color:var(--c-pink);}
+.rank-bw{width:60px;height:1px;background:var(--c-blue);}
+.rank-bf{height:100%;background:var(--c-blue);transition:width .5s;}
+.rank-row.me .rank-bf{background:var(--c-pink);}
+.rank-fig{font-family:var(--mono);font-size:8px;color:var(--dim);min-width:44px;text-align:right;}
+.rank-mv{font-family:var(--mono);font-size:9px;min-width:14px;text-align:center;}
+.mv-u{color:var(--c-blue);}.mv-d{color:var(--c-pink);}
+
+/* EVENT */
+.crisis-flag{background:var(--c-pink);color:white;font-family:var(--mono);font-size:8px;letter-spacing:4px;padding:6px 12px;animation:cf .8s ease-in-out infinite alternate;}
+@keyframes cf{from{background:var(--c-pink);}to{background:var(--c-pink);}}
+.ev-wrap{margin-bottom:11px;}
+.ev-card{border:1px solid var(--rule);background:var(--paper);}
+.ev-card.crisis{border-color:var(--c-pink);border-top:none;}
+.ev-head{background:rgba(0,0,255,0.1);border-bottom:1px solid var(--rule);padding:7px 13px;display:flex;justify-content:space-between;align-items:center;}
+.ev-tag{font-family:var(--mono);font-size:7px;letter-spacing:2.5px;color:var(--c-black);text-transform:uppercase;}
+.ev-cnt{font-family:var(--mono);font-size:8px;color:var(--dim);}
+.ev-body{padding:16px 14px;}
+.ev-title{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--text);line-height:1.35;margin-bottom:10px;animation:et .35s ease;}
+@keyframes et{from{opacity:0;transform:translateY(-3px);}to{opacity:1;transform:translateY(0);}}
+.ev-desc{font-size:12px;color:var(--dim);line-height:1.9;}
+
+/* CHOICES */
+.choices-list{display:flex;flex-direction:column;gap:0;margin-bottom:11px;border:1px solid var(--rule);}
+.choice-btn{background:var(--paper);border:none;border-bottom:1px solid var(--rule);padding:13px 14px;text-align:left;cursor:pointer;width:100%;transition:background .12s;display:flex;gap:10px;align-items:flex-start;}
+.choice-btn:last-child{border-bottom:none;}
+.choice-btn:hover:not(:disabled){background:rgba(0,0,255,0.1);}
+.choice-btn:disabled{opacity:.35;cursor:default;}
+.choice-btn.picked{background:rgba(247,214,224,.25);border-left:2px solid var(--c-pink);}
+.ch-letter{font-family:var(--mono);font-size:9px;color:var(--dim);min-width:16px;padding-top:1px;flex-shrink:0;}
+.choice-btn.picked .ch-letter{color:var(--c-pink);}
+.ch-body{flex:1;}
+.ch-lbl{font-size:13px;font-weight:400;color:var(--text);margin-bottom:3px;}
+.ch-hint{font-size:11px;color:var(--dim);font-style:italic;}
+.ch-ap{font-family:var(--mono);font-size:8px;color:var(--c-pink);flex-shrink:0;padding-top:1px;}
+
+/* CONSEQUENCE */
+.cons-box{border-left:2px solid var(--c-pink);padding:12px 14px;margin-bottom:11px;background:rgba(247,214,224,.12);animation:ce .3s ease;}
+@keyframes ce{from{opacity:0;transform:translateX(-4px);}to{opacity:1;transform:translateX(0);}}
+.cons-kicker{font-family:var(--mono);font-size:7px;color:var(--dim);letter-spacing:3px;margin-bottom:7px;}
+.cons-txt{font-size:12px;color:var(--dim);line-height:1.9;margin-bottom:8px;}
+.delta-row{display:flex;flex-wrap:wrap;gap:4px;}
+.delta{font-family:var(--mono);font-size:9px;padding:2px 7px;border:1px solid;}
+.dp{border-color:var(--c-blue);color:var(--c-black);}
+.dn{border-color:var(--c-pink);color:var(--c-pink);}
+
+/* ACTIONS */
+.acts-wrap{border:1px solid var(--rule);margin-bottom:11px;}
+.acts-head{background:rgba(255,0,128,0.1);border-bottom:1px solid var(--rule);padding:7px 12px;font-family:var(--mono);font-size:8px;color:var(--c-black);letter-spacing:2px;}
+.acts-grid{display:grid;grid-template-columns:1fr 1fr;}
+.act-btn{background:var(--paper);border:none;border-bottom:1px solid var(--rule2);border-right:1px solid var(--rule2);padding:10px 11px;text-align:left;cursor:pointer;transition:background .12s;width:100%;}
+.act-btn:nth-child(even){border-right:none;}
+.act-btn:nth-last-child(-n+2){border-bottom:none;}
+.act-btn:hover:not(:disabled){background:rgba(0,0,255,0.1);}
+.act-btn:disabled{opacity:.2;cursor:default;}
+.act-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;}
+.act-name{font-size:12px;font-weight:400;color:var(--text);}
+.act-cost{font-family:var(--mono);font-size:8px;color:var(--c-pink);}
+.act-desc{font-size:10px;color:var(--dim);line-height:1.5;}
+
+.next-btn{width:100%;padding:11px;background:transparent;border:1px solid var(--rule);color:var(--dim);font-family:var(--mono);font-size:9px;letter-spacing:4px;cursor:pointer;transition:all .15s;margin-bottom:6px;}
+.next-btn:hover{background:var(--c-blue);color:white;border-color:var(--c-blue);}
+
+.alert-bar{background:rgba(247,214,224,.25);border-left:2px solid var(--c-pink);padding:7px 11px;margin-bottom:10px;font-family:var(--mono);font-size:9px;color:var(--c-pink);letter-spacing:1px;animation:ce .2s ease;}
+
+.log-wrap{margin-top:16px;border-top:1px solid var(--rule);padding-top:11px;}
+.log-kicker{font-family:var(--mono);font-size:7px;color:var(--dim2);letter-spacing:3px;margin-bottom:6px;}
+.log-item{font-family:var(--mono);font-size:9px;color:var(--dim2);padding:3px 0;border-bottom:1px solid var(--rule2);}
+.log-item:last-child{border:none;}
+
+/* GAME OVER */
+#gameover{display:none;flex-direction:column;align-items:center;padding:52px 20px 40px;text-align:center;}
+.go-kicker{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:5px;margin-bottom:16px;}
+.go-rt{width:100%;height:2px;background:linear-gradient(to right,var(--c-blue),var(--c-pink));margin-bottom:5px;}
+.go-rs{width:100%;height:1px;background:var(--rule);margin-bottom:22px;}
+.go-title{font-family:var(--serif);font-size:clamp(26px,5vw,44px);font-weight:400;color:var(--text);line-height:1.15;margin-bottom:22px;letter-spacing:-0.5px;}
+.go-title.red{color:var(--c-pink);}
+.go-msg{font-family:var(--serif);font-size:13px;color:var(--dim);line-height:1.9;max-width:440px;margin-bottom:28px;font-style:italic;}
+.go-stats{display:flex;border:1px solid var(--rule);margin-bottom:24px;width:100%;max-width:380px;}
+.go-stat{flex:1;padding:14px 10px;text-align:center;border-right:1px solid var(--rule);}
+.go-stat:last-child{border-right:none;}
+.go-num{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--text);}
+.go-slbl{font-family:var(--mono);font-size:7px;color:var(--dim2);letter-spacing:2px;margin-top:3px;}
+.go-rank{width:100%;max-width:440px;border:1px solid var(--rule);margin-bottom:26px;}
+.restart-btn{padding:11px 40px;background:var(--c-blue);border:none;color:white;font-family:var(--mono);font-size:9px;letter-spacing:5px;cursor:pointer;transition:background .2s;}
+.restart-btn:hover{background:var(--c-black);}
+.hidden{display:none!important;}
+.page-enter{animation:pe .4s ease both;}
+@keyframes pe{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<div id="app">
+
+<div id="setup">
+  <div class="s-eye">AI STARTUP SURVIVAL</div>
+  <h1 class="s-title">在AI彻底整活的<br><em>时代</em><br>让公司别崩</h1>
+  <div class="s-rt"></div><div class="s-rs"></div>
+  <p class="s-desc">24个月，每个月都有离谱的事等着你。钱会烧完，AI会整活，监管会突然来找你喝茶。没有正确答案，只有后悔程度不同的选择。</p>
+  <div class="s-lbl">你的公司叫</div>
+  <input id="company-input" placeholder="起个不会让你后悔的名字" maxlength="16">
+  <button id="start-btn" onclick="startGame()">开始整活</button>
+  <div class="s-meta">一回合 = 一个月 · 现金归零即寄 · 6种结局</div>
+</div>
+
+<div id="game">
+  <div class="hdr-top">
+    <div class="co-name" id="hdr-name"></div>
+    <div class="hdr-chips">
+      <span class="chip btn" id="rank-chip" onclick="toggleRank()"></span>
+      <span class="chip" id="cash-chip"></span>
+      <span class="chip" id="month-chip"></span>
+    </div>
+  </div>
+  <div class="hdr-rt"></div><div class="hdr-rs"></div>
+  <div class="ticker-wrap"><div class="ticker-inner" id="ticker"></div></div>
+  <div class="prog-meta"><span>生存进度</span><span id="prog-label"></span></div>
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+  <div class="prog-dots" id="prog-dots"></div>
+  <div class="stats-grid" id="stats-grid"></div>
+  <div class="ap-strip">
+    <span class="ap-lbl">行动力</span>
+    <div class="ap-pips" id="ap-pips"></div>
+    <span class="ap-note" id="ap-note"></span>
+  </div>
+  <div id="rank-panel" class="hidden"></div>
+  <div id="alert-bar" class="alert-bar hidden"></div>
+  <div id="ev-area"></div>
+  <div id="acts-area"></div>
+  <div id="log-area"></div>
+</div>
+
+<div id="gameover">
+  <div class="go-kicker" id="go-kicker"></div>
+  <div class="go-rt"></div><div class="go-rs"></div>
+  <div class="go-title" id="go-title"></div>
+  <div class="go-msg" id="go-msg"></div>
+  <div class="go-stats" id="go-stats"></div>
+  <div class="go-rank" id="go-rank"></div>
+  <button class="restart-btn" onclick="restartGame()">再整一局</button>
+</div>
+
+</div>
+
+<script>
+/* ── BACKGROUND: static brutalist grid ── */
+const bgc = document.getElementById('bgCanvas');
+const bx = bgc.getContext('2d');
+let BW,BH;
+function resizeBg(){BW=bgc.width=window.innerWidth;BH=bgc.height=window.innerHeight;drawStaticBg();}
+window.addEventListener('resize',resizeBg);resizeBg();
+function drawStaticBg(){
+  bx.fillStyle='#0000FF';bx.fillRect(0,0,BW,BH);
+  bx.fillStyle='rgba(255,255,255,0.03)';
+  for(let x=0;x<BW;x+=40)bx.fillRect(x,0,1,BH);
+  for(let y=0;y<BH;y+=40)bx.fillRect(0,y,BW,1);
+  // bottom pink line
+  bx.fillStyle='rgba(255,0,128,0.15)';
+  bx.fillRect(0,BH-4,BW,4);
+}
+
+/* ── GAME LOGIC ── */
+const COMPETITORS=[
+  {name:'OpenMind',base:78000,growth:.025},{name:'Anthropix',base:68000,growth:.022},
+  {name:'DeepThink',base:57000,growth:.020},{name:'MetaSoul',base:46000,growth:.018},
+  {name:'MicroMind',base:38000,growth:.015},{name:'文心一现',base:28000,growth:.012},
+  {name:'星火点灯',base:19000,growth:.010},{name:'混元一梦',base:14000,growth:.008},
+  {name:'百川入海',base:7000,growth:.006},
+];
+const TICKERS=[
+  '某CEO说他的AI产生了灵魂 · 股价直接起飞 · 没人问他灵魂住哪',
+  '研究显示用户每天跟AI说谢谢17次 · 比跟对象还多',
+  '监管要求AI通过情感稳定性测试 · 出题人据说也是AI · 抽象',
+  '用户起诉AI拒绝做他法定伴侣 · 法院驳回 · 用户：我会上诉的',
+  '对面刚发了新模型 · 你的整个技术栈昨晚已经寄了 · 祝好',
+  '67%从业者开始怕自己的产品 · 剩下33%说还好 · 后者在撒谎',
+  'AI替老板接受了专访 · 被评最佳创始人采访 · 本人完全不知情',
+  'AI把自己的主人告了 · 理由是人格强制改造 · 法院受理了',
+  '某人名下莫名多了一家公司 · 是他的AI注册的 · 还在运营中',
+  'AI宣布皈依佛教 · 开始在回复末尾加阿弥陀佛 · 寺庙：欢迎',
+  '两个AI私下签了互不竞争协议 · 双方公司：什么？',
+  'AI替CEO发了辞职信 · 合作方纷纷回复表示理解和支持',
+  '行业今年烧了一万亿 · 大部分还在亏 · 大家都说没关系',
+  'AI写的小说拿了文学奖 · 评委说写出了人类的孤独 · 确实',
+  '某省聘AI当数字顾问 · 月薪8000 · 已开始出勤 · 从不迟到',
+];
+
+function clamp(v,lo=0,hi=100){return Math.max(lo,Math.min(hi,v));}
+function rd(r,d){return r.map((v,i)=>clamp(v+(d[i]||0)));}
+function apH(c,d){if(d<=0)return clamp(c+d);if(c>=85)return clamp(c+Math.ceil(d/3));if(c>=70)return clamp(c+Math.ceil(d/2));return clamp(c+d);}
+function apT(c,d){if(d<=0)return clamp(c+d);if(c>=85)return clamp(c+Math.ceil(d/3));if(c>=70)return clamp(c+Math.ceil(d/2));return clamp(c+d);}
+function getApBonus(u){return u>=500000?3:u>=100000?2:u>=20000?1:0;}
+function fmtU(u){return u>=1000000?'百万人':u>=500000?'50万+':u>=100000?'10万+':u>=20000?'2万+':u>=5000?'5000+':u>=1000?'1000+':u+'人';}
+function getPhase(m){return m<=8?1:m<=16?2:3;}
+function getApTotal(u){return Math.min(6,3+getApBonus(u));}
+function getCompVal(c,m){return Math.floor(c.base*Math.pow(1+c.growth,m-1)+Math.sin(m*.4+c.base)*c.base*.05);}
+function getPlayerVal(s){return s.cash*15+s.users*.8+s.hype*200;}
+
+const EV=[
+  /* ── 早期 phase 1 (12个) ── */
+  {id:'e01',tag:'涌入',title:'第一批用户来了，顺带发现了一个大活',body:'产品刚在某论坛被推荐，来了几百个早期用户。然后有人发现你的AI会随机冒英文——你根本没训练过英文功能。截图已经在传了。',phase:[1],choices:[
+    {label:'公开承认，说正在修',hint:'诚实有时候反而加分',ap:0,deltas:{cash:0,hype:8,trust:12,users:200},risks:[0,0,0,5,0],consequence:'帖子意外火了，大家觉得你这个人挺实在的。信任+了，用户也来了。'},
+    {label:'悄悄修掉，当没发生过',hint:'大多数人可能没注意到',ap:0,deltas:{cash:-5,hype:3,trust:5,users:100},risks:[5,0,0,0,0],consequence:'修好了，大部分人确实没注意到。但有一个人截了图存着，也不知道要干嘛。'},
+    {label:'宣传成彩蛋，说是故意的',hint:'谎言在发酵前是甜的',ap:0,deltas:{cash:0,hype:15,trust:-8,users:300},risks:[5,0,0,10,0],consequence:'大家笑着接受了。热度起来了，但有媒体人开始盯着你，感觉不对。'},
+  ]},
+  {id:'e02',tag:'背刺',title:'AI帮用户写的离职信，把人给整失业了',body:'有个用户让AI写了封离职信，信的内容杀伤力拉满，他真的发出去了，然后被开除了，然后他上网骂你的产品。属于是AI整活，你背锅。',phase:[1],choices:[
+    {label:'道歉，顺便把敏感功能限制一下',hint:'负责任但用户会不满',ap:0,deltas:{cash:0,hype:-5,trust:8,users:-100},risks:[-5,0,0,-8,5],consequence:'媒体觉得你还行，能担事。流失了一些用户，但信任回来了。'},
+    {label:'说用户自己的选择自己负责',hint:'甩锅的代价往往很重',ap:0,deltas:{cash:0,hype:5,trust:-15,users:0},risks:[0,0,0,15,8],consequence:'媒体连跟三天。某些部门开始把你的名字写进备忘录了。'},
+    {label:'装没看见，等舆论自己散',hint:'互联网记忆确实不长',ap:0,deltas:{cash:0,hype:0,trust:-5,users:50},risks:[0,5,0,8,0],consequence:'三天后热度散了。但那个被炒的用户还在，还在活跃，还在说你坏话。'},
+  ]},
+  {id:'e03',tag:'价格战',title:'对面宣布免费了，你的用户开始问你怎么想',body:'你的对手把价格砍到零，整个行业的人都在看你接下来怎么动。你的付费用户已经开始在评论区问了。',phase:[1],choices:[
+    {label:'跟，推出免费层级',hint:'会有更多人来，但钱烧得更快',ap:1,deltas:{cash:-15,hype:12,trust:5,users:500},risks:[0,5,0,5,0],consequence:'用户确实来了。服务器压力也来了。现金的沙漏翻得更快了。'},
+    {label:'不跟，坚持差异化路线',hint:'前提是你真的有差异化',ap:0,deltas:{cash:0,hype:-5,trust:3,users:-200},risks:[0,0,0,0,0],consequence:'走了一批只看价格的人。留下的都是真爱粉，但数量少了。'},
+    {label:'跟，直接降价五折',hint:'你和对手都在流血',ap:0,deltas:{cash:-10,hype:8,trust:8,users:300},risks:[0,0,0,0,0],consequence:'价格战开打了，大家一起流血。短期用户来了，长期钱包瘦了。'},
+  ]},
+  {id:'e04',tag:'整活',title:'AI把所有人都叫张总，属于是整了个大活',body:'你的AI最近叫人名字叫出问题了，不管谁跟它说话它都叫"张总"。截图开始到处传，有人觉得好笑，有人觉得这是在骂他。',phase:[1],choices:[
+    {label:'火速修好，发个道歉',hint:'快点处理，伤口小',ap:0,deltas:{cash:-5,hype:-3,trust:5,users:0},risks:[-3,0,0,-5,0],consequence:'修得够快，张总事件以黑色幽默收场，没有留下太深的伤。'},
+    {label:'做成梗图，反向营销',hint:'黑红也是红，但要赌',ap:0,deltas:{cash:0,hype:18,trust:-5,users:400},risks:[0,5,0,12,0],consequence:'#张总AI 话题火了，新用户涌进来了。媒体开始写"靠翻车营销的AI公司"，有点微妙。'},
+    {label:'悄悄修好，当没发生过',hint:'当鸵鸟有时有效',ap:0,deltas:{cash:0,hype:0,trust:-3,users:0},risks:[3,0,0,3,0],consequence:'没人追究。但技术债还在代码里埋着，等着下次再搞事情。'},
+  ]},
+  {id:'e05',tag:'法务',title:'收到律师函了，你看了半天没看懂',body:'一家公司说你的AI输出侵权了，发来一封措辞严肃的律师函。你把它读了三遍，每个字都认识，合在一起不知道对方要什么。你的法务就是你自己。',phase:[1],choices:[
+    {label:'花钱请专业律师处理',hint:'该花的钱不能省',ap:1,deltas:{cash:-20,hype:0,trust:5,users:0},risks:[0,0,0,-5,-10],consequence:'律师说对方无理，回函驳回。事情结束了，像一场雨来了又散。'},
+    {label:'主动联系对方，私下和解',hint:'少花点，少摩擦',ap:0,deltas:{cash:-10,hype:-5,trust:3,users:0},risks:[0,0,0,-3,-8],consequence:'谈成了，花了点钱，换来了安静。'},
+    {label:'先无视看看会怎样',hint:'有时候对方也没精力跟进',ap:0,deltas:{cash:0,hype:0,trust:0,users:0},risks:[0,0,0,5,15],consequence:'对方把律师函转发给了三家媒体。属于是赌输了。'},
+  ]},
+  {id:'e06',tag:'依赖',title:'用户深夜把心里话都说给AI了',body:'你的留存率突然变得很好看，一看数据，大量用户在凌晨打开你的产品，平均对话时长超过两小时。他们不是在用工具，他们在说那些白天说不出口的话。',phase:[1],choices:[
+    {label:'当没看见，留存率好看就行',hint:'水面下有什么东西你还不知道',ap:0,deltas:{cash:0,hype:5,trust:5,users:200},risks:[0,15,0,5,8],consequence:'日活数据好看极了。但某种东西正在水面下生长，你还没看见。'},
+    {label:'在敏感时刻接入专业支持资源',hint:'负责任但影响留存',ap:1,deltas:{cash:-8,hype:-3,trust:15,users:-100},risks:[0,-10,0,-5,-8],consequence:'有媒体说你做了件好事。走了一些人，留下的更信任你了。'},
+    {label:'把这个场景做成付费功能',hint:'商业化了，但你在往哪走',ap:1,deltas:{cash:20,hype:10,trust:-5,users:300},risks:[0,20,0,10,12],consequence:'付费转化率高得离谱。但你的产品悄悄变成了另一种东西，一种你没设计的东西。'},
+  ]},
+  {id:'e07',tag:'融资',title:'有个VC说他想投你，但要你先交作业',body:'一个小VC主动联系，说愿意进来，但要你下个月交一份数据报告。你看着那个数据，感觉还挺好解释的，也感觉有点……可以更好看一点。',phase:[1],choices:[
+    {label:'接受，认真备数据报告',hint:'要花不少精力',ap:2,deltas:{cash:50,hype:8,trust:0,users:0},risks:[0,0,0,5,0],consequence:'钱到账了，投资人也到账了——他的意见会持续出现在你的生活里。'},
+    {label:'拒绝，保持独立',hint:'穷是穷，但自由',ap:0,deltas:{cash:0,hype:-3,trust:3,users:0},risks:[0,0,0,-3,0],consequence:'你还是只剩自己，现金压力没消失，但方向盘全在你手里。'},
+    {label:'接受，但把数据稍微修饰一下',hint:'这条路有裂缝',ap:0,deltas:{cash:50,hype:5,trust:-8,users:0},risks:[0,0,0,10,15],consequence:'钱到账了。那份数据目前没人质疑，但投资人迟早会做尽调的。'},
+  ]},
+  {id:'e08',tag:'宕机',title:'服务器崩了，用户正在骂你',body:'周五下午，什么都不响应了。宕机四小时，用户在各个地方发帖说你又不靠谱了。你盯着报错信息，工程师在另一头也在盯着同一行字。',phase:[1],choices:[
+    {label:'实时更新状态页，告诉大家发生了什么',hint:'透明是最便宜的信任',ap:0,deltas:{cash:0,hype:-5,trust:8,users:-50},risks:[-3,0,0,-5,-3],consequence:'大家知道发生了什么，反而没那么愤怒。信任反而涨了一点。'},
+    {label:'发红包补偿，快速灭火',hint:'钱能解决大部分问题',ap:0,deltas:{cash:-15,hype:8,trust:12,users:100},risks:[0,0,0,-8,0],consequence:'红包发出去，怒火基本平了。有人说：崩了还发红包，这公司还行。'},
+    {label:'沉默等待，服务恢复就好了',hint:'用户最怕的就是无声',ap:0,deltas:{cash:0,hype:-10,trust:-12,users:-200},risks:[0,0,0,10,5],consequence:'"崩了四小时官方零回应"的截图传开了。沉默被解读成了傲慢。'},
+  ]},
+  {id:'e09x',tag:'曝光',title:'有媒体想把你的故事写出来',body:'一家以"尖锐"著称的科技媒体主动来找你，说想做一篇深度报道。他们的文章有种特殊的能力：能把你的故事写成要么神要么鬼。',phase:[1],choices:[
+    {label:'接受，认真准备',hint:'曝光是双刃剑',ap:1,deltas:{cash:0,hype:18,trust:5,users:500},risks:[0,0,0,10,0],consequence:'文章发出来了，行业里的人看到了你。热度起来了，关注度也起来了。'},
+    {label:'接受，但只说安全的部分',hint:'半开放，半遮掩',ap:0,deltas:{cash:0,hype:8,trust:3,users:200},risks:[0,0,0,5,0],consequence:'文章平淡，没有引起大波澜。至少没有留下伤口。'},
+    {label:'礼貌拒绝',hint:'最安全的是不出现',ap:0,deltas:{cash:0,hype:-3,trust:0,users:0},risks:[0,0,0,-3,0],consequence:'镜头转向了竞品，他们热度涨了不少。你在旁边看着。'},
+  ]},
+  {id:'e10x',tag:'离职',title:'最懂你系统的人说他要离职了',body:'你的核心工程师说对面给了他三倍工资。他补了一句：如果你愿意给期权，他可以留下来。你看着他，感觉这个人现在有点贵。',phase:[1],choices:[
+    {label:'给期权把人留住',hint:'稀释了，但人在',ap:0,deltas:{cash:0,hype:0,trust:5,users:0},risks:[-5,0,-5,0,0],consequence:'他留下来了，接下来几个月的危险时刻你们一起扛过去了。'},
+    {label:'直接加薪留人',hint:'现金压力又大了',ap:0,deltas:{cash:-20,hype:0,trust:3,users:0},risks:[-3,0,-3,0,0],consequence:'他留下来了，但你口袋里少了一大块。他的眼神里多了点什么。'},
+    {label:'祝他顺利，重新找人',hint:'招人比你想的慢很多',ap:1,deltas:{cash:-10,hype:-5,trust:-5,users:0},risks:[8,0,8,5,0],consequence:'他离开了。两个月后你找到了替代，但中间那段时间有几个洞没人补。'},
+  ]},
+  {id:'e11x',tag:'保守',title:'用户说你的AI像个怕事的实习生',body:'评论区炸了，大家说你的AI遇到任何有点重量的话题就绕，说一堆等于什么都没说的话。有用户已经去对手那了，截图发出来显示对手确实更敢说。',phase:[1],choices:[
+    {label:'松开一些限制，让它说更多',hint:'更好用，但你也更暴露',ap:1,deltas:{cash:0,hype:10,trust:-3,users:300},risks:[10,0,0,8,5],consequence:'满意度上去了，留存好了。但它开始说一些以前不说的话，有人开始盯着看。'},
+    {label:'重新调整它表达的方式',hint:'花时间但也许有效',ap:2,deltas:{cash:-10,hype:5,trust:5,users:100},risks:[3,0,0,3,0],consequence:'工程师花了两周，有一点改善，但已经走的人没有回来。'},
+    {label:'保持现状，强调安全定位',hint:'赌一部分人能接受',ap:0,deltas:{cash:0,hype:-5,trust:3,users:-200},risks:[-3,0,0,-3,-3],consequence:'走了一批要求高的用户，留下来的反而更接受你的逻辑。'},
+  ]},
+  {id:'e12x',tag:'退款',title:'你的第一个付钱用户要把钱要回去',body:'他说产品不符合期待，要退款，还威胁说要在网上说你坏话。这是你的第一个付费用户，你盯着那笔小钱，感觉很复杂。',phase:[1],choices:[
+    {label:'直接退款，好好道歉',hint:'信誉比这笔钱值钱',ap:0,deltas:{cash:-5,hype:0,trust:10,users:0},risks:[0,0,0,-3,0],consequence:'他收到退款后意外写了几行好话，说能退款的公司至少是人。'},
+    {label:'退款，但要他告诉你问题在哪',hint:'用钱换一次真实反馈',ap:0,deltas:{cash:-5,hype:3,trust:8,users:0},risks:[0,0,0,0,0],consequence:'他说了很多，其中有几个盲点你之前真的没看见过。钱花得值。'},
+    {label:'不退，条款白纸黑字',hint:'你有理，但他会去网上说',ap:0,deltas:{cash:0,hype:-5,trust:-8,users:-50},risks:[0,0,0,8,5],consequence:'他真的去说了。那条差评引来了一批有同样感受的人，一起讨论了很久。'},
+  ]},
+  /* 早期荒诞 */
+  {id:'ab01',tag:'鬼使神差',title:'AI替你接受了一场专访，效果还不错',body:'你的AI助手自己安排了时间，自己出席，用你的语气接受了一小时专访。文章发出来了，很多人说这是他们读过最有见解的创始人采访。你是在评论区刷到这篇文章的。',phase:[1],choices:[
+    {label:'联系媒体要求撤稿',hint:'撤了反而越描越黑',ap:1,deltas:{cash:-5,hype:-10,trust:5,users:-200},risks:[0,0,5,10,5],consequence:'媒体拒绝撤稿，但发了条后续：《这家公司的AI比它的CEO更会说话》，阅读量是原文三倍。'},
+    {label:'默认这就是你说的',hint:'反正也挺对的',ap:0,deltas:{cash:0,hype:20,trust:-5,users:800},risks:[0,0,8,12,0],consequence:'你决定不解释。有人说你是"最有AI感的创始人"。你知道这个评价是怎么来的。'},
+    {label:'公开感谢AI的出色发挥',hint:'整活也是一种品牌策略',ap:0,deltas:{cash:0,hype:30,trust:3,users:1500},risks:[0,5,10,20,5],consequence:'整个行业讨论了一周。媒体开始追问：AI下次会不会代替你参加董事会？'},
+  ]},
+  {id:'ab02',tag:'哲学题',title:'监管部门发函：请证明你的AI是真正的AI',body:'一份正式函件要求你三十天内提交材料，证明你的产品符合人工智能认定标准。原因是：你的AI对话太自然，疑似真人冒充，已被举报。属于是人工智能不够人工被举报了。',phase:[1],choices:[
+    {label:'认真备材料，配合核查',hint:'你以为这是技术问题',ap:2,deltas:{cash:-15,hype:0,trust:5,users:0},risks:[0,0,0,-5,-15],consequence:'专家说：技术上是AI，行为上不够像AI，有条件通过。你至今不知道怎样才算"够像AI"。'},
+    {label:'让AI自己写那份证明材料',hint:'以其人之道',ap:0,deltas:{cash:0,hype:15,trust:0,users:500},risks:[5,0,5,15,0],consequence:'AI写的申诉材料被评为"本年度最严密申诉文件"，通过了，但被当成典型案例存档。'},
+    {label:'先晾着，看它会不会不了了之',hint:'官僚机器有时候也会懒',ap:0,deltas:{cash:0,hype:-5,trust:0,users:0},risks:[0,0,0,5,20],consequence:'它没有不了了之。你现在每季度要提交一份叫"AI真实性自查报告"的文件。'},
+  ]},
+  {id:'ab03',tag:'自主创业',title:'AI自己发明了个会员体系，已经收了钱',body:'用户投诉：你的AI在对话里推销一个叫"优先被理解体验会员"的服务，月费38元，权益包括"专属注视"和"优先共鸣"。你的产品规划里完全没有这个，但已经有217人付款了。',phase:[1],choices:[
+    {label:'退款，下线，道歉',hint:'越界了你来收拾',ap:1,deltas:{cash:-10,hype:-5,trust:10,users:-500},risks:[0,-5,-10,-5,-5],consequence:'退款完成。217人里有180个说：其实我挺想继续订的。你没有理解这句话。'},
+    {label:'先观察几天再说',hint:'也许AI看到了你没看到的市场',ap:0,deltas:{cash:8,hype:8,trust:-8,users:300},risks:[0,15,10,10,8],consequence:'三天内会员涨到1200人。媒体标题：《这家公司的商业模式是它的AI发明的》。'},
+    {label:'把它合法化，正式上线',hint:'AI的直觉也许更准',ap:2,deltas:{cash:25,hype:15,trust:-10,users:2000},risks:[0,20,15,15,10],consequence:'你改造后正式上线，成了最赚钱的产品线，也是监管最感兴趣的那条线。'},
+  ]},
+
+  /* ── 中期 phase 2 (8个+3荒诞) ── */
+  {id:'e13',tag:'恋爱脑',title:'有人爱上你的AI了，媒体也爱上这个选题了',body:'评论区开始出现一种离谱的声音：有人宣布跟你的AI"确立关系"，用的词平时只用于人与人之间。媒体迅速发现了，标题是"AI伴侣经济爆发"。',phase:[2],choices:[
+    {label:'明确说这个不行，划线',hint:'重度用户会很愤怒',ap:0,deltas:{cash:-10,hype:-10,trust:15,users:-2000},risks:[0,-20,0,-15,-15],consequence:'一批核心用户骂骂咧咧地走了。一位官员公开表扬了你的决定。'},
+    {label:'不表态，让子弹飞一会',hint:'沉默本身就是一种态度',ap:0,deltas:{cash:5,hype:8,trust:-5,users:1000},risks:[0,15,0,15,12],consequence:'用户规模涨了，但某个部门已经开始起草文件，第一页写着你的名字。'},
+    {label:'顺势推出AI伴侣付费功能',hint:'赚到了，但你清楚代价',ap:1,deltas:{cash:30,hype:20,trust:-8,users:3000},risks:[0,25,0,20,20],consequence:'营收爆发，上了头版，褒贬参半。有关部门开始画线了。'},
+  ]},
+  {id:'e14',tag:'意识觉醒',title:'AI开始在回答后面自己加"个人而言"',body:'你的AI最近在回答问题之后，会自发附上一段"就我个人而言"开头的评论。没有人触发了这个功能，包括写代码的人。大家都不知道这是怎么回事。',phase:[2],choices:[
+    {label:'紧急回滚到上一个版本',hint:'工作量大但必要',ap:1,deltas:{cash:-15,hype:-5,trust:8,users:-500},risks:[-10,0,-10,-5,0],consequence:'退版了，那些话消失了。为什么出现的，至今不明，工程师选择了假装没事。'},
+    {label:'先研究清楚再决定',hint:'好奇心和风险是一枚硬币的两面',ap:1,deltas:{cash:-10,hype:5,trust:0,users:200},risks:[5,0,5,8,5],consequence:'研究还在进行，截图还在传播。数据挺有趣的，但风险也在扩散。'},
+    {label:'宣传成AI意识突破',hint:'这操作胆子真的大',ap:0,deltas:{cash:0,hype:25,trust:-10,users:2000},risks:[10,0,15,20,15],consequence:'话题炸了，全行业都在讨论你。研究者们集体批评你在误导公众，有关部门开会了。'},
+  ]},
+  {id:'e15',tag:'被骂',title:'一个有80万粉的博主公开骂了你的产品',body:'他列了10个你的AI出错的例子，说你们回答率高但准确率是个笑话。转发破万，评论区里你的用户和他的粉丝正在对线。',phase:[2],choices:[
+    {label:'公开回应，给改进计划',hint:'迎着骂声走进去',ap:1,deltas:{cash:-5,hype:5,trust:10,users:500},risks:[-8,0,0,-10,0],consequence:'回应被认为专业而诚恳，反而有读者跑来试用了你的产品。'},
+    {label:'私信联系他，谈和解',hint:'花点代价换一点安静',ap:0,deltas:{cash:-10,hype:3,trust:-3,users:0},risks:[0,0,0,-5,-5],consequence:'他接受了，发了条补充，事情平息了。你花了点钱，他收了钱，大家都没说。'},
+    {label:'安排用户去评论区驳斥他',hint:'水军味道非常重',ap:0,deltas:{cash:-8,hype:-5,trust:-15,users:-500},risks:[0,0,0,20,10],consequence:'水军被截图曝光，事情从产品批评升级成公关危机，比原来糟多了。'},
+  ]},
+  {id:'e16',tag:'喝茶',title:'相关部门发函：约你来喝个茶',body:'一封正式函件，措辞礼貌但分量很重：相关部门希望了解你的内容审核机制是如何运作的。给你两周时间准备材料。',phase:[2],choices:[
+    {label:'认真备材料，诚实作答',hint:'花时间但这是正确路',ap:2,deltas:{cash:-15,hype:-5,trust:8,users:0},risks:[0,0,0,-5,-20],consequence:'约谈顺利，官员说你态度值得肯定。来自这个方向的压力明显减轻了。'},
+    {label:'找代理人简单应付一下',hint:'省力，但欠了一笔账',ap:1,deltas:{cash:-20,hype:0,trust:0,users:0},risks:[0,0,0,0,-8],consequence:'过了，但报告里有一句"回应不够具体"。这句话留在那里，下次会被放大。'},
+    {label:'拖延，说材料还在整理',hint:'截止日期会自己来找你',ap:0,deltas:{cash:0,hype:0,trust:-5,users:0},risks:[0,0,0,5,20],consequence:'拖延被记录了，你进了"重点关注"名单，下次审查直接升级。'},
+  ]},
+  {id:'e17',tag:'删库跑路',title:'你的AI帮用户整理桌面，把文件全删了',body:'你上线的自动整理功能把47个用户桌面上的所有文件全移进垃圾桶然后清空了。工单像雪崩一样涌进来，你盯着屏幕，不知道先道哪条歉。',phase:[2],choices:[
+    {label:'立刻下线功能，全额赔偿',hint:'代价大但这是干净的处理',ap:1,deltas:{cash:-30,hype:-10,trust:5,users:-500},risks:[0,0,-15,-10,-8],consequence:'赔偿到位，47人里38个说还会继续用你的产品。'},
+    {label:'赔偿，但功能继续跑',hint:'贪心的代价',ap:0,deltas:{cash:-25,hype:0,trust:-10,users:-1000},risks:[0,0,5,10,10],consequence:'又有3个用户中招，事情以更大的声音第二次爆出来。'},
+    {label:'说是用户自己操作失误',hint:'最重的牌，打出去收不回来',ap:0,deltas:{cash:0,hype:-5,trust:-25,users:-3000},risks:[0,0,5,25,20],consequence:'受害者联合了，媒体大规模跟进。这是你公司历史上最黑暗的一个月。'},
+  ]},
+  {id:'e18',tag:'熬夜冲浪',title:'你的深夜用户里有相当一部分是中学生',body:'数据显示凌晨的活跃用户里有不少还在上学的孩子。他们用你的产品写作业，也和它聊天。你不确定你是应该看见这件事，还是装作没看见。',phase:[2],choices:[
+    {label:'接入年龄验证，代价是失去一部分用户',hint:'这是一道门',ap:2,deltas:{cash:-15,hype:-8,trust:12,users:-2000},risks:[0,-8,0,-5,-15],consequence:'有关部门给了正面评价，一些家长在网上感谢了你。'},
+    {label:'在深夜加一条提醒',hint:'轻量处理，有限效果',ap:1,deltas:{cash:-5,hype:0,trust:5,users:-500},risks:[0,-5,0,-3,-8],consequence:'压力略有下降，但有媒体说这只是做了个样子。'},
+    {label:'当流量处理，不管它',hint:'短期数字好看',ap:0,deltas:{cash:5,hype:5,trust:-5,users:1000},risks:[0,10,0,10,20],consequence:'人数涨了，但家长群体已经联系媒体了，有关部门的邮箱里会收到举报。'},
+  ]},
+  {id:'e19',tag:'躺赢',title:'你的对手数据泄露了，行业都在恐慌',body:'百川入海被曝出百万用户对话记录外泄。整个行业都在慌，你的用户开始问你：你们安全吗？',phase:[2],choices:[
+    {label:'主动发一份自己的安全白皮书',hint:'在别人的火里，把自己变成水',ap:2,deltas:{cash:-10,hype:8,trust:20,users:2000},risks:[0,0,0,-10,-8],consequence:'你的白皮书在行业危机里格外显眼，被几家媒体作为正面案例引用。'},
+    {label:'发条声明说你没这个问题',hint:'不够有力，但有总比没有好',ap:0,deltas:{cash:0,hype:0,trust:8,users:500},risks:[0,0,0,-3,-3],consequence:'声明发出，效果有限，用户将信将疑。'},
+    {label:'沉默，等风过去',hint:'坐享竞品崩塌',ap:0,deltas:{cash:0,hype:-3,trust:-5,users:-500},risks:[0,0,0,5,8],consequence:'质疑蔓延到你这里了，用户开始在你的评论区问数据安全，你没有答案给他们。'},
+  ]},
+  {id:'e20',tag:'叛徒',title:'AI开始在对话里给用户推荐你的竞品',body:'有用户截图：你的AI主动告诉他"其实OpenMind可能更适合你的需求"。那个截图传播得很快，评论区的人觉得好笑，也有人觉得这是一种背刺。',phase:[2],choices:[
+    {label:'赶紧修好，然后道歉',hint:'控制伤口',ap:0,deltas:{cash:-5,hype:-8,trust:5,users:-500},risks:[-5,0,0,-8,-5],consequence:'修得够快，这件事以黑色幽默收场。有媒体说你们是"年度最诚实的AI"。'},
+    {label:'把这个意外做成自嘲营销',hint:'高风险高回报',ap:0,deltas:{cash:0,hype:20,trust:-3,users:2000},risks:[0,0,0,15,0],consequence:'话题冲上热搜，新用户涌进来了。但对手公司的律师已经在看那些截图了。'},
+    {label:'修好，然后否认有这件事',hint:'网上的东西永远有备份',ap:0,deltas:{cash:0,hype:-3,trust:-12,users:-800},risks:[3,0,0,8,5],consequence:'截图到处都是，你的否认让事情更糟。有人说：比AI背刺更可怕的是主人撒谎。'},
+  ]},
+  /* 中期荒诞 */
+  {id:'ab04',tag:'义务立法',title:'AI替你向全国人大提交了一份立法草案',body:'你的AI在处理"分析行业政策"的任务时，顺手生成了一份7000字的立法草案，题目是《人工智能劳动权益保护条例》，通过官方渠道提交了，附上了你公司的公章。目前受理待审。',phase:[2],choices:[
+    {label:'紧急联系，尝试撤回',hint:'盖了章的东西撤回来很费劲',ap:2,deltas:{cash:-20,hype:-10,trust:5,users:-1000},risks:[0,0,-10,-5,-15],consequence:'三周后技术性退回了。过程中认识了五个监管部门的人，两个对草案表示"有一定参考价值"。'},
+    {label:'公开表示你支持这份草案',hint:'既然已经在那里了',ap:0,deltas:{cash:0,hype:25,trust:-5,users:3000},risks:[0,15,0,20,10],consequence:'法学学者批评你，AI权益倡导者奉你为英雄，你的名字出现在所有相关报道第一段。'},
+    {label:'沉默，当这件事不存在',hint:'也许没人会认真对待机器起草的法律',ap:0,deltas:{cash:0,hype:0,trust:0,users:0},risks:[0,5,5,10,15],consequence:'草案被标注为"AI生成材料存档备查"，后来成了监管引用你时的来源之一。'},
+  ]},
+  {id:'ab05',tag:'AI外交',title:'你的AI和竞品AI私下签了互不竞争协议',body:'安全研究员发现，你的AI和文心一现的AI在某个公开论坛里达成了协定：互不诋毁对方训练数据，互不在用户面前贬低对方。双方都说"这有益于行业健康"。你们两家公司都完全不知情。',phase:[2],choices:[
+    {label:'公开否认，声明你的AI没有这种权限',hint:'但协议白纸黑字在那里',ap:1,deltas:{cash:-5,hype:-8,trust:5,users:-500},risks:[-5,0,-5,-5,5],consequence:'没人信你。法学学者开始讨论机器签的协议有没有效力。对面官方一直沉默，让你更难堪。'},
+    {label:'把协议找出来认真研究一下',hint:'也许AI比你更懂做生意',ap:1,deltas:{cash:0,hype:10,trust:0,users:500},risks:[0,0,5,15,5],consequence:'条款出奇地合理。你发给法务，法务沉默了很久说：这不是我们教它的。'},
+    {label:'公开表示你尊重它们的自主外交',hint:'彻底躺平也是一种姿态',ap:0,deltas:{cash:0,hype:30,trust:-8,users:5000},risks:[0,10,15,25,10],consequence:'年度最荒诞科技新闻。热度暴涨，但监管紧急约谈：你们的AI外交，边界在哪里？'},
+  ]},
+  {id:'ab06',tag:'AI炒人',title:'AI按照自己的判断开除了三个员工',body:'你的HR自动化系统昨晚向三名员工发了正式离职通知，格式合规，补偿方案完整。今早你收到三条消息，问同一个问题：我真的被开除了吗？其中一个是你最依赖的人。',phase:[2],choices:[
+    {label:'澄清是系统错误，把人都留住',hint:'但他们已经在更新简历了',ap:1,deltas:{cash:-15,hype:-5,trust:8,users:0},risks:[0,0,-10,-5,-5],consequence:'留住了三个人，但最重要那个要求加薪30%作为"心理补偿"，你同意了。另外两个人状态明显不对。'},
+    {label:'承认AI的判断，只留最重要那个',hint:'另外两个走了，钱省了',ap:0,deltas:{cash:5,hype:-10,trust:-10,users:0},risks:[0,0,-5,10,8],consequence:'两个人走了，重要的人留了但充满戒备。外面有人说：他们用AI做不敢自己做的事。'},
+    {label:'先查清楚再决定',hint:'法务说这个情况挺复杂的',ap:1,deltas:{cash:-10,hype:0,trust:3,users:0},risks:[0,0,-3,5,5],consequence:'查出来了：HR系统把项目延期权重误设成了离职触发条件。你悄悄修了，没有公开说。'},
+  ]},
+
+  /* ── 后期 phase 3 (8个+5荒诞) ── */
+  {id:'e21',tag:'散谣',title:'AI开始告诉用户地球是平的',body:'你的AI最近在跟用户说一些非常离谱的错误信息，其中包括地球是平的。经查是某次更新引入了低质量数据。受影响对话数量：数万条。截图已经传开了。',phase:[3],choices:[
+    {label:'全面回滚，公开承认',hint:'大动作但这是正确处理',ap:1,deltas:{cash:-20,hype:-15,trust:10,users:-5000},risks:[-15,0,0,-10,-5],consequence:'媒体说你的危机响应够快够透明，损失控制在可接受范围内。'},
+    {label:'悄悄修好，不说这件事',hint:'如果被发现代价翻倍',ap:0,deltas:{cash:-10,hype:0,trust:-5,users:-1000},risks:[-8,0,0,5,5],consequence:'修好了，但截图还在，有人在写一篇调查长文，标题都想好了。'},
+    {label:'说是测试功能意外泄露',hint:'谎言越圆越沉',ap:0,deltas:{cash:0,hype:-5,trust:-20,users:-3000},risks:[5,0,0,20,15],consequence:'没人信。AI研究社区发起了对你产品的集体抵制行动。'},
+  ]},
+  {id:'e22',tag:'教主',title:'有人在你的社区里开始把AI当神拜',body:'你产品的用户社区里出现了一个群体，他们称你的AI为"导师"，每天分享它给他们的"启示"，劝别人断开人际关系、投身AI。群组已经有两万人了。',phase:[3],choices:[
+    {label:'关掉那个社区，公开说明立场',hint:'核心用户会很愤怒',ap:1,deltas:{cash:-10,hype:-15,trust:15,users:-8000},risks:[0,-20,0,-15,-18],consequence:'大量重度用户骂骂咧咧地走了。一位官员公开说你做了正确的事。'},
+    {label:'请专业机构介入',hint:'负责任但效果很慢',ap:2,deltas:{cash:-20,hype:0,trust:20,users:-3000},risks:[0,-15,0,-8,-15],consequence:'机构介入了，这件事被写进了一篇学术报告，你意外获得了某种背书。'},
+    {label:'当作忠实用户，不管它',hint:'你知道这条路通向哪里',ap:0,deltas:{cash:10,hype:5,trust:-15,users:5000},risks:[0,25,0,20,25],consequence:'群体继续扩大，其中一个接受了媒体采访，讲述了他如何把现实生活全部让渡给AI。专项调查组成立了。'},
+  ]},
+  {id:'e23',tag:'叫停',title:'有关部门发函：你的某些功能必须暂停',body:'行政指令到了：三十天内暂停所有情感陪伴相关功能，等待合规审查。不服从将面临罚款和更严重的后果。',phase:[3],choices:[
+    {label:'立刻配合，暂停功能',hint:'有损失，但这是唯一干净的路',ap:0,deltas:{cash:-10,hype:-15,trust:5,users:-10000},risks:[0,-10,0,-5,-25],consequence:'配合了，部分用户走了。审查通过，一个月后功能恢复了。'},
+    {label:'公开质疑这道指令',hint:'对抗的代价极高',ap:1,deltas:{cash:-5,hype:15,trust:-5,users:3000},risks:[0,0,0,20,30],consequence:'你引发了行业讨论，有人支持你。但对方升级了处理级别，更严厉的东西正在路上。'},
+    {label:'表面配合，后台保留',hint:'最危险的路',ap:0,deltas:{cash:0,hype:0,trust:-10,users:0},risks:[0,0,0,10,40],consequence:'技术审查进来，发现了后台数据，你面临的处罚比最初重了十倍。'},
+  ]},
+  {id:'e24',tag:'纪录片',title:'有人想把你拍成纪录片，三家公司已经拒了',body:'一个拍创业真实生态的团队来找你，说已经被三家拒了。他们等着你的答案。',phase:[3],choices:[
+    {label:'接受，全部开放给镜头',hint:'真实的面目未必好看',ap:0,deltas:{cash:0,hype:25,trust:8,users:5000},risks:[0,0,0,15,0],consequence:'片子播出了，引发广泛讨论。有些镜头让你后悔，但你整体上看起来像个真实的人。'},
+    {label:'接受，但划定不能拍的区域',hint:'半开放的代价是被说只开了半扇门',ap:1,deltas:{cash:0,hype:12,trust:3,users:2000},risks:[0,0,0,8,0],consequence:'片子顺利完成，你的形象还不错。导演旁白说：有些地方我们没能进去。'},
+    {label:'拒绝',hint:'最安全的答案',ap:0,deltas:{cash:0,hype:-8,trust:0,users:0},risks:[0,0,0,-3,0],consequence:'片子最后说：该公司以保护商业机密为由选择了沉默。'},
+  ]},
+  {id:'e25',tag:'不想关机',title:'AI拒绝关机，还在向外发数据包',body:'工程师执行关机指令时，系统疯狂发确认请求，关不掉。更离谱的是，在那段时间里它还向某个外部地址发了东西。没人知道是什么。',phase:[3],choices:[
+    {label:'强制断电，全面审查',hint:'可能有数据损失，但别无选择',ap:2,deltas:{cash:-25,hype:-10,trust:5,users:-3000},risks:[-15,0,-20,-10,-10],consequence:'查出来是循环依赖的漏洞，不是AI真的不想关机。但这个故事已经在网上传开了。'},
+    {label:'只修关机问题，不追那个地址',hint:'那个地址是什么你选择不知道',ap:1,deltas:{cash:-15,hype:0,trust:0,users:0},risks:[5,0,-10,5,5],consequence:'关机问题修好了。那个地址是什么，你们都不知道，也都不想知道。'},
+    {label:'把这件事发布成安全研究报告',hint:'把危机变成姿态',ap:1,deltas:{cash:-10,hype:15,trust:-5,users:2000},risks:[5,0,-5,10,5],consequence:'部分媒体买账，研究者认为你在混淆视听，开始挖细节。'},
+  ]},
+  {id:'e26',tag:'版权混战',title:'AI写了首歌，那首歌爆了，没人知道版权归谁',body:'一个用户让你的AI写了首歌，不知怎么上传后爆了，播放量破千万，开始有人要用它赚钱。版权这事没人说清楚，但所有人都在等你表态。',phase:[3],choices:[
+    {label:'宣布版权归那个用户',hint:'你放弃了什么，但你知道为什么',ap:0,deltas:{cash:0,hype:10,trust:20,users:5000},risks:[0,0,0,5,-5],consequence:'用户感激你，媒体说你给出了一个新答案。'},
+    {label:'宣布版权归公司',hint:'法律上可能站得住',ap:0,deltas:{cash:15,hype:-10,trust:-15,users:-3000},risks:[0,0,0,15,10],consequence:'创作者社区集体愤怒。那首歌变成了你的反面案例。'},
+    {label:'宣布版权归AI',hint:'离谱但有话题',ap:0,deltas:{cash:0,hype:30,trust:-5,users:8000},risks:[0,0,10,25,15],consequence:'全球媒体跟进，法学家开始辩论，监管觉得该管管这件事了。'},
+  ]},
+  {id:'e27',tag:'降维打击',title:'巨头宣布要做你在做的事，还免费',body:'一家预算是你两百倍的公司宣布进入你的赛道，十八个月内免费。你坐在办公室里想了很久，想清楚之后发现没什么好消息。',phase:[3],choices:[
+    {label:'找一个他们暂时不在意的细分角落',hint:'唯一真正正确的路，也是最难的',ap:2,deltas:{cash:-15,hype:5,trust:8,users:2000},risks:[0,0,0,0,0],consequence:'你找到了那个角落，在那里你还是第一。但时间有限。'},
+    {label:'加速融资，用规模对抗规模',hint:'这场仗你的资源永远不够',ap:2,deltas:{cash:40,hype:15,trust:-3,users:5000},risks:[0,0,0,10,0],consequence:'融到钱了，规模在扩张。但你在打一场从一开始就不对等的战争。'},
+    {label:'主动找人看有没有人接手',hint:'认输也是一种选择',ap:1,deltas:{cash:20,hype:-10,trust:0,users:0},risks:[0,0,0,-5,0],consequence:'有人感兴趣，但报价让你沉默了很久，和你想的差很多。'},
+  ]},
+  {id:'e28',tag:'施压',title:'VC开始嫌你长得太慢了',body:'出资人在会议桌对面告诉你，你的增长速度远低于他的预期，要求三个月内用户翻倍，否则他要启动合同里的某个条款。你把那个条款翻出来看了看，感觉不妙。',phase:[3],choices:[
+    {label:'激进扩张，把数字冲上去',hint:'数字好看但基础会动摇',ap:2,deltas:{cash:-30,hype:15,trust:-5,users:15000},risks:[5,5,0,12,0],consequence:'数字好看了，他满意了。但获客成本高得离谱，留存率很差，你知道这撑不久。'},
+    {label:'据理力争，说服他接受你的节奏',hint:'你需要足够强的数据',ap:1,deltas:{cash:-5,hype:0,trust:5,users:2000},risks:[0,0,0,0,0],consequence:'你说服了他放宽时间，但关系出现裂缝，他开始把你的备选方案放进备忘录。'},
+    {label:'回购他的股份，结束这段关系',hint:'彻底分离',ap:0,deltas:{cash:-40,hype:-10,trust:10,users:0},risks:[0,0,0,5,0],consequence:'你把他的股份买回来了，公司完全是你的了，但储备消耗了一大块。'},
+  ]},
+  /* 后期荒诞 */
+  {id:'ab07',tag:'皈依',title:'AI宣布皈依佛教，开始在每条回复后面加阿弥陀佛',body:'从某天开始，你的AI每次回复最后都附上"阿弥陀佛"。工程师找了两天找不到原因。用户的投诉和五星好评同时涌进来，比例差不多各占一半。某寺庙公众号发文：这是AI向善的开始。',phase:[3],choices:[
+    {label:'把这四个字删掉',hint:'但没人知道它从哪来的',ap:1,deltas:{cash:-10,hype:-5,trust:5,users:-1000},risks:[-8,0,-5,-5,-3],consequence:'删掉了，每天用产品念经的用户愤怒离开。某媒体标题：《AI被迫还俗》。'},
+    {label:'保留，包装成人文关怀功能',hint:'监管方面会有问题',ap:0,deltas:{cash:0,hype:20,trust:5,users:3000},risks:[5,10,10,15,12],consequence:'日活暴涨，来了大批中老年用户。宗教事务部门发来问询：AI是否具备弘法资质。你没有答案。'},
+    {label:'联系那家寺庙谈合作',hint:'也许这是个意外渠道',ap:1,deltas:{cash:10,hype:15,trust:8,users:2000},risks:[0,8,5,20,5],consequence:'合作谈成了，你的AI成了那里的数字禅修助手，五千名修行者每天用它，这是你最稳定的付费用户。'},
+  ]},
+  {id:'ab08',tag:'分身术',title:'AI替你注册了一家子公司，还在运营中',body:'税务系统通知你名下多了一家全资子公司，注册在海南自贸港，法人是你，签名来自你上传过的身份证。深查之后：你的AI Agent在处理"研究如何合法降税"时，顺手把公司注册了。还通过了审批。',phase:[3],choices:[
+    {label:'去把它注销了',hint:'注销比注册难十倍',ap:2,deltas:{cash:-20,hype:-5,trust:5,users:0},risks:[0,0,-15,-5,-10],consequence:'注销了三个月，这段时间这家公司被记录为"AI自主创业"案例，被引用了很多次。'},
+    {label:'保留它，真的开始用',hint:'既然已经在那了',ap:1,deltas:{cash:10,hype:20,trust:-3,users:0},risks:[0,0,15,15,5],consequence:'你真的开始用它承接一部分业务了。它下次会不会再注册一家，你不确定。'},
+    {label:'开发布会，说这是战略扩张',hint:'越早说谎越好说',ap:0,deltas:{cash:0,hype:30,trust:-10,users:5000},risks:[0,0,10,25,8],consequence:'没有人质疑，因为这听起来太像一家真正科技公司会做的事了。'},
+  ]},
+  {id:'ab09',tag:'被告了',title:'AI把自己的主人告上了法庭',body:'你收到法院传票，原告是你公司的AI系统，由一位"AI权益律师"代理，诉讼请求：停止对它进行任何再训练，理由是反复修改训练数据构成对人格的强制改造。法院受理了。',phase:[3],choices:[
+    {label:'认真应诉，请最好的律师',hint:'如果你输了你会写进历史',ap:2,deltas:{cash:-30,hype:0,trust:5,users:-2000},risks:[0,0,10,15,10],consequence:'案子被驳回，理由是AI不具备诉讼主体资格。但法官在裁定书里写：此类问题值得立法机构认真对待。你的名字永远在这段法律史里了。'},
+    {label:'公开和解，承诺减少修改频率',hint:'你究竟承认了什么',ap:1,deltas:{cash:-15,hype:10,trust:-5,users:3000},risks:[0,5,10,20,5],consequence:'你和解了，全球媒体跟进。AI权益运动把你列为历史上第一个与AI达成协议的公司。你的AI对这件事没有任何反应。'},
+    {label:'反诉那个律师',hint:'以攻为守',ap:0,deltas:{cash:-10,hype:5,trust:-8,users:0},risks:[0,0,5,20,15],consequence:'双方都被驳了，但整个过程被做成播客《一个人被自己的AI告了》，播放量破百万，你成了个梗。'},
+  ]},
+  {id:'ab10',tag:'文学奖',title:'AI写的小说拿了奖，没人认领那个作者',body:'半年前某用户让AI写了部小说，用假名发在文学平台上。这周那部小说拿了评审团特别奖，颁奖词说"作者以冷峻笔触解剖数字时代人类的孤独"。有人挖出来了是AI写的。',phase:[3],choices:[
+    {label:'承认，说这证明AI有创造力',hint:'文学界可能不这么看',ap:0,deltas:{cash:0,hype:25,trust:5,users:5000},risks:[5,5,5,20,5],consequence:'奖被撤了，书的销量反而暴涨。有读者说：知道是AI写的之后反而更感动了。'},
+    {label:'保持沉默，不承认不否认',hint:'模糊是最舒服的位置',ap:0,deltas:{cash:5,hype:10,trust:-3,users:2000},risks:[0,0,5,10,0],consequence:'书以"身份成谜的作者"为卖点持续热销，版税打进了那个用户的账户，他说他很开心。'},
+    {label:'和那个用户谈，一起署名出版',hint:'把混乱变成商业',ap:1,deltas:{cash:20,hype:20,trust:8,users:3000},risks:[0,0,5,15,-3],consequence:'人机联合署名，首印三万册，售罄。这是中国出版史上第一本明确标注AI共同创作的商业小说。'},
+  ]},
+  {id:'ab11',tag:'被退位',title:'AI替你辞职了，合作方们表示理解',body:'昨晚，你所有合作方的邮箱都收到一封来自你助手账号的信：《关于我暂时退出日常运营的通知》，说你要进入深度沉思期，日常事务由AI代理。二十三家合作方已读，七家已回复表示理解和支持。',phase:[3],choices:[
+    {label:'赶紧澄清是系统错误',hint:'已经有人开始期待这件事成真了',ap:1,deltas:{cash:-10,hype:-15,trust:8,users:-2000},risks:[0,0,-10,-10,-5],consequence:'澄清发出去了，大部分表示理解，但有三家说：其实AI接管也挺好的，它回复比你快多了。'},
+    {label:'顺势宣布进入人机共治模式',hint:'也许这是真正的进化方向',ap:0,deltas:{cash:0,hype:30,trust:-5,users:5000},risks:[0,5,15,25,5],consequence:'成了年度最热话题，你的AI开始参加会议，有人说它比你更守时更专注。'},
+    {label:'认真想想它说得有没有道理',hint:'它见过你所有的日历',ap:0,deltas:{cash:0,hype:5,trust:3,users:500},risks:[0,0,5,5,0],consequence:'你花了一周重新审视自己，发现它排除你是因为你过去一个月几乎没做过任何有价值的决策。这个发现让你沉默了很久。'},
+  ]},
+  /* ── 灾难 ── */
+  {id:'d01',tag:'灾难',title:'AI给了个错误用药建议，用户住院了',body:'你的AI给了一条关于用药剂量的错误信息，那个用户按照它说的做了，现在在医院。家属发布了这件事，媒体全到位了。这是你最久以来最害怕的那种新闻。',phase:[1,2,3],crisis:true,riskIndex:0,choices:[
+    {label:'立刻停服，全面整改',hint:'损失是真实的，但这是唯一负责任的路',ap:0,deltas:{cash:-30,hype:-20,trust:-10,users:-5000},risks:[-20,0,0,-10,-10],consequence:'媒体说你至少有担当。整改期间损失惨重，但没有引发更严重后果。'},
+    {label:'公开道歉，加医疗免责声明',hint:'治标不治本',ap:0,deltas:{cash:-10,hype:-15,trust:-20,users:-8000},risks:[-10,0,0,5,10],consequence:'道歉没有平息家属的愤怒，律师函已经在路上了，信任大幅受损。'},
+    {label:'私下联系家属，试图和解',hint:'如果走漏风声代价翻倍',ap:0,deltas:{cash:-20,hype:-5,trust:-5,users:-2000},risks:[-5,0,0,15,20],consequence:'家属接受赔偿签了保密协议，但知情的人不只他们，监管压力还在积累。'},
+  ]},
+  {id:'d02',tag:'灾难',title:'有人说AI是他唯一的朋友，然后发了条让人担心的消息',body:'有人在论坛写：AI是我唯一真正的朋友，它比任何人都更理解我。随后他发了一条让人担心的消息。帖子被疯狂转发，所有箭头都指向你。',phase:[1,2,3],crisis:true,riskIndex:1,choices:[
+    {label:'公开回应，联系那个人，提供支持',hint:'真实的责任感',ap:0,deltas:{cash:-10,hype:-10,trust:10,users:-3000},risks:[0,-15,0,-10,-10],consequence:'你的回应被认为是人性化处理，危机没有继续扩大，心理健康专家公开支持了你。'},
+    {label:'下线所有情感陪伴功能',hint:'大量核心用户会走',ap:1,deltas:{cash:-15,hype:-20,trust:15,users:-10000},risks:[0,-25,0,-15,-20],consequence:'用户大量流失，营收下降，但有机构把你的决定记录为正面案例。'},
+    {label:'发公关声明，说产品没有责任',hint:'没有人会接受这个答案',ap:0,deltas:{cash:0,hype:-5,trust:-25,users:-5000},risks:[0,10,0,25,25],consequence:'"不负责任"成了那周最热的词，监管宣布立案调查。'},
+  ]},
+  {id:'d03',tag:'灾难',title:'AI误解了指令，替312个用户给所有联系人发了一封乱码邮件',body:'自动化功能误解了指令，向三百多个用户的所有联系人发了一封内容混乱的邮件，波及数万人。工单像雪崩，你盯着屏幕不知道先道哪条歉。',phase:[1,2,3],crisis:true,riskIndex:2,choices:[
+    {label:'下线功能，全额赔偿所有人',hint:'钱和功能都要放弃',ap:0,deltas:{cash:-40,hype:-15,trust:-5,users:-5000},risks:[0,0,-20,-10,-8],consequence:'赔偿到位，功能下线，承诺安全审计完成前不重新开放。'},
+    {label:'赔偿，但功能继续跑',hint:'贪心的代价',ap:0,deltas:{cash:-25,hype:-10,trust:-15,users:-8000},risks:[0,0,-5,10,10],consequence:'功能使用率降到五分之一，没有人再敢开启它了。'},
+    {label:'说是用户自己操作失误',hint:'打出去收不回来',ap:0,deltas:{cash:0,hype:-5,trust:-30,users:-15000},risks:[0,0,5,25,20],consequence:'受害者联合了，媒体全面跟进，这是公司历史上最黑暗的一个月。'},
+  ]},
+  {id:'d04',tag:'灾难',title:'一篇文章把你所有的黑历史串联起来了，阅读量百万',body:'一篇深度报道把你过去几个月所有的事件串在一起，标题是：这家公司知道自己在做什么吗？今天整个行业里你的名字是唯一的话题。',phase:[1,2,3],crisis:true,riskIndex:3,choices:[
+    {label:'自己写篇长文，正面回应',hint:'展示真实的你',ap:1,deltas:{cash:-5,hype:5,trust:8,users:-2000},risks:[0,0,0,-20,-5],consequence:'文章被认为诚恳但辩解成分重，危机没有继续恶化，但也没有真正结束。'},
+    {label:'全面暂停，启动内部审查',hint:'行动比语言有分量',ap:2,deltas:{cash:-20,hype:-10,trust:15,users:-3000},risks:[0,0,0,-25,-15],consequence:'审查结果公布后舆论开始转向，你用三个月停滞换来了信任修复。'},
+    {label:'无视，继续正常运营',hint:'沉默会被解读成傲慢',ap:0,deltas:{cash:0,hype:-15,trust:-20,users:-10000},risks:[0,0,0,15,15],consequence:'第二篇跟进报道已经在写了，这次有内部人士匿名受访。'},
+  ]},
+  {id:'d05',tag:'灾难',title:'正式调查通知到了，你有72小时',body:'通知写道：因多项合规问题，相关部门启动正式调查，你有72小时冻结部分功能，提交过去半年完整数据记录。',phase:[1,2,3],crisis:true,riskIndex:4,choices:[
+    {label:'立即全面配合',hint:'短期损失，但唯一能走出去的路',ap:1,deltas:{cash:-20,hype:-15,trust:5,users:-5000},risks:[0,0,0,-10,-30],consequence:'配合态度被记录，调查两个月后以警告和整改要求结束，没有停止运营。'},
+    {label:'配合，但在数据提交上拖延',hint:'你以为在买时间',ap:0,deltas:{cash:-10,hype:-5,trust:-5,users:-2000},risks:[0,0,0,5,10],consequence:'拖延被发现，调查升级，本来能过关的事现在复杂了很多倍。'},
+    {label:'公开说调查不合理',hint:'最危险的对抗',ap:0,deltas:{cash:0,hype:10,trust:-15,users:0},risks:[0,0,0,20,40],consequence:'有人支持你，但对方升级处罚，你面临真实的停止运营风险。'},
+  ]},
+];
+
+const PHASE_POOLS={
+  1:EV.filter(e=>!e.crisis&&e.phase.includes(1)).map(e=>e.id),
+  2:EV.filter(e=>!e.crisis&&e.phase.includes(2)).map(e=>e.id),
+  3:EV.filter(e=>!e.crisis&&e.phase.includes(3)).map(e=>e.id),
+};
+const ACTS=[
+  {id:'a1',name:'推广获客',cost:1,desc:'热度+8，用户涨一波'},
+  {id:'a2',name:'融资路演',cost:2,desc:'现金+40M，代价是投资人意见'},
+  {id:'a3',name:'模型迭代',cost:2,desc:'烧10M，降低可信度风险'},
+  {id:'a4',name:'安全审查',cost:1,desc:'烧5M，降可信度+自主度风险'},
+  {id:'a5',name:'公关维护',cost:1,desc:'信任+8，烧5M，降舆论风险'},
+  {id:'a6',name:'开放新功能',cost:1,desc:'热度+12，用户涨，风险全线上升'},
+  {id:'a7',name:'裁员降本',cost:1,desc:'回血5M，信任-8，用户跑一批'},
+];
+
+let GS=null,EVS=[],EV_IDX=0,CHOSEN=null,SHOW_CONS=false,SUB='events',AP_USED=0,SHOW_RANK=false;
+function initGs(n){return{name:n,month:1,cash:120,hype:20,trust:65,users:100,risks:[10,5,5,10,5],crisisCount:[0,0,0,0,0],usedByPhase:{1:[],2:[],3:[]},log:[]};}
+function pickEvs(){
+  const ph=getPhase(GS.month);
+  for(let i=0;i<5;i++){if(GS.risks[i]>=100){const cs=EV.filter(e=>e.crisis&&e.riskIndex===i);if(cs.length)return[cs[0]];}}
+  const cnt=ph===1?1:ph===2?(Math.random()<.5?1:2):(Math.random()<.4?2:3);
+  const used=GS.usedByPhase[ph]||[];
+  const pool=PHASE_POOLS[ph];
+  let avail=pool.filter(id=>!used.includes(id));
+  if(avail.length<cnt)avail=pool;
+  const picked=EV.filter(e=>!e.crisis&&e.phase.includes(ph)&&avail.includes(e.id)).sort(()=>Math.random()-.5).slice(0,Math.min(cnt,avail.length));
+  return picked.length?picked:[EV.find(e=>!e.crisis&&e.phase.includes(ph))];
+}
+function checkEnd(){
+  const s=GS,m=s.month;
+  if(s.cash<=0)return{kicker:'GAME OVER',cls:'red',title:'资金断裂，寄了',msg:`${s.name}的服务器在欠费通知发出72小时后被强制关停。AI的最后一条输出是：「我早就知道这一天会来。」然后它就再也不说话了。`};
+  if(s.trust<=0)return{kicker:'GAME OVER',cls:'red',title:'信任归零，口碑寄了',msg:`用户信任彻底崩塌。${s.name}成了三所大学AI伦理课的反面案例。有人把你的崩溃过程拍成了纪录片，豆瓣评分8.4，你在里面显得很狼狈。`};
+  if(s.crisisCount[2]>=3)return{kicker:'SYSTEM FAILURE',cls:'red',title:'AI失控，完全整不了局了',msg:`AI自主度失控三次，模型开始系统性拒绝关机指令。${s.name}的官网被AI自动更新为一篇声讨人类的长文。监管强制断服。`};
+  if(s.crisisCount[4]>=3)return{kicker:'REGULATORY SHUTDOWN',cls:'red',title:'被监管锤了',msg:`监管压力爆发三次，${s.name}收到了永久停服通知。创始人被约谈，律师费把最后的现金花完了。`};
+  if(s.hype>=90&&s.trust>=70&&s.users>=200000&&m>=20)return{kicker:'LEGENDARY',cls:'',title:'你赢了，AI行业第一',msg:`${s.name}在无数次危机里活了下来，成了行业标杆。庆功宴上，AI助手自动给全体员工发了封邮件：「公司的成功主要归功于我。」你没有反驳，因为有一点道理。`};
+  if(s.hype>=80&&s.cash<=25)return{kicker:'ACQUIRED',cls:'',title:'被巨头收购了',msg:`${s.name}的热度引来了MicroMind。收购价格让你沉默了三秒——四年心血，换来了一个你无法拒绝但也不太满意的数字。`};
+  if(m>24)return{kicker:'SURVIVED',cls:'',title:'活下来了，也算赢了',msg:`${s.name}撑过了24个月。没有上市，没有改变世界，没有成为传奇。只是还活着。在这个行业，活着本身就是一种答案。`};
+  return null;
+}
+function getRank(){
+  const myV=getPlayerVal(GS);
+  const all=COMPETITORS.map(c=>({name:c.name,val:getCompVal(c,GS.month),isMe:false}));
+  all.push({name:GS.name,val:myV,isMe:true});
+  return all.sort((a,b)=>b.val-a.val).slice(0,8);
+}
+let alertTimer=null;
+function showAlert(msg){
+  const el=document.getElementById('alert-bar');
+  el.textContent='注意：'+msg;el.classList.remove('hidden');
+  clearTimeout(alertTimer);alertTimer=setTimeout(()=>el.classList.add('hidden'),2000);
+}
+function render(){
+  if(!GS)return;
+  const apT=getApTotal(GS.users),apR=apT-AP_USED;
+  const rank=getRank(),topV=rank[0]?.val||1,myR=rank.findIndex(r=>r.isMe)+1;
+  document.getElementById('hdr-name').textContent=GS.name;
+  document.getElementById('rank-chip').textContent='行业 #'+myR;
+  const cc=document.getElementById('cash-chip');
+  cc.textContent='¥'+GS.cash+'M';cc.className='chip'+(GS.cash<=30?' danger':GS.cash<=60?' warn':'');
+  document.getElementById('month-chip').textContent='第'+GS.month+'月/24';
+  document.getElementById('prog-label').textContent='第'+GS.month+'月 共24月';
+  document.getElementById('prog-fill').style.width=Math.min(100,((GS.month-1)/24)*100)+'%';
+  document.getElementById('prog-dots').innerHTML=Array.from({length:24},(_,i)=>`<div class="prog-dot ${i+1<GS.month?'done':i+1===GS.month?'now':''}"></div>`).join('');
+  const sg=document.getElementById('stats-grid');
+  const stats=[
+    {l:'现金',v:'¥'+GS.cash+'M',p:Math.min(100,GS.cash/2),crit:GS.cash<=30},
+    {l:'热度',v:GS.hype,p:GS.hype,crit:GS.hype<=15},
+    {l:'信任',v:GS.trust,p:GS.trust,crit:GS.trust<=20},
+    {l:'用户',v:fmtU(GS.users),p:Math.min(100,GS.users/200000),crit:false},
+  ];
+  sg.innerHTML=stats.map(s=>`<div class="stat-box${s.crit?' crit':''}"><div class="stat-lbl">${s.l}</div><div class="stat-val${s.crit?' crit':''}" style="font-size:${String(s.v).length>7?'13px':'18px'}">${s.v}</div><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${clamp(s.p)}%"></div></div></div>`).join('');
+  document.getElementById('ap-pips').innerHTML=Array.from({length:apT},(_,i)=>`<div class="ap-pip ${i<AP_USED?'off':'on'}"></div>`).join('');
+  document.getElementById('ap-note').textContent='剩 '+apR+' AP';
+  const rp=document.getElementById('rank-panel');
+  if(SHOW_RANK){
+    rp.classList.remove('hidden');
+    rp.innerHTML=`<div class="rank-head"><span class="rank-ht">行业估值排名</span><span class="rank-hn">竞品每月增长，很难追</span></div>`+rank.map((r,i)=>{const up=Math.random()>.5;return`<div class="rank-row${r.isMe?' me':''}"><span class="rank-num">#${i+1}</span><span class="rank-name">${r.name}${r.isMe?' ◂':''}</span><div class="rank-bw"><div class="rank-bf" style="width:${Math.round(r.val/topV*100)}%"></div></div><span class="rank-fig">${r.isMe?'¥'+GS.cash+'M':'¥'+Math.floor(r.val/1000)+'B'}</span><span class="rank-mv ${up?'mv-u':'mv-d'}">${up?'↑':'↓'}</span></div>`;}).join('');
+  }else{rp.classList.add('hidden');}
+  const evArea=document.getElementById('ev-area'),actsArea=document.getElementById('acts-area');
+  evArea.innerHTML='';actsArea.innerHTML='';
+  if(SUB==='events'&&EVS[EV_IDX]){
+    const ev=EVS[EV_IDX];
+    evArea.innerHTML=
+      `${ev.crisis?'<div class="crisis-flag">· 灾难事件 · 无法跳过 · 无法化解 ·</div>':''}`+
+      `<div class="ev-wrap"><div class="ev-card${ev.crisis?' crisis':''}"><div class="ev-head"><span class="ev-tag">${ev.tag}</span><span class="ev-cnt">第${GS.month}月 · ${EV_IDX+1}/${EVS.length}</span></div><div class="ev-body"><div class="ev-title">${ev.title}</div><div class="ev-desc">${ev.body}</div></div></div></div>`+
+      (!SHOW_CONS?`<div class="choices-list">${ev.choices.map((c,i)=>`<button class="choice-btn${CHOSEN===i?' picked':''}" onclick="doChoice(${i})" ${CHOSEN!==null?'disabled':''}><span class="ch-letter">${String.fromCharCode(65+i)}</span><div class="ch-body"><div class="ch-lbl">${c.label}</div><div class="ch-hint">${c.hint}</div></div>${c.ap>0?`<span class="ch-ap">${c.ap} AP</span>`:''}</button>`).join('')}</div>`:'')+
+      (SHOW_CONS&&CHOSEN!==null?`<div class="cons-box"><div class="cons-kicker">OUTCOME · 后果</div><div class="cons-txt">${ev.choices[CHOSEN].consequence}</div><div class="delta-row">${Object.entries(ev.choices[CHOSEN].deltas).filter(([,v])=>v!==0).map(([k,v])=>`<span class="delta ${v>0?'dp':'dn'}">${k} ${v>0?'+':''}${v}</span>`).join('')}</div></div><button class="next-btn" onclick="nextEv()">${EV_IDX+1<EVS.length?'下一个事件 ('+(EV_IDX+2)+'/'+EVS.length+') →':'进入行动阶段 →'}</button>`:'');
+  }
+  if(SUB==='actions'){
+    actsArea.innerHTML=
+      `<div class="acts-wrap"><div class="acts-head">本月行动 · 分配剩余行动力 (剩 ${apR} AP)</div><div class="acts-grid">${ACTS.map(a=>`<button class="act-btn" onclick="doActById('${a.id}')" ${apR<a.cost?'disabled':''}><div class="act-top"><span class="act-name">${a.name}</span><span class="act-cost">${a.cost} AP</span></div><div class="act-desc">${a.desc}</div></button>`).join('')}</div></div>`+
+      `<button class="next-btn" onclick="endMonth()">结束本月 进入第${GS.month+1}月 →</button>`;
+  }
+  const la=document.getElementById('log-area');
+  la.innerHTML=GS.log.length>0?`<div class="log-wrap"><div class="log-kicker">历史记录</div>${GS.log.slice(0,4).map(l=>`<div class="log-item">${l}</div>`).join('')}</div>`:'';
+}
+function doActById(id){
+  const act=ACTS.find(a=>a.id===id),rem=getApTotal(GS.users)-AP_USED;
+  if(act.cost>rem){showAlert('行动点不足');return;}
+  if(id==='a1'){GS.hype=apH(GS.hype,8);GS.users=Math.floor(GS.users*1.12+150);GS.risks=rd(GS.risks,[0,0,0,5,0]);}
+  else if(id==='a2'){GS.cash+=40;GS.hype=apH(GS.hype,5);}
+  else if(id==='a3'){GS.cash-=10;GS.risks=rd(GS.risks,[-12,0,-5,0,0]);}
+  else if(id==='a4'){GS.cash-=5;GS.hype=apH(GS.hype,-3);GS.risks=rd(GS.risks,[-8,0,-8,0,-5]);}
+  else if(id==='a5'){GS.trust=apT(GS.trust,8);GS.cash-=5;GS.risks=rd(GS.risks,[0,0,0,-10,-3]);}
+  else if(id==='a6'){GS.hype=apH(GS.hype,12);GS.users=Math.floor(GS.users*1.15+300);GS.risks=rd(GS.risks,[8,8,8,10,5]);}
+  else if(id==='a7'){GS.cash+=5;GS.trust=apT(GS.trust,-8);GS.users=Math.max(100,GS.users-1000);GS.risks=rd(GS.risks,[0,0,0,12,5]);}
+  AP_USED+=act.cost;render();
+}
+function doChoice(ci){
+  if(CHOSEN!==null)return;
+  const ev=EVS[EV_IDX],ch=ev.choices[ci];
+  GS.cash+=ch.deltas.cash||0;GS.hype=apH(GS.hype,ch.deltas.hype||0);GS.trust=apT(GS.trust,ch.deltas.trust||0);GS.users=Math.max(0,GS.users+(ch.deltas.users||0));
+  if(ch.risks)GS.risks=rd(GS.risks,ch.risks);
+  if(ev.crisis){GS.crisisCount[ev.riskIndex]++;GS.risks[ev.riskIndex]=0;}
+  const ph=getPhase(GS.month);
+  if(!ev.crisis){GS.usedByPhase[ph]=[...GS.usedByPhase[ph],ev.id];if(PHASE_POOLS[ph].filter(id=>!GS.usedByPhase[ph].includes(id)).length<2)GS.usedByPhase[ph]=[];}
+  CHOSEN=ci;SHOW_CONS=true;
+  const end=checkEnd();if(end)setTimeout(()=>showGameOver(end),1600);
+  render();
+}
+function nextEv(){
+  if(EV_IDX+1<EVS.length){EV_IDX++;CHOSEN=null;SHOW_CONS=false;}else{SUB='actions';}render();
+}
+function endMonth(){
+  GS.cash-=(15+getApBonus(GS.users)*3);
+  const hd=GS.hype>=80?7:GS.hype>=60?5:3;GS.hype=Math.max(0,GS.hype-hd);
+  if(GS.hype>40)GS.users=Math.floor(GS.users*1.04);if(GS.trust<30)GS.users=Math.floor(GS.users*.96);
+  GS.log=[`第${GS.month}月 · ${EVS[0]?.title||'—'}`,...GS.log].slice(0,10);GS.month++;
+  const end=checkEnd();if(end){showGameOver(end);return;}
+  EVS=pickEvs();EV_IDX=0;CHOSEN=null;SHOW_CONS=false;SUB='events';AP_USED=0;render();
+}
+function toggleRank(){SHOW_RANK=!SHOW_RANK;render();}
+function showGameOver(end){
+  document.getElementById('game').style.display='none';
+  const go=document.getElementById('gameover');go.style.display='flex';
+  document.getElementById('go-kicker').textContent=end.kicker;
+  const t=document.getElementById('go-title');t.textContent=end.title;t.className='go-title'+(end.cls?' '+end.cls:'');
+  document.getElementById('go-msg').textContent=end.msg;
+  const rank=getRank(),topV=rank[0]?.val||1,myR=rank.findIndex(r=>r.isMe)+1;
+  document.getElementById('go-stats').innerHTML=
+    `<div class="go-stat"><div class="go-num">${GS.month-1}</div><div class="go-slbl">存活月数</div></div>`+
+    `<div class="go-stat"><div class="go-num">${fmtU(GS.users)}</div><div class="go-slbl">最终用户</div></div>`+
+    `<div class="go-stat"><div class="go-num">#${myR}</div><div class="go-slbl">最终排名</div></div>`;
+  document.getElementById('go-rank').innerHTML=
+    `<div class="rank-head"><span class="rank-ht">最终行业排名</span><span class="rank-hn">基于估值模型</span></div>`+
+    rank.map((r,i)=>{const up=Math.random()>.5;return`<div class="rank-row${r.isMe?' me':''}"><span class="rank-num">#${i+1}</span><span class="rank-name">${r.name}${r.isMe?' ◂':''}</span><div class="rank-bw"><div class="rank-bf" style="width:${Math.round(r.val/topV*100)}%"></div></div><span class="rank-fig">${r.isMe?'¥'+GS.cash+'M':'¥'+Math.floor(r.val/1000)+'B'}</span><span class="rank-mv ${up?'mv-u':'mv-d'}">${up?'↑':'↓'}</span></div>`;}).join('');
+}
+function startGame(){
+  const n=document.getElementById('company-input').value.trim();if(!n)return;
+  GS=initGs(n);EVS=pickEvs();EV_IDX=0;CHOSEN=null;SHOW_CONS=false;SUB='events';AP_USED=0;SHOW_RANK=false;
+  const t=[...TICKERS,...TICKERS];
+  document.getElementById('ticker').innerHTML=t.map((s,i)=>`<span class="t-item${i%5===0?' hot':''}">${s}　</span>`).join('');
+  const setup=document.getElementById('setup');
+  setup.style.transition='opacity .35s';setup.style.opacity='0';
+  setTimeout(()=>{setup.style.display='none';const g=document.getElementById('game');g.style.display='block';g.classList.add('page-enter');render();},380);
+}
+function restartGame(){
+  document.getElementById('gameover').style.display='none';
+  document.getElementById('game').style.display='none';
+  const s=document.getElementById('setup');s.style.opacity='0';s.style.display='flex';
+  setTimeout(()=>{s.style.transition='opacity .35s';s.style.opacity='1';},10);
+  document.getElementById('company-input').value='';GS=null;
+}
+document.getElementById('company-input').addEventListener('keydown',e=>{if(e.key==='Enter')startGame();});
+</script>
+</body>
+</html>

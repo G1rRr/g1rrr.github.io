@@ -631,7 +631,7 @@ const About = ({ onOpenJanus, onOpenCognition, onOpenMeihua }: { onOpenJanus: ()
   const projectActions: Record<string, { action?: () => void; link?: string }> = {
     MeihuaBOT: { action: onOpenMeihua },
     JanusBOT: { action: onOpenJanus },
-    "AI Startup Survival": { link: "https://g1rrr.github.io/Ai-Startup-Survival/" },
+    "AI Startup Survival": { link: "/ai-startup-survival.html" },
     "Workshop Manager": { link: "/workshop_mobile_v2.html" },
     "AI Product Cognition System": { action: onOpenCognition },
   };
