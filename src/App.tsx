@@ -264,7 +264,7 @@ const CrabWalker = () => {
   const EYE_L = { x: 4, y: 1 }, EYE_R = { x: 9, y: 1 };
   const CRAB = '#CD6E58';
   const BLACK = '#000';
-  const PX = 10;
+  const getPX = (w: number) => w < 450 ? 5 : w < 768 ? 7 : 10;
   const BLUE = '#0000FF';
   const PINK = '#FF0080';
   const WHITE = '#FFFFFF';
@@ -280,6 +280,7 @@ const CrabWalker = () => {
     const ctx = canvas.getContext('2d')!;
     let raf: number;
     let tick = 0;
+    let PX = getPX(window.innerWidth);
     let mx = -100, my = -100;
     let anim: { crab: number; start: number } | null = null;
     const ANIM_LENS = [0, 35, 35, 20, 55]; // 螃蟹1-4的动画帧数
@@ -292,20 +293,31 @@ const CrabWalker = () => {
       my = (e.clientY - rect.top) / PX;
     };
     const onLeave = () => { mx = -100; my = -100; };
-    const onClick = (e: MouseEvent) => {
+    const doClick = (cx: number, cy: number) => {
       if (anim) return;
-      const rect = canvas.getBoundingClientRect();
-      const cx = (e.clientX - rect.left) / PX;
-      const cy = (e.clientY - rect.top) / PX;
       const near = (bx: number, by: number) => Math.abs(cx - (bx + 7)) < 9 && Math.abs(cy - (by + 4)) < 7;
       if (near(crabPos.c1x, crabPos.c1y)) anim = { crab: 1, start: tick };
       else if (near(crabPos.c4x, crabPos.c4y)) anim = { crab: 4, start: tick };
       else if (near(crabPos.c2x, crabPos.c2y)) anim = { crab: 2, start: tick };
       else if (near(crabPos.c3x, crabPos.c3y)) anim = { crab: 3, start: tick };
     };
+    const onClick = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      doClick((e.clientX - rect.left) / PX, (e.clientY - rect.top) / PX);
+    };
     canvas.addEventListener('mousemove', onMove);
     canvas.addEventListener('mouseleave', onLeave);
     canvas.addEventListener('click', onClick);
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 0) { const t = e.touches[0]; const rect = canvas.getBoundingClientRect(); const cx = (t.clientX - rect.left) / PX; const cy = (t.clientY - rect.top) / PX; mx = cx; my = cy; doClick(cx, cy); }
+    };
+    const onTouchMove2 = (e: TouchEvent) => {
+      if (e.touches.length > 0) { const t = e.touches[0]; const rect = canvas.getBoundingClientRect(); mx = (t.clientX - rect.left) / PX; my = (t.clientY - rect.top) / PX; }
+    };
+    const onResize = () => { PX = getPX(window.innerWidth); };
+    canvas.addEventListener('touchstart', onTouchStart, { passive: true });
+    canvas.addEventListener('touchmove', onTouchMove2, { passive: true });
+    window.addEventListener('resize', onResize);
 
     const p = (gx: number, gy: number, c: string, a?: number) => {
       if (a !== undefined) ctx.globalAlpha = a;
@@ -350,9 +362,10 @@ const CrabWalker = () => {
     };
 
     const render = () => {
+      PX = getPX(window.innerWidth);
       const barW = canvas.parentElement?.clientWidth ?? window.innerWidth;
       const GW = Math.ceil(barW / PX);
-      const GH = 24;
+      const GH = 22;
       canvas.width = barW;
       canvas.height = GH * PX;
 
@@ -597,12 +610,15 @@ const CrabWalker = () => {
       canvas.removeEventListener('mousemove', onMove);
       canvas.removeEventListener('mouseleave', onLeave);
       canvas.removeEventListener('click', onClick);
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove2);
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 
   return (
-    <div className="w-full bg-[#0000FF] overflow-hidden relative flex z-10">
-      <canvas ref={canvasRef} className="block w-full cursor-none" style={{ imageRendering: 'pixelated' }} />
+    <div className="w-full bg-[#0000FF] overflow-hidden relative flex z-10 max-h-[200px] md:max-h-none">
+      <canvas ref={canvasRef} className="block w-full cursor-none" style={{ imageRendering: 'pixelated', touchAction: 'manipulation' }} />
     </div>
   );
 };
