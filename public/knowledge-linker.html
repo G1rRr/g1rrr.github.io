@@ -23,17 +23,16 @@
   <h1>knowledge linker</h1>
   <div class="tag">Agent 系统</div>
   <p>基于 LangGraph 构建的知识管理 Agent MVP，手动输入驱动，自动完成语义关联发现与主动推送，实现<strong>感知 → 规划 → 工具调用 → 反馈闭环</strong>四要素。</p>
-  <h2>快速开始</h2>
-  <div class="code">
-    pip install -r requirements.txt<br>
-    cp .env.example .env<br>
-    python main.py<br>
-    python main.py --feedback starred
-  </div>
-  <h2>Agent 能力</h2>
-  <p>自动发现、链接、整理零散知识碎片，构建结构化知识图谱。支持用户反馈学习（starred / clicked / dismissed）。</p>
+  <h2>部署方式</h2>
+  <div class="code">python deploy_server.py &nbsp;&nbsp;<span style="color:#999"># 端口 8710，PORT 环境变量可改</span></div>
+  <h2>对接方式</h2>
+  <p><strong>iframe 嵌入</strong> — <code>&lt;iframe src="http://你的服务器:8710"&gt;</code></p>
+  <p><strong>API 调用</strong> — 主站搜索框调 <code>/api/recall</code> 搜知识库</p>
+  <p><strong>Nginx 代理</strong> — 绑定子域名指向服务</p>
   <h2>技术栈</h2>
-  <p>Python · Anthropic API · 知识图谱 · SQLite</p>
+  <p>Python · LangGraph · Anthropic API · 知识图谱 · 语义关联</p>
+  <h2>源码</h2>
+  <p>已推送至 GitHub，包含 deploy_server.py、API接入文档、static/、nodes/、graph.py 等</p>
   <a href="/" class="back">← Back</a>
 </div>
 </body>
