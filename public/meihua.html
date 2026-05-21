@@ -7,25 +7,79 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;800&family=Space+Grotesk:wght@300;400;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0000FF;color:#050505;font-family:'Space Grotesk',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
-.card{background:#FFF;max-width:560px;width:100%;padding:48px 40px;border:3px solid #000;box-shadow:10px 10px 0 #FF0080}
-h1{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;letter-spacing:-1px;line-height:1}
-h1 span{color:#FF0080}
-.cat{display:inline-block;background:#FF0080;color:#FFF;font-size:10px;letter-spacing:3px;padding:4px 12px;margin:16px 0 24px}
-p{font-size:15px;line-height:1.9;color:#333}
-.btn{display:inline-block;margin-top:32px;padding:14px 36px;background:#0000FF;color:#FFF;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;text-decoration:none;border:2px solid #0000FF;transition:all .2s}
-.btn:hover{background:#FF0080;border-color:#FF0080}
-.back{display:inline-block;margin-top:20px;margin-left:16px;color:#0000FF;font-size:12px;letter-spacing:2px;text-decoration:none;border-bottom:2px solid #FF0080;padding-bottom:2px}
-.back:hover{color:#FF0080}
+/* ── 卡片页 ── */
+#card{background:#0000FF;font-family:'Space Grotesk',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+#card.hidden{display:none}
+.card-inner{background:#FFF;max-width:560px;width:100%;padding:48px 40px;border:3px solid #000;box-shadow:10px 10px 0 #FF0080}
+.card-inner h1{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;letter-spacing:-1px;line-height:1}
+.card-inner h1 span{color:#FF0080}
+.card-inner .cat{display:inline-block;background:#FF0080;color:#FFF;font-size:10px;letter-spacing:3px;padding:4px 12px;margin:16px 0 24px}
+.card-inner p{font-size:15px;line-height:1.9;color:#333}
+.card-inner .btn{display:inline-block;margin-top:32px;padding:14px 36px;background:#0000FF;color:#FFF;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;text-decoration:none;border:2px solid #0000FF;transition:all .2s;cursor:pointer}
+.card-inner .btn:hover{background:#FF0080;border-color:#FF0080}
+.card-inner .back{display:inline-block;margin-top:20px;margin-left:16px;color:#0000FF;font-size:12px;letter-spacing:2px;text-decoration:none;border-bottom:2px solid #FF0080;padding-bottom:2px}
+.card-inner .back:hover{color:#FF0080}
+/* ── 梅花页 ── */
+#meihua{display:none;position:fixed;inset:0;background:rgba(0,0,255,.96);z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px;overflow-y:auto;font-family:'Space Grotesk',sans-serif}
+#meihua.show{display:flex}
+#meihua .close{position:fixed;top:20px;right:24px;color:rgba(255,255,255,.5);font-size:12px;letter-spacing:2px;background:none;border:none;cursor:pointer}
+#meihua .close:hover{color:#FF0080}
+#meihua svg{flex-shrink:0}
+#meihua h2{font-family:'Syne',sans-serif;font-weight:800;color:#FFF;font-size:clamp(28px,5vw,72px);letter-spacing:-1px}
+#meihua .tag{color:#FF0080;font-size:11px;letter-spacing:4px;text-transform:uppercase}
+#meihua .cta{display:inline-block;padding:12px 28px;border:2px solid #FFF;color:#FFF;font-family:'Syne',sans-serif;font-weight:600;font-size:14px;letter-spacing:2px;text-decoration:none;transition:all .2s}
+#meihua .cta:hover{background:#FF0080;border-color:#FF0080}
+#meihua .wechat{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:1px}
+#meihua .foot{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;color:rgba(255,255,255,.2);padding-top:24px;border-top:1px solid rgba(255,255,255,.08);width:100%;text-align:center;transition:color .3s}
+#meihua .foot span{color:#FF0080}
+#meihua .foot:hover{color:#FF0080}
 </style>
 </head>
 <body>
-<div class="card">
-  <h1>Meihua<span>BOT</span></h1>
-  <div class="cat">AI 决策助手</div>
-  <p>基于大模型的多场景 AI 决策系统，覆盖饮食、出行、社交等生活场景，通过多轮交互与长期记忆生成个性化建议。</p>
-  <a href="https://www.coze.cn/s/SNzo0AZVc6o/" target="_blank" class="btn">进入体验 →</a>
-  <a href="/" class="back">← Back</a>
+
+<div id="card">
+  <div class="card-inner">
+    <h1>Meihua<span>BOT</span></h1>
+    <div class="cat">AI 决策助手</div>
+    <p>基于大模型的多场景 AI 决策系统，覆盖饮食、出行、社交等生活场景，通过多轮交互与长期记忆生成个性化建议。</p>
+    <button class="btn" onclick="openMeihua()">进入体验 →</button>
+    <a href="/" class="back">← Back</a>
+  </div>
 </div>
+
+<div id="meihua">
+  <button class="close" onclick="closeMeihua()">[ Close ]</button>
+  <svg width="260" height="260" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 60px rgba(255,0,128,.4))">
+    <defs><path id="petal" d="M160 45 C148 25 130 18 118 30 C100 48 102 72 118 86 C134 100 148 92 160 80" stroke="#FF0080" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="#FFF"/></defs>
+    <use href="#petal"/>
+    <use href="#petal" transform="rotate(72 160 160)"/>
+    <use href="#petal" transform="rotate(144 160 160)"/>
+    <use href="#petal" transform="rotate(216 160 160)"/>
+    <use href="#petal" transform="rotate(288 160 160)"/>
+    <circle cx="160" cy="160" r="20" fill="#FF0080" stroke="#FFF" stroke-width="3.5"/>
+    <circle cx="152" cy="153" r="3" fill="#FFF"/><circle cx="168" cy="153" r="3" fill="#FFF"/>
+    <circle cx="160" cy="165" r="3" fill="#FFF"/><circle cx="148" cy="164" r="2.5" fill="#FFF"/><circle cx="172" cy="164" r="2.5" fill="#FFF"/>
+    <path d="M36 42 L20 28" stroke="#FFF" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>
+    <path d="M44 34 L30 18" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+    <path d="M286 44 L304 26" stroke="#FFF" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>
+    <path d="M278 34 L294 18" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
+    <path d="M286 278 L304 296" stroke="#FFF" stroke-width="2" stroke-linecap="round" opacity=".4"/>
+    <path d="M36 280 L20 298" stroke="#FFF" stroke-width="2" stroke-linecap="round" opacity=".4"/>
+    <circle cx="18" cy="26" r="2.5" fill="#FFF" opacity=".5"/><circle cx="306" cy="24" r="2" fill="#FFF" opacity=".4"/>
+    <circle cx="308" cy="298" r="2" fill="#FFF" opacity=".3"/><circle cx="18" cy="300" r="2" fill="#FFF" opacity=".3"/>
+  </svg>
+  <h2>MeihuaBOT</h2>
+  <div class="tag">AI 决策助手</div>
+  <a href="https://www.coze.cn/s/SNzo0AZVc6o/" target="_blank" class="cta">立即体验 →</a>
+  <div class="wechat">微信公众号：MeihuaBOT</div>
+  <div class="foot">G<span>1</span>rRr</div>
+</div>
+
+<script>
+function openMeihua(){document.getElementById('meihua').classList.add('show');document.body.style.overflow='hidden'}
+function closeMeihua(){document.getElementById('meihua').classList.remove('show');document.body.style.overflow=''}
+document.getElementById('meihua').addEventListener('click',function(e){if(e.target===this)closeMeihua()})
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMeihua()})
+</script>
 </body>
 </html>
