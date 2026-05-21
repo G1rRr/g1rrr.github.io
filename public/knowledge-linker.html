@@ -5,35 +5,98 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>knowledge linker</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;800&family=Space+Grotesk:wght@300;400;700&display=swap');
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#0000FF;color:#050505;font-family:'Space Grotesk',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh}
-  .card{background:#FFFFFF;max-width:600px;width:90%;padding:48px 40px;border:3px solid #000;box-shadow:8px 8px 0 #FF0080}
-  h1{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
-  .tag{display:inline-block;background:#FF0080;color:#FFF;font-size:11px;letter-spacing:2px;padding:3px 10px;margin-bottom:24px}
-  p,li{font-size:14px;line-height:1.8;color:#333}
-  h2{font-family:'Syne',sans-serif;font-size:18px;margin:24px 0 8px;border-left:4px solid #FF0080;padding-left:12px}
-  .code{background:#F5F5FF;border:1px solid #ddd;padding:14px 18px;font-family:'Space Grotesk',monospace;font-size:12px;line-height:1.7;margin:8px 0;overflow-x:auto}
-  .back{display:inline-block;margin-top:28px;color:#0000FF;font-size:12px;letter-spacing:2px;text-decoration:none;border-bottom:2px solid #FF0080;padding-bottom:2px;transition:all .2s}
-  .back:hover{color:#FF0080;border-color:#0000FF}
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;800&family=Space+Grotesk:wght@300;400;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0000FF;color:#050505;font-family:'Space Grotesk',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+.card{background:#FFF;max-width:600px;width:100%;padding:40px;border:3px solid #000;box-shadow:10px 10px 0 #FF0080}
+h1{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;letter-spacing:-1px;margin-bottom:6px}
+.tag{display:inline-block;background:#FF0080;color:#FFF;font-size:10px;letter-spacing:2px;padding:3px 10px;margin-bottom:20px}
+.desc{font-size:14px;line-height:1.8;color:#333;margin-bottom:24px}
+.input-row{display:flex;gap:8px;margin-bottom:20px}
+input{flex:1;padding:12px 16px;border:2px solid #000;font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+input:focus{border-color:#FF0080}
+button{padding:12px 24px;background:#0000FF;color:#FFF;border:2px solid #0000FF;font-family:'Syne',sans-serif;font-weight:600;font-size:13px;letter-spacing:1px;cursor:pointer;transition:all .2s;white-space:nowrap}
+button:hover{background:#FF0080;border-color:#FF0080}
+button:disabled{opacity:.4;cursor:default}
+#output{min-height:200px}
+.step{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;opacity:0;transform:translateY(10px);transition:all .4s}
+.step.show{opacity:1;transform:translateY(0)}
+.step-icon{width:28px;height:28px;border:2px solid #0000FF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;color:#0000FF}
+.step-body{font-size:13px;line-height:1.7;color:#333;padding-top:3px}
+.step-body strong{color:#0000FF}
+.links{margin-top:16px;padding:16px;background:#F8F8FF;border-left:4px solid #FF0080}
+.link-item{font-size:13px;padding:4px 0;color:#0000FF;cursor:default;display:flex;align-items:center;gap:8px}
+.link-item::before{content:'→';color:#FF0080;font-weight:700}
+.feedback{display:flex;gap:8px;margin-top:12px}
+.fb-btn{padding:6px 16px;font-size:11px;border:2px solid #ccc;background:#FFF;color:#666;cursor:pointer;transition:all .15s}
+.fb-btn:hover{border-color:#FF0080;color:#FF0080}
+.fb-btn.active{border-color:#FF0080;background:#FF0080;color:#FFF}
+.back{display:inline-block;margin-top:24px;color:#0000FF;font-size:12px;letter-spacing:2px;text-decoration:none;border-bottom:2px solid #FF0080;padding-bottom:2px}
+.back:hover{color:#FF0080}
 </style>
 </head>
 <body>
 <div class="card">
   <h1>knowledge linker</h1>
-  <div class="tag">Agent 系统</div>
-  <p>基于 LangGraph 构建的知识管理 Agent MVP，手动输入驱动，自动完成语义关联发现与主动推送，实现<strong>感知 → 规划 → 工具调用 → 反馈闭环</strong>四要素。</p>
-  <h2>部署方式</h2>
-  <div class="code">python deploy_server.py &nbsp;&nbsp;<span style="color:#999"># 端口 8710，PORT 环境变量可改</span></div>
-  <h2>对接方式</h2>
-  <p><strong>iframe 嵌入</strong> — <code>&lt;iframe src="http://你的服务器:8710"&gt;</code></p>
-  <p><strong>API 调用</strong> — 主站搜索框调 <code>/api/recall</code> 搜知识库</p>
-  <p><strong>Nginx 代理</strong> — 绑定子域名指向服务</p>
-  <h2>技术栈</h2>
-  <p>Python · LangGraph · Anthropic API · 知识图谱 · 语义关联</p>
-  <h2>源码</h2>
-  <p>已推送至 GitHub，包含 deploy_server.py、API接入文档、static/、nodes/、graph.py 等</p>
+  <div class="tag">Agent · LangGraph</div>
+  <p class="desc">基于 LangGraph 构建的知识管理 Agent，<strong>感知 → 规划 → 工具调用 → 反馈闭环</strong>。输入一段知识，Agent 自动发现语义关联并主动推送。</p>
+  <div class="input-row">
+    <input id="q" placeholder="输入一段知识，例如：Transformer 架构的核心是自注意力机制..." value="Transformer 架构的核心是自注意力机制">
+    <button onclick="run()">连接</button>
+  </div>
+  <div id="output"></div>
   <a href="/" class="back">← Back</a>
 </div>
+
+<script>
+const steps=[
+  {icon:'感',text:'<strong>感知</strong> — 解析输入，提取关键实体「Transformer」「自注意力机制」「架构」'},
+  {icon:'规',text:'<strong>规划</strong> — 制定检索策略：查询知识库中与注意力机制、深度学习架构相关的节点'},
+  {icon:'工',text:'<strong>工具调用</strong> — 检索知识图谱，发现以下语义关联：'},
+  {icon:'馈',text:'<strong>反馈闭环</strong> — 推送关联节点，等待用户确认关联强度。用户可标记相关/不相关以优化下次检索。'},
+];
+const links=[
+  'Attention Is All You Need (2017) — 匹配度 94%',
+  'BERT：基于 Transformer 的双向编码器 — 匹配度 87%',
+  'Multi-Head Attention 机制详解 — 匹配度 82%',
+  'GPT 系列：自回归 Transformer 解码器 — 匹配度 76%',
+  'ResNet：残差连接与注意力机制的关系 — 匹配度 61%',
+];
+
+async function run(){
+  const btn=document.querySelector('button');
+  const out=document.getElementById('output');
+  btn.disabled=true;out.innerHTML='';
+  for(let i=0;i<steps.length;i++){
+    await new Promise(r=>setTimeout(r,600));
+    const div=document.createElement('div');
+    div.className='step';
+    div.innerHTML=`<div class="step-icon">${steps[i].icon}</div><div class="step-body">${steps[i].text}</div>`;
+    out.appendChild(div);
+    requestAnimationFrame(()=>div.classList.add('show'));
+    if(i===2){
+      await new Promise(r=>setTimeout(r,400));
+      const lb=document.createElement('div');
+      lb.className='links';
+      lb.innerHTML=links.map(l=>`<div class="link-item">${l}</div>`).join('');
+      lb.style.opacity='0';lb.style.transform='translateY(8px)';lb.style.transition='all .4s';
+      out.appendChild(lb);
+      requestAnimationFrame(()=>{lb.style.opacity='1';lb.style.transform='translateY(0)'});
+    }
+    if(i===3){
+      await new Promise(r=>setTimeout(r,400));
+      const fb=document.createElement('div');
+      fb.className='feedback';
+      fb.innerHTML='<button class="fb-btn">相关</button><button class="fb-btn">不相关</button><button class="fb-btn">收藏</button>';
+      fb.querySelectorAll('button').forEach(b=>b.addEventListener('click',function(){
+        fb.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+        this.classList.add('active');
+      }));
+      out.appendChild(fb);
+    }
+  }
+  btn.disabled=false;
+}
+</script>
 </body>
 </html>
