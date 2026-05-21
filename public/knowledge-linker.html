@@ -10,8 +10,11 @@
 body{background:#0000FF;font-family:'Space Grotesk',sans-serif;min-height:100vh;display:flex;justify-content:center;padding:30px 20px}
 .wrap{max-width:720px;width:100%}
 .card{background:#FFF;padding:36px 36px 28px;border:3px solid #000;box-shadow:10px 10px 0 #FF0080;margin-bottom:20px}
-h1{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:12px}
+h1{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+h1 .left{display:flex;align-items:center;gap:12px}
 h1 .dot{width:10px;height:10px;background:#FF0080;flex-shrink:0}
+h1 .demo-link{padding:8px 18px;background:#FF0080;color:#FFF;font-size:11px;letter-spacing:3px;cursor:pointer;border:none;font-family:'Syne',sans-serif;font-weight:600;transition:all .2s}
+h1 .demo-link:hover{background:#0000FF}
 .tag{display:inline-block;background:#FF0080;color:#FFF;font-size:9px;letter-spacing:3px;padding:3px 10px;margin:10px 0 16px}
 .desc{font-size:13px;line-height:1.8;color:#555;margin-bottom:6px}
 .subtitle{font-size:12px;line-height:1.7;color:#999;font-style:italic;margin-bottom:28px}
@@ -94,15 +97,19 @@ canvas{display:block;margin:16px 0;background:#FAFAFF;border:1.5px solid #eee;wi
 </head>
 <body>
 <div class="wrap">
-  <!-- 卡片：流程框架 -->
+  <!-- 卡片 -->
   <div class="card">
-    <h1><span class="dot"></span>knowledge linker</h1>
+    <h1>
+      <span class="left"><span class="dot"></span>knowledge linker</span>
+      <button class="demo-link" id="demoToggle" onclick="toggleDemo()">体验 DEMO</button>
+    </h1>
     <div class="tag">感知 → 规划 → 工具调用 → 反馈闭环</div>
-    <p class="desc">基于 LangGraph 构建的知识管理 Agent — 手动输入驱动，自动完成语义关联发现与主动推送。</p>
-    <p class="subtitle">不是笔记软件，是会学习的知识 Agent——输入越多，它越懂你在研究什么。</p>
 
-    <!-- 流程图 -->
-    <div class="flow">
+    <!-- 流程框架（默认） -->
+    <div id="flowView">
+      <p class="desc">基于 LangGraph 构建的知识管理 Agent — 手动输入驱动，自动完成语义关联发现与主动推送。</p>
+      <p class="subtitle">不是笔记软件，是会学习的知识 Agent——输入越多，它越懂你在研究什么。</p>
+      <div class="flow">
       <div class="flow-row">
         <div class="flow-node start">输入</div>
       </div>
@@ -143,43 +150,34 @@ canvas{display:block;margin:16px 0;background:#FAFAFF;border:1.5px solid #eee;wi
       </div>
       <div class="flow-loop">← 反馈回路：权重写入 SQLite · 下次 <span>plan</span> 读取，决策发生变化 →</div>
     </div>
-  </div>
+    </div>
 
-  <!-- Hero DEMO -->
-  <div class="hero-card" id="heroCard">
-    <h2>knowledge linker</h2>
-    <p class="hero-sub">不是笔记软件，是会学习的知识 Agent</p>
-    <button class="hero-btn" onclick="openDemo()">体 验</button>
-    <p class="hint">输入一段知识，看 Agent 如何工作</p>
-  </div>
-
-  <!-- DEMO 卡片 -->
-  <div class="demo-card" id="demo">
-    <button class="close-demo" onclick="closeDemo()">← 返回</button>
-    <h2><span class="live"></span>Interactive Demo</h2>
-    <div class="pipeline" id="pipeline">
-      <div class="pipe" id="p0"><span class="n">1</span>感知</div>
-      <div class="pipe" id="p1"><span class="n">2</span>规划</div>
-      <div class="pipe" id="p2"><span class="n">3</span>工具调用</div>
-      <div class="pipe" id="p3"><span class="n">4</span>反馈闭环</div>
-    </div>
-    <div class="input-row">
-      <input id="q" placeholder="输入一段知识...">
-      <button class="btn" id="runBtn" onclick="run()">连接</button>
-    </div>
-    <div class="chips">
-      <span class="chip" onclick="setQ('Transformer 架构的核心是自注意力机制')">Transformer</span>
-      <span class="chip" onclick="setQ('LangGraph 用状态图编排多步 Agent 流程')">LangGraph</span>
-      <span class="chip" onclick="setQ('RAG 结合检索增强与 LLM 生成')">RAG</span>
-      <span class="chip" onclick="setQ('因果推断的核心方法包括 do-calculus')">因果推断</span>
-    </div>
-    <canvas id="c" width="600" height="200"></canvas>
-    <div id="output" style="display:none">
-      <div class="nodes" id="nodes"></div>
-      <div class="feedback" id="fb">
-        <button class="fb-btn" onclick="fbClick(this)">相关</button>
-        <button class="fb-btn" onclick="fbClick(this)">不相关</button>
-        <button class="fb-btn" onclick="fbClick(this)">收藏</button>
+    <!-- DEMO 视图（默认隐藏） -->
+    <div id="demoView" style="display:none">
+      <div class="pipeline" id="pipeline">
+        <div class="pipe" id="p0"><span class="n">1</span>感知</div>
+        <div class="pipe" id="p1"><span class="n">2</span>规划</div>
+        <div class="pipe" id="p2"><span class="n">3</span>工具调用</div>
+        <div class="pipe" id="p3"><span class="n">4</span>反馈闭环</div>
+      </div>
+      <div class="input-row">
+        <input id="q" placeholder="输入一段知识...">
+        <button class="btn" id="runBtn" onclick="run()">连接</button>
+      </div>
+      <div class="chips">
+        <span class="chip" onclick="setQ('Transformer 架构的核心是自注意力机制')">Transformer</span>
+        <span class="chip" onclick="setQ('LangGraph 用状态图编排多步 Agent 流程')">LangGraph</span>
+        <span class="chip" onclick="setQ('RAG 结合检索增强与 LLM 生成')">RAG</span>
+        <span class="chip" onclick="setQ('因果推断的核心方法包括 do-calculus')">因果推断</span>
+      </div>
+      <canvas id="c" width="600" height="200"></canvas>
+      <div id="output" style="display:none">
+        <div class="nodes" id="nodes"></div>
+        <div class="feedback" id="fb">
+          <button class="fb-btn" onclick="fbClick(this)">相关</button>
+          <button class="fb-btn" onclick="fbClick(this)">不相关</button>
+          <button class="fb-btn" onclick="fbClick(this)">收藏</button>
+        </div>
       </div>
     </div>
   </div>
@@ -189,14 +187,14 @@ canvas{display:block;margin:16px 0;background:#FAFAFF;border:1.5px solid #eee;wi
 
 <script>
 // DEMO 切换
-function openDemo(){
-  document.getElementById('heroCard').style.display='none';
-  document.getElementById('demo').classList.add('show');
-}
-function closeDemo(){
-  document.getElementById('heroCard').style.display='block';
-  document.getElementById('demo').classList.remove('show');
-  resetPipe();document.getElementById('output').style.display='none';
+let demoOn=false;
+function toggleDemo(){
+  demoOn=!demoOn;
+  document.getElementById('flowView').style.display=demoOn?'none':'block';
+  document.getElementById('demoView').style.display=demoOn?'block':'none';
+  document.getElementById('demoToggle').textContent=demoOn?'← 查看流程':'体验 DEMO';
+  document.getElementById('demoToggle').style.background=demoOn?'#0000FF':'#FF0080';
+  if(!demoOn){resetPipe();document.getElementById('output').style.display='none'}
 }
 
 // DEMO 逻辑
