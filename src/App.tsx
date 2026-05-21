@@ -627,7 +627,7 @@ const CrabWalker = () => {
 };
 
 // --- 关于：G1rRr + 项目名录 ---
-const About = ({ onOpenJanus, onOpenCognition, onOpenMeihua }: { onOpenJanus: () => void; onOpenCognition: () => void; onOpenMeihua: () => void }) => {
+const About = () => {
   const projectActions: Record<string, { action?: () => void; link?: string }> = {
     MeihuaBOT: { link: "/meihua.html" },
     JanusBOT: { link: "/janus.html" },
@@ -1026,7 +1026,7 @@ export default function App() {
       {showCognition && <CognitionDialog onClose={() => setShowCognition(false)} />}
       {showMeihua && <MeihuaDialog onClose={() => setShowMeihua(false)} />}
       <div className="drop-in" style={{ animationDelay: '0s' }}><Hero /></div>
-      <div className="drop-in" style={{ animationDelay: '0.12s' }}><About onOpenJanus={() => setShowJanus(true)} onOpenCognition={() => setShowCognition(true)} onOpenMeihua={() => setShowMeihua(true)} /></div>
+      <div className="drop-in" style={{ animationDelay: '0.12s' }}><About /></div>
       <div className="drop-in" style={{ animationDelay: '0.22s' }}><CrabWalker /></div>
       <div className="drop-in" style={{ animationDelay: '0.32s' }}><Footer /></div>
     </div>
