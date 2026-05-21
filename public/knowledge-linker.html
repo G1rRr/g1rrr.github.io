@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>knowledge linker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;800&family=Space+Grotesk:wght@300;400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0000FF;color:#050505;font-family:'Space Grotesk',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh}
+  .card{background:#FFFFFF;max-width:600px;width:90%;padding:48px 40px;border:3px solid #000;box-shadow:8px 8px 0 #FF0080}
+  h1{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
+  .tag{display:inline-block;background:#FF0080;color:#FFF;font-size:11px;letter-spacing:2px;padding:3px 10px;margin-bottom:24px}
+  p,li{font-size:14px;line-height:1.8;color:#333}
+  h2{font-family:'Syne',sans-serif;font-size:18px;margin:24px 0 8px;border-left:4px solid #FF0080;padding-left:12px}
+  .code{background:#F5F5FF;border:1px solid #ddd;padding:14px 18px;font-family:'Space Grotesk',monospace;font-size:12px;line-height:1.7;margin:8px 0;overflow-x:auto}
+  .back{display:inline-block;margin-top:28px;color:#0000FF;font-size:12px;letter-spacing:2px;text-decoration:none;border-bottom:2px solid #FF0080;padding-bottom:2px;transition:all .2s}
+  .back:hover{color:#FF0080;border-color:#0000FF}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>knowledge linker</h1>
+  <div class="tag">Agent 系统</div>
+  <p>严格符合 Agent 四要素的知识管理系统：<strong>感知 → 规划 → 工具调用 → 反馈闭环</strong>。</p>
+  <h2>快速开始</h2>
+  <div class="code">
+    pip install -r requirements.txt<br>
+    cp .env.example .env<br>
+    python main.py<br>
+    python main.py --feedback starred
+  </div>
+  <h2>Agent 能力</h2>
+  <p>自动发现、链接、整理零散知识碎片，构建结构化知识图谱。支持用户反馈学习（starred / clicked / dismissed）。</p>
+  <h2>技术栈</h2>
+  <p>Python · Anthropic API · 知识图谱 · SQLite</p>
+  <a href="/" class="back">← Back</a>
+</div>
+</body>
+</html>

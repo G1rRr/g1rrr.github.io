@@ -633,7 +633,7 @@ const About = ({ onOpenJanus, onOpenCognition, onOpenMeihua }: { onOpenJanus: ()
     JanusBOT: { action: onOpenJanus },
     "AI Startup Survival": { link: "/ai-startup-survival.html" },
     "Workshop Manager": { link: "/workshop_mobile_v2.html" },
-    "knowledge_linker": { action: onOpenCognition },
+    "knowledge linker": { link: "/knowledge-linker.html" },
   };
 
   return (
@@ -662,7 +662,7 @@ const About = ({ onOpenJanus, onOpenCognition, onOpenMeihua }: { onOpenJanus: ()
                 "JanusBOT",
                 "AI Startup Survival",
                 "Workshop Manager",
-                "knowledge_linker",
+                "knowledge linker",
               ].map((name, i) => {
                 const handler = projectActions[name];
                 const isClickable = !!handler;
@@ -827,7 +827,7 @@ const JanusDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   );
 };
 
-// --- knowledge_linker 提示词展示 ---
+// --- knowledge linker 提示词展示 ---
 const cognitionPrompt = `你的角色
 不是知识百科，是训练教练
 每次对话聚焦一个训练维度，给我题目，让我先输出，再给结构化反馈
