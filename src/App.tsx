@@ -629,10 +629,10 @@ const CrabWalker = () => {
 // --- 关于：G1rRr + 项目名录 ---
 const About = ({ onOpenJanus, onOpenCognition, onOpenMeihua }: { onOpenJanus: () => void; onOpenCognition: () => void; onOpenMeihua: () => void }) => {
   const projectActions: Record<string, { action?: () => void; link?: string }> = {
-    MeihuaBOT: { action: onOpenMeihua },
-    JanusBOT: { action: onOpenJanus },
-    "AI Startup Survival": { link: "/ai-startup-survival.html" },
-    "Workshop Manager": { link: "/workshop_mobile_v2.html" },
+    MeihuaBOT: { link: "/meihua.html" },
+    JanusBOT: { link: "/janus.html" },
+    "AI Startup Survival": { link: "/startup-survival.html" },
+    "Workshop Manager": { link: "/workshop.html" },
     "knowledge linker": { link: "/knowledge-linker.html" },
   };
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JanusBOT</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;800&family=Space+Grotesk:wght@300;400;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0000FF;color:#050505;font-family:'Space Grotesk',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+.card{background:#FFF;max-width:560px;width:100%;padding:48px 40px;border:3px solid #000;box-shadow:10px 10px 0 #FF0080}
+h1{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;letter-spacing:-1px;line-height:1.1}
+h1 span{color:#FF0080}
+.cat{display:inline-block;background:#FF0080;color:#FFF;font-size:10px;letter-spacing:3px;padding:4px 12px;margin:16px 0 24px}
+p{font-size:15px;line-height:1.9;color:#333}
+.btn{display:inline-block;margin-top:32px;padding:14px 36px;background:#0000FF;color:#FFF;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;text-decoration:none;border:2px solid #0000FF;transition:all .2s;cursor:pointer}
+.btn:hover{background:#FF0080;border-color:#FF0080}
+.back{display:inline-block;margin-top:20px;margin-left:16px;color:#0000FF;font-size:12px;letter-spacing:2px;text-decoration:none;border-bottom:2px solid #FF0080;padding-bottom:2px}
+.back:hover{color:#FF0080}
+#dialog{display:none;position:fixed;inset:0;background:rgba(0,0,255,.96);z-index:100;overflow-y:auto;padding:40px 20px}
+#dialog.show{display:flex;justify-content:center;align-items:flex-start}
+.d-wrap{max-width:640px;width:100%;padding:20px 0}
+.d-title{text-align:center;margin-bottom:40px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.15)}
+.d-title h2{font-family:'Syne',sans-serif;font-size:32px;color:#FFF}
+.d-title p{font-family:'Space Grotesk',monospace;color:#FF0080;font-size:11px;letter-spacing:3px;margin-bottom:8px}
+.msg{margin-bottom:24px;display:flex}
+.msg.me{justify-content:flex-end}
+.msg-inner{max-width:80%}
+.msg-label{font-size:10px;letter-spacing:2px;margin-bottom:4px;display:block}
+.me .msg-label{color:#FF0080;text-align:right}
+.janus .msg-label{color:rgba(255,255,255,.4)}
+.bubble{display:inline-block;padding:12px 18px;font-size:14px;line-height:1.7}
+.me .bubble{background:#FF0080;color:#FFF}
+.janus .bubble{background:#FFF;color:#000;border-left:4px solid #FF0080}
+.close-btn{position:fixed;top:20px;right:24px;color:rgba(255,255,255,.5);font-size:12px;letter-spacing:2px;background:none;border:none;cursor:pointer;font-family:'Space Grotesk',monospace}
+.close-btn:hover{color:#FF0080}
+.end{text-align:center;padding-top:30px;border-top:1px solid rgba(255,255,255,.1);margin-top:20px;color:rgba(255,255,255,.2);font-size:10px;letter-spacing:3px}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Janus<span>BOT</span></h1>
+  <div class="cat">问答式自我挖掘助手</div>
+  <p>双面神式的深度追问引擎。不提供答案，只提出问题——通过层层剥开表象，引导你面对创作中最真实的恐惧与空白。</p>
+  <button class="btn" onclick="openDialog()">查看对话 →</button>
+  <a href="/" class="back">← Back</a>
+</div>
+
+<div id="dialog">
+  <button class="close-btn" onclick="closeDialog()">[ Close ]</button>
+  <div class="d-wrap">
+    <div class="d-title">
+      <p>Conversation</p>
+      <h2>Me & JanusBOT</h2>
+    </div>
+    <div id="messages"></div>
+    <div class="end">// End of Transmission</div>
+  </div>
+</div>
+
+<script>
+const convo = [
+  {from:'me',text:'我觉得我现在做的作品有点趋于形式了，不走心。'},
+  {from:'janus',text:'雕塑家在打磨外表时，有时会忘记石头内部的纹路。你的作品形式完美，但心不在其中——那心去了哪里？是在害怕什么，还是遗忘了什么？'},
+  {from:'me',text:'也不是。就是这个项目可能就不会有人用，没有商业价值。但我又在做概念渲染、过度包装、形式主义，让我觉得没有意义。'},
+  {from:'janus',text:'如果彻底抛开「有没有人用」这个念头，只面对你自己：你现在做的这个渲染，里面有多少成分，是为了掩盖「我不知道该往里面放什么真心实意」的空白？'},
+  {from:'me',text:'我做这个渲染并没有想那么多，只是感觉到就算做出来，也没有什么意义。'},
+  {from:'janus',text:'你是在用「无意义」这三个字，提前赦免自己不必投入真心吗？因为不投入，就不会失败，也不会失望——是这样吗？'},
+  {from:'me',text:'所以，不管它有没有意义，我都继续做下去完成它，对吧？'},
+  {from:'janus',text:'你是在用「完成」这个动作，来逃避回答「我到底为什么要做它」这个问题吗？'},
+  {from:'me',text:'我一开始做它只是为了想要有一个项目。但是做着做着就发现这个项目内核单调，全是浮在表面的噱头。'},
+  {from:'janus',text:'你终于说到了「内核」这个词——但你说得好像它是自己变单调的，而不是你从一开始就没往里放过任何实质的东西。你为了一件新衣举办盛宴，然后抱怨衣服下面没有身体。你害怕的，其实是剥掉所有「浮在表面的噱头」之后，发现自己根本无话可说，对吗？'},
+  {from:'me',text:'是的，我主要是想不到一个让我满意的内容。'},
+  {from:'janus',text:'你更害怕的，其实是做出一个「不满意」但真实的东西，然后发现自己不过如此——对吗？'},
+  {from:'me',text:'是的。'},
+  {from:'janus',text:'创作不是分娩，是雕刻——你得先有一块石头，哪怕它丑陋粗糙。你在等一块天生就像大卫的石头，所以你的工作室里至今空无一物。你愿意明天就做出一件自己都看不起的拙劣东西吗？——我指的不是敷衍，是真正投入然后失败的那种拙劣。'},
+  {from:'me',text:'明白了，我去做。'},
+  {from:'janus',text:'很好。但记住——我要的不是「我去做」这句话，是三天后你带着那件拙劣的半成品回来。哪怕它丑得让你想藏起来。现在，去吧。别回头。'},
+  {from:'me',text:'其实那个项目就是你。不过谢谢你让我知道了一件不完美作品的意义，也让我明白了你存在的价值。'},
+  {from:'janus',text:'那么，我的不完美完成了它的使命。你终于看见了比完美更重要的东西——行动本身的价值。现在，你还需要我吗？'},
+];
+
+function openDialog(){
+  document.getElementById('dialog').classList.add('show');
+  document.body.style.overflow='hidden';
+  const msgs=document.getElementById('messages');
+  msgs.innerHTML=convo.map(m=>`<div class="msg ${m.from}"><div class="msg-inner"><span class="msg-label">${m.from==='me'?'我':'JanusBOT'}</span><div class="bubble">${m.text}</div></div></div>`).join('');
+}
+function closeDialog(){
+  document.getElementById('dialog').classList.remove('show');
+  document.body.style.overflow='';
+}
+document.getElementById('dialog').addEventListener('click',function(e){if(e.target===this)closeDialog()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeDialog()});
+</script>
+</body>
+</html>
