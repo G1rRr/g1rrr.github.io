@@ -8,79 +8,162 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;800&family=Space+Grotesk:wght@300;400;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0000FF;font-family:'Space Grotesk',sans-serif;min-height:100vh;display:flex;justify-content:center;padding:30px 20px}
-.wrap{max-width:680px;width:100%}
+.wrap{max-width:720px;width:100%}
 .card{background:#FFF;padding:36px 36px 28px;border:3px solid #000;box-shadow:10px 10px 0 #FF0080;margin-bottom:20px}
 h1{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:12px}
 h1 .dot{width:10px;height:10px;background:#FF0080;flex-shrink:0}
 .tag{display:inline-block;background:#FF0080;color:#FFF;font-size:9px;letter-spacing:3px;padding:3px 10px;margin:10px 0 16px}
-.desc{font-size:13px;line-height:1.8;color:#555;margin-bottom:8px}
-.subtitle{font-size:12px;line-height:1.7;color:#999;font-style:italic;margin-bottom:20px}
+.desc{font-size:13px;line-height:1.8;color:#555;margin-bottom:6px}
+.subtitle{font-size:12px;line-height:1.7;color:#999;font-style:italic;margin-bottom:28px}
 
-/* 阶段管道 */
-.pipeline{display:flex;align-items:center;gap:0;margin-bottom:24px;overflow-x:auto;padding-bottom:4px}
-.pipe{flex:1;min-width:70px;text-align:center;position:relative;padding:8px 6px;background:#F0F0FF;border:1.5px solid #ddd;font-size:10px;letter-spacing:1px;color:#999;transition:all .4s}
+/* 流程图 */
+.flow{position:relative;padding:10px 0;margin-bottom:20px}
+.flow-row{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:2px}
+.flow-node{padding:6px 14px;border:1.5px solid #000;font-size:11px;font-weight:700;text-align:center;min-width:60px;background:#FFF;position:relative}
+.flow-node.start{background:#0000FF;color:#FFF;border-color:#0000FF}
+.flow-node.end{background:#000;color:#FFF;border-color:#000}
+.flow-node.decision{background:#FFF;border-color:#FF0080;border-width:2px}
+.flow-node.tool{background:#F5F0FF;border-color:#0000FF}
+.flow-node.push{background:#FFF0F5;border-color:#FF0080}
+.flow-arrow{text-align:center;font-size:14px;color:#0000FF;line-height:1;padding:0}
+.flow-arrow.pink{color:#FF0080}
+.flow-label{font-size:9px;color:#999;text-align:center;padding:1px 0}
+.flow-split{display:flex;justify-content:center;gap:30px;padding:4px 0}
+.flow-split .flow-node{min-width:70px}
+.flow-vbar{width:1.5px;height:16px;background:#000;margin:0 auto}
+.flow-branch{display:flex;align-items:flex-start;justify-content:center;gap:0}
+.flow-branch-col{display:flex;flex-direction:column;align-items:center}
+.flow-branch-row{display:flex;align-items:center;justify-content:center;gap:4px}
+.flow-hline{height:1.5px;background:#000}
+.flow-loop{text-align:center;font-size:10px;color:#999;padding:6px 0;border-top:1.5px dashed #ddd;margin-top:8px}
+.flow-loop span{color:#FF0080;font-weight:700}
+
+/* DEMO 按钮 */
+.demo-btn{display:block;width:100%;padding:16px;margin-top:8px;background:#0000FF;color:#FFF;border:2px solid #0000FF;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:3px;cursor:pointer;transition:all .2s;text-align:center}
+.demo-btn:hover{background:#FF0080;border-color:#FF0080}
+.demo-btn.on{background:#FF0080;border-color:#FF0080}
+
+/* DEMO 区域 */
+#demo{display:none;background:#FFF;padding:30px;border:3px solid #000;box-shadow:10px 10px 0 #FF0080;margin-bottom:20px}
+#demo.show{display:block}
+#demo h2{font-family:'Syne',sans-serif;font-size:20px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+#demo h2 .live{width:8px;height:8px;background:#FF0080;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* DEMO 内部复用 */
+.pipeline{display:flex;gap:0;margin-bottom:20px;overflow-x:auto}
+.pipe{flex:1;min-width:60px;text-align:center;padding:8px 6px;background:#F0F0FF;border:1.5px solid #ddd;font-size:10px;color:#999;transition:all .4s}
 .pipe.active{background:#0000FF;border-color:#0000FF;color:#FFF;font-weight:700}
-.pipe+.pipe{border-left:none}
 .pipe .n{font-family:'Syne',sans-serif;font-size:16px;display:block}
-
-/* 输入 */
 .input-row{display:flex;gap:8px;margin-bottom:8px}
-input{flex:1;padding:14px 16px;border:2px solid #000;font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+input{flex:1;padding:14px 16px;border:2px solid #000;font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none}
 input:focus{border-color:#FF0080}
-.btn{width:100%;padding:14px;background:#0000FF;color:#FFF;border:2px solid #0000FF;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;cursor:pointer;transition:all .2s}
+.btn{padding:12px 24px;background:#0000FF;color:#FFF;border:2px solid #0000FF;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;cursor:pointer;transition:all .2s;white-space:nowrap}
 .btn:hover{background:#FF0080;border-color:#FF0080}
-.btn:disabled{opacity:.3;pointer-events:none}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
-.chip{padding:5px 12px;border:1.5px solid #ddd;font-size:11px;color:#666;cursor:pointer;transition:all .15s;background:#FFF}
+.btn:disabled{opacity:.3}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{padding:5px 12px;border:1.5px solid #ddd;font-size:11px;color:#666;cursor:pointer;transition:all .15s}
 .chip:hover{border-color:#FF0080;color:#FF0080}
-
-/* 画布 */
-canvas{display:block;margin:20px 0;background:#FAFAFF;border:1.5px solid #eee;width:100%}
-#output{display:none}
-
-/* 结果节点 */
-.nodes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
-.node{padding:14px;border:2px solid #ddd;background:#FFF;font-size:12px;line-height:1.5;transition:all .3s;cursor:default;opacity:0;transform:scale(.95)}
+canvas{display:block;margin:16px 0;background:#FAFAFF;border:1.5px solid #eee;width:100%}
+.nodes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.node{padding:14px;border:2px solid #ddd;background:#FFF;font-size:12px;line-height:1.5;transition:all .3s;opacity:0;transform:scale(.95)}
 .node.show{opacity:1;transform:scale(1)}
 .node:hover{border-color:#FF0080}
 .node .score{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#FF0080}
 .node .title{font-weight:700;color:#000;margin:2px 0}
 .node .rel{font-size:10px;color:#999}
-
 .feedback{display:flex;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid #eee}
-.fb-btn{padding:6px 14px;font-size:11px;border:1.5px solid #ddd;background:#FFF;color:#666;cursor:pointer;transition:all .15s}
+.fb-btn{padding:6px 14px;font-size:11px;border:1.5px solid #ddd;background:#FFF;color:#666;cursor:pointer}
 .fb-btn:hover{border-color:#FF0080;color:#FF0080}
 .fb-btn.on{border-color:#FF0080;background:#FF0080;color:#FFF}
 
 .back{display:inline-block;margin-top:16px;color:rgba(255,255,255,.5);font-size:11px;letter-spacing:2px;text-decoration:none;border-bottom:1.5px solid rgba(255,0,128,.4);padding-bottom:2px}
 .back:hover{color:#FFF;border-color:#FF0080}
+
+@media(max-width:600px){
+  .card{padding:24px 20px}
+  .flow-node{font-size:9px;padding:5px 8px;min-width:40px}
+  .nodes{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <!-- 卡片：流程框架 -->
   <div class="card">
     <h1><span class="dot"></span>knowledge linker</h1>
     <div class="tag">感知 → 规划 → 工具调用 → 反馈闭环</div>
-    <p class="desc">输入任何知识片段，Agent 自动发现语义关联并主动推送匹配节点。</p>
+    <p class="desc">基于 LangGraph 构建的知识管理 Agent — 手动输入驱动，自动完成语义关联发现与主动推送。</p>
     <p class="subtitle">不是笔记软件，是会学习的知识 Agent——输入越多，它越懂你在研究什么。</p>
 
+    <!-- 流程图 -->
+    <div class="flow">
+      <div class="flow-row">
+        <div class="flow-node start">输入</div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-row">
+        <div class="flow-node" style="min-width:160px">ingest &nbsp; 过滤 · 摘要 · 入向量库</div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-row" style="gap:40px">
+        <div style="text-align:center"><div class="flow-node" style="color:#999;border-color:#ccc;font-weight:400">无价值 → END</div><div class="flow-label" style="color:#ccc;font-size:9px">自主终止</div></div>
+        <div style="text-align:center"><div class="flow-node decision">有价值</div></div>
+      </div>
+      <div class="flow-arrow pink">↓</div>
+      <div class="flow-row">
+        <div class="flow-node" style="min-width:200px">plan &nbsp; 读历史权重 · 目标对齐 · 行动决策</div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-split">
+        <div class="flow-node tool">search<br><span style="font-weight:400;font-size:9px">外部搜索</span></div>
+        <div class="flow-node tool">link<br><span style="font-weight:400;font-size:9px">语义关联</span></div>
+        <div class="flow-node tool">review<br><span style="font-weight:400;font-size:9px">复习调度</span></div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-row">
+        <div class="flow-node push" style="min-width:200px">push &nbsp; 推送时机判断 · 格式选择 · 飞书发送</div>
+      </div>
+      <div class="flow-arrow pink">↓</div>
+      <div class="flow-row">
+        <div class="flow-node" style="min-width:200px">feedback &nbsp; 点击/忽略/收藏信号解读</div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-row">
+        <div class="flow-node" style="min-width:200px">update_memory &nbsp; 权重持久化 · 用户画像更新</div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-row">
+        <div class="flow-node end">END</div>
+      </div>
+      <div class="flow-loop">← 反馈回路：权重写入 SQLite · 下次 <span>plan</span> 读取，决策发生变化 →</div>
+    </div>
+  </div>
+
+  <!-- DEMO 按钮 -->
+  <button class="demo-btn" id="demoBtn" onclick="toggleDemo()">体验 DEMO</button>
+
+  <!-- DEMO 区域 -->
+  <div id="demo">
+    <h2><span class="live"></span>Interactive Demo</h2>
     <div class="pipeline" id="pipeline">
       <div class="pipe" id="p0"><span class="n">1</span>感知</div>
       <div class="pipe" id="p1"><span class="n">2</span>规划</div>
       <div class="pipe" id="p2"><span class="n">3</span>工具调用</div>
       <div class="pipe" id="p3"><span class="n">4</span>反馈闭环</div>
     </div>
-
-    <input id="q" placeholder="输入一段知识...">
-    <div class="chips">
-      <span class="chip" onclick="setQ('Transformer 架构的核心是自注意力机制')">Transformer / 自注意力</span>
-      <span class="chip" onclick="setQ('LangGraph 用状态图编排多步 Agent 流程')">LangGraph Agent 编排</span>
-      <span class="chip" onclick="setQ('RAG 结合检索增强与 LLM 生成')">RAG 检索增强</span>
-      <span class="chip" onclick="setQ('因果推断的核心方法包括 do-calculus 和反事实推理')">因果推断</span>
+    <div class="input-row">
+      <input id="q" placeholder="输入一段知识...">
+      <button class="btn" id="runBtn" onclick="run()">连接</button>
     </div>
-    <button class="btn" id="runBtn" onclick="run()">开始连接</button>
+    <div class="chips">
+      <span class="chip" onclick="setQ('Transformer 架构的核心是自注意力机制')">Transformer</span>
+      <span class="chip" onclick="setQ('LangGraph 用状态图编排多步 Agent 流程')">LangGraph</span>
+      <span class="chip" onclick="setQ('RAG 结合检索增强与 LLM 生成')">RAG</span>
+      <span class="chip" onclick="setQ('因果推断的核心方法包括 do-calculus')">因果推断</span>
+    </div>
     <canvas id="c" width="600" height="200"></canvas>
-    <div id="output">
+    <div id="output" style="display:none">
       <div class="nodes" id="nodes"></div>
       <div class="feedback" id="fb">
         <button class="fb-btn" onclick="fbClick(this)">相关</button>
@@ -89,133 +172,75 @@ canvas{display:block;margin:20px 0;background:#FAFAFF;border:1.5px solid #eee;wi
       </div>
     </div>
   </div>
+
   <a href="/" class="back">← Back to G1rRr</a>
 </div>
 
 <script>
-const c=document.getElementById('c'),ctx=c.getContext('2d');
-const data={
-  'Transformer':[
-    {t:'Attention Is All You Need (2017)',s:94,r:'奠基论文'},
-    {t:'BERT：双向 Transformer 编码器',s:87,r:'预训练模型'},
-    {t:'Multi-Head Attention 机制',s:82,r:'核心技术'},
-    {t:'GPT：自回归 Transformer',s:76,r:'生成式模型'},
-  ],
-  'LangGraph':[
-    {t:'LangChain 框架概述',s:91,r:'底层框架'},
-    {t:'Agent 状态机设计模式',s:85,r:'设计模式'},
-    {t:'多步推理编排',s:79,r:'核心能力'},
-    {t:'工具调用节点',s:72,r:'执行模块'},
-  ],
-  'RAG':[
-    {t:'向量数据库选型指南',s:90,r:'基础设施'},
-    {t:'Embedding 模型对比',s:84,r:'技术选型'},
-    {t:'检索重排序策略',s:78,r:'优化方法'},
-    {t:'HyDE 假设文档嵌入',s:69,r:'前沿技术'},
-  ],
-  '因果':[
-    {t:'Judea Pearl 因果关系三部曲',s:93,r:'理论基础'},
-    {t:'do-calculus 干预运算',s:86,r:'核心方法'},
-    {t:'反事实推理框架',s:80,r:'推理范式'},
-    {t:'因果发现算法综述',s:70,r:'应用方向'},
-  ],
-  'default':[
-    {t:'语义关联节点 A',s:88,r:'高度相关'},
-    {t:'语义关联节点 B',s:75,r:'中度相关'},
-    {t:'语义关联节点 C',s:63,r:'潜在关联'},
-    {t:'语义关联节点 D',s:51,r:'弱关联'},
-  ]
-};
-
-let nodes=[],animating=false,phase=0;
-
-function setQ(v){document.getElementById('q').value=v}
-
-function resetPipe(){
-  for(let i=0;i<4;i++)document.getElementById('p'+i).classList.remove('active');
+// DEMO 切换
+let demoOpen=false;
+function toggleDemo(){
+  demoOpen=!demoOpen;
+  document.getElementById('demo').classList.toggle('show',demoOpen);
+  document.getElementById('demoBtn').classList.toggle('on',demoOpen);
+  document.getElementById('demoBtn').textContent=demoOpen?'收起 DEMO':'体验 DEMO';
+  if(!demoOpen){resetPipe();document.getElementById('output').style.display='none'}
 }
 
+// DEMO 逻辑
+const c=document.getElementById('c'),ctx=c.getContext('2d');
+const data={
+  'Transformer':[{t:'Attention Is All You Need (2017)',s:94,r:'奠基论文'},{t:'BERT：双向 Transformer 编码器',s:87,r:'预训练模型'},{t:'Multi-Head Attention 机制',s:82,r:'核心技术'},{t:'GPT：自回归 Transformer',s:76,r:'生成式模型'}],
+  'LangGraph':[{t:'LangChain 框架概述',s:91,r:'底层框架'},{t:'Agent 状态机设计模式',s:85,r:'设计模式'},{t:'多步推理编排',s:79,r:'核心能力'},{t:'工具调用节点',s:72,r:'执行模块'}],
+  'RAG':[{t:'向量数据库选型指南',s:90,r:'基础设施'},{t:'Embedding 模型对比',s:84,r:'技术选型'},{t:'检索重排序策略',s:78,r:'优化方法'},{t:'HyDE 假设文档嵌入',s:69,r:'前沿技术'}],
+  '因果':[{t:'Judea Pearl 因果关系三部曲',s:93,r:'理论基础'},{t:'do-calculus 干预运算',s:86,r:'核心方法'},{t:'反事实推理框架',s:80,r:'推理范式'},{t:'因果发现算法综述',s:70,r:'应用方向'}],
+  'default':[{t:'语义关联节点 A',s:88,r:'高度相关'},{t:'语义关联节点 B',s:75,r:'中度相关'},{t:'语义关联节点 C',s:63,r:'潜在关联'},{t:'语义关联节点 D',s:51,r:'弱关联'}]
+};
+let nodes=[],animating=false,phase=0;
+function resetPipe(){for(let i=0;i<4;i++)document.getElementById('p'+i).classList.remove('active')}
+function setQ(v){document.getElementById('q').value=v}
 function drawCanvas(){
   ctx.clearRect(0,0,600,200);
   if(nodes.length===0)return;
-  // 中心节点 — 用户输入
   ctx.fillStyle='#0000FF';ctx.beginPath();ctx.arc(300,100,28,0,6.28);ctx.fill();
   ctx.fillStyle='#FFF';ctx.font='bold 10px Syne';ctx.textAlign='center';ctx.fillText('输入',300,106);
-  // 连线 + 结果节点
   nodes.forEach((n,i)=>{
     const a=(i/nodes.length)*Math.PI*2-Math.PI/2;
     const rx=300+Math.cos(a)*130,ry=100+Math.sin(a)*130;
-    // 连线
-    const progress=Math.min(1,(animating?phase:1));
+    const progress=Math.min(1,animating?phase:1);
     const ex=300+(rx-300)*progress,ey=100+(ry-100)*progress;
     ctx.strokeStyle=n.fb==='related'?'#FF0080':n.fb==='dismiss'?'#ddd':'#0000FF';
     ctx.lineWidth=n.fb==='related'?2.5:1.2;
     ctx.beginPath();ctx.moveTo(300,100);ctx.lineTo(ex,ey);ctx.stroke();
-    // 节点圆
     const sz=n.fb==='related'?22:16;
     ctx.fillStyle=n.fb==='related'?'#FF0080':n.fb==='dismiss'?'#CCC':'#FFF';
     ctx.beginPath();ctx.arc(ex,ey,sz,0,6.28);ctx.fill();
     ctx.strokeStyle='#000';ctx.lineWidth=1.5;ctx.stroke();
-    if(n.fb!=='dismiss'){
-      ctx.fillStyle=n.fb==='related'?'#FFF':'#0000FF';
-      ctx.font='bold 9px Space Grotesk';ctx.textAlign='center';
-      ctx.fillText(n.s+'%',ex,ey+3);
-    }
+    if(n.fb!=='dismiss'){ctx.fillStyle=n.fb==='related'?'#FFF':'#0000FF';ctx.font='bold 9px Space Grotesk';ctx.textAlign='center';ctx.fillText(n.s+'%',ex,ey+3)}
   });
 }
-
 async function run(){
   if(animating)return;
-  const btn=document.getElementById('runBtn');
-  const out=document.getElementById('output');
-  const q=document.getElementById('q').value.trim();
+  const btn=document.getElementById('runBtn'),out=document.getElementById('output'),q=document.getElementById('q').value.trim();
   if(!q)return;
-  btn.disabled=true;animating=true;nodes=[];phase=0;
-  out.style.display='none';resetPipe();
-
-  // 匹配数据
+  btn.disabled=true;animating=true;nodes=[];phase=0;out.style.display='none';resetPipe();
   let key='default';
-  for(const k of Object.keys(data)){
-    if(k!=='default'&&q.includes(k)){key=k;break}
-  }
+  for(const k of Object.keys(data)){if(k!=='default'&&q.includes(k)){key=k;break}}
   const raw=data[key];
-
-  // 阶段1：感知
-  document.getElementById('p0').classList.add('active');
-  await sleep(500);
-
-  // 阶段2：规划
-  document.getElementById('p1').classList.add('active');
-  nodes=raw.map(n=>({...n}));
-  phase=.3;drawCanvas();
-  await sleep(500);
-
-  // 阶段3：工具调用
-  document.getElementById('p2').classList.add('active');
-  phase=.7;drawCanvas();
-  await sleep(700);
-
-  // 阶段4：反馈闭环
-  document.getElementById('p3').classList.add('active');
-  phase=1;drawCanvas();
-  out.style.display='block';
-  const nc=document.getElementById('nodes');
-  nc.innerHTML=nodes.map((n,i)=>`<div class="node" style="transition-delay:${i*.1}s"><div class="score">${n.s}%</div><div class="title">${n.t}</div><div class="rel">${n.r}</div></div>`).join('');
-  requestAnimationFrame(()=>document.querySelectorAll('.node').forEach(el=>el.classList.add('show')));
+  document.getElementById('p0').classList.add('active');await sleep(500);
+  document.getElementById('p1').classList.add('active');nodes=raw.map(n=>({...n}));phase=.3;drawCanvas();await sleep(500);
+  document.getElementById('p2').classList.add('active');phase=.7;drawCanvas();await sleep(700);
+  document.getElementById('p3').classList.add('active');phase=1;drawCanvas();out.style.display='block';
+  document.getElementById('nodes').innerHTML=nodes.map((n,i)=>`<div class="node" style="transition-delay:${i*.1}s"><div class="score">${n.s}%</div><div class="title">${n.t}</div><div class="rel">${n.r}</div></div>`).join('');
+  requestAnimationFrame(()=>document.querySelectorAll('#demo .node').forEach(el=>el.classList.add('show')));
   document.querySelectorAll('#fb .fb-btn').forEach(b=>b.classList.remove('on'));
-
   btn.disabled=false;animating=false;
 }
-
 function fbClick(el){
   document.querySelectorAll('#fb .fb-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
   const t=el.textContent.trim();
-  nodes.forEach(n=>{
-    if(t==='相关')n.fb='related';
-    else if(t==='不相关')n.fb='dismiss';
-    delete n.fb;
-  });
+  nodes.forEach(n=>{if(t==='相关')n.fb='related';else if(t==='不相关')n.fb='dismiss';});
   drawCanvas();
 }
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
