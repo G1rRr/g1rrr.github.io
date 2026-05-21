@@ -38,17 +38,22 @@ h1 .dot{width:10px;height:10px;background:#FF0080;flex-shrink:0}
 .flow-loop{text-align:center;font-size:10px;color:#999;padding:6px 0;border-top:1.5px dashed #ddd;margin-top:8px}
 .flow-loop span{color:#FF0080;font-weight:700}
 
-/* DEMO 按钮 */
-.demo-btn{display:block;width:100%;padding:16px;margin-top:8px;background:#0000FF;color:#FFF;border:2px solid #0000FF;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:3px;cursor:pointer;transition:all .2s;text-align:center}
-.demo-btn:hover{background:#FF0080;border-color:#FF0080}
-.demo-btn.on{background:#FF0080;border-color:#FF0080}
+/* Hero DEMO 卡片 */
+.hero-card{background:#FFF;padding:40px 36px;border:3px solid #000;box-shadow:10px 10px 0 #FF0080;margin-bottom:20px;text-align:center}
+.hero-card h2{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:8px}
+.hero-card .hero-sub{font-size:13px;color:#666;margin-bottom:24px}
+.hero-card .hero-btn{display:inline-block;padding:18px 48px;background:#FF0080;color:#FFF;font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:3px;cursor:pointer;border:none;transition:all .2s;box-shadow:6px 6px 0 #0000FF}
+.hero-card .hero-btn:hover{background:#0000FF;box-shadow:6px 6px 0 #FF0080}
+.hero-card .hint{font-size:11px;color:#999;margin-top:12px}
 
-/* DEMO 区域 */
-#demo{display:none;background:#FFF;padding:30px;border:3px solid #000;box-shadow:10px 10px 0 #FF0080;margin-bottom:20px}
-#demo.show{display:block}
-#demo h2{font-family:'Syne',sans-serif;font-size:20px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-#demo h2 .live{width:8px;height:8px;background:#FF0080;animation:blink 1s infinite}
+/* DEMO 卡片 */
+.demo-card{display:none;background:#FFF;padding:30px;border:3px solid #000;box-shadow:10px 10px 0 #FF0080;margin-bottom:20px}
+.demo-card.show{display:block}
+.demo-card h2{font-family:'Syne',sans-serif;font-size:20px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.demo-card h2 .live{width:8px;height:8px;background:#FF0080;animation:blink 1s infinite}
 @keyframes blink{50%{opacity:0}}
+.demo-card .close-demo{float:right;font-size:11px;color:#999;cursor:pointer;background:none;border:none;letter-spacing:2px;padding:4px 8px}
+.demo-card .close-demo:hover{color:#FF0080}
 
 /* DEMO 内部复用 */
 .pipeline{display:flex;gap:0;margin-bottom:20px;overflow-x:auto}
@@ -140,11 +145,17 @@ canvas{display:block;margin:16px 0;background:#FAFAFF;border:1.5px solid #eee;wi
     </div>
   </div>
 
-  <!-- DEMO 按钮 -->
-  <button class="demo-btn" id="demoBtn" onclick="toggleDemo()">体验 DEMO</button>
+  <!-- Hero DEMO -->
+  <div class="hero-card" id="heroCard">
+    <h2>knowledge linker</h2>
+    <p class="hero-sub">不是笔记软件，是会学习的知识 Agent</p>
+    <button class="hero-btn" onclick="openDemo()">体 验</button>
+    <p class="hint">输入一段知识，看 Agent 如何工作</p>
+  </div>
 
-  <!-- DEMO 区域 -->
-  <div id="demo">
+  <!-- DEMO 卡片 -->
+  <div class="demo-card" id="demo">
+    <button class="close-demo" onclick="closeDemo()">← 返回</button>
     <h2><span class="live"></span>Interactive Demo</h2>
     <div class="pipeline" id="pipeline">
       <div class="pipe" id="p0"><span class="n">1</span>感知</div>
@@ -178,13 +189,14 @@ canvas{display:block;margin:16px 0;background:#FAFAFF;border:1.5px solid #eee;wi
 
 <script>
 // DEMO 切换
-let demoOpen=false;
-function toggleDemo(){
-  demoOpen=!demoOpen;
-  document.getElementById('demo').classList.toggle('show',demoOpen);
-  document.getElementById('demoBtn').classList.toggle('on',demoOpen);
-  document.getElementById('demoBtn').textContent=demoOpen?'收起 DEMO':'体验 DEMO';
-  if(!demoOpen){resetPipe();document.getElementById('output').style.display='none'}
+function openDemo(){
+  document.getElementById('heroCard').style.display='none';
+  document.getElementById('demo').classList.add('show');
+}
+function closeDemo(){
+  document.getElementById('heroCard').style.display='block';
+  document.getElementById('demo').classList.remove('show');
+  resetPipe();document.getElementById('output').style.display='none';
 }
 
 // DEMO 逻辑
