@@ -712,6 +712,31 @@ const About = () => {
   );
 };
 
+// --- 迷你巡回螃蟹 ---
+const MiniCrab = () => {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const c = ref.current; if (!c) return;
+    const ctx = c.getContext('2d')!; let t = 0, raf: number;
+    const BODY = [[0,0,1,1,1,1,1,1,0,0],[0,1,1,1,1,1,1,1,1,0],[0,1,0,0,1,1,0,0,1,0],[0,0,0,1,0,0,1,0,0,0],[0,0,0,1,0,0,1,0,0,0]];
+    const P = 2, W = 10, H = 5;
+    const render = () => {
+      c.width = 24; c.height = 16;
+      ctx.clearRect(0,0,24,16);
+      const cx = Math.round(2 + Math.sin(t * 0.03) * 4);
+      const cy = Math.round(3 + Math.abs(Math.sin(t * 0.06)) * 1);
+      for (let r=0;r<H;r++) for (let col=0;col<W;col++)
+        if (BODY[r][col]) { ctx.fillStyle = '#CD6E58'; ctx.fillRect(cx+col*P, cy+r*P, P, P); }
+      // 眼睛
+      ctx.fillStyle = '#000'; ctx.fillRect(cx+3*P, cy+P, P, P); ctx.fillRect(cx+7*P, cy+P, P, P);
+      t++; raf = requestAnimationFrame(render);
+    };
+    raf = requestAnimationFrame(render);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={ref} className="block flex-shrink-0" style={{imageRendering:'pixelated'}} />;
+};
+
 // --- 项目分类展示 ---
 const Showcase = () => {
   const cats = [
@@ -737,7 +762,10 @@ const Showcase = () => {
       <div className="max-w-5xl mx-auto">
         <Reveal>
           <div className="mb-12 border-b border-black/10 pb-6">
-            <p className="font-mono text-[#FF0080] text-xs tracking-[0.3em] uppercase mb-2">// Categories</p>
+            <div className="flex items-center gap-3">
+              <MiniCrab />
+              <p className="font-mono text-[#FF0080] text-xs tracking-[0.3em] uppercase">// Categories</p>
+            </div>
           </div>
         </Reveal>
 
