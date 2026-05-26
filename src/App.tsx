@@ -720,8 +720,8 @@ const Showcase = () => {
       { name: 'AI Startup Survival', desc: 'AI 公司生存模拟', link: '/startup-survival.html' },
     ]},
     { label: 'AGENT', items: [
-      { name: 'inspiration linker', desc: '灵感引擎 Agent', link: '' },
-      { name: 'Knowledge Linker', desc: '知识管理 Agent', link: '/knowledge-linker.html' },
+      { name: 'inspiration linker', desc: '灵感链接机', link: '' },
+      { name: 'Knowledge Linker', desc: '知识链接机', link: '/knowledge-linker.html' },
     ]},
     { label: 'BOT', items: [
       { name: 'MeihuaBOT', desc: 'AI 决策助手', link: '/meihua.html' },
@@ -745,11 +745,11 @@ const Showcase = () => {
           {cats.map((cat, i) => (
             <Reveal key={i} delay={i * 100}>
               <div className="border-2 border-black/10 p-5 md:py-7 md:px-8 hover:border-[#FF0080] transition-all duration-300 group flex flex-col md:flex-row md:items-start gap-3 md:gap-8">
-                <span className="font-syne font-black text-2xl md:text-4xl text-[#FF0080] uppercase tracking-tight whitespace-nowrap flex-shrink-0 flex items-center gap-3 pt-1">
+                <span className="font-syne font-black text-2xl md:text-4xl text-[#FF0080] uppercase tracking-tight whitespace-nowrap flex-shrink-0 flex items-center gap-3 w-[100px] md:w-[150px] pt-1">
                   <span className="inline-flex w-3 h-3 rounded-full bg-[#0000FF] breathe-dot" />
                   {cat.label}
                 </span>
-                <div className="flex flex-col gap-y-3">
+                <div className="flex flex-col gap-y-3 flex-1">
                   {cat.items.map((item, j) => (
                     <a
                       key={j}
