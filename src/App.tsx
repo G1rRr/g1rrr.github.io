@@ -712,10 +712,21 @@ const About = () => {
 // --- 项目分类展示 ---
 const Showcase = () => {
   const cats = [
-    { label: 'GAME', items: ['Career Life Survival', 'AI Startup Survival'], links: ['/career-life.html', '/startup-survival.html'] },
-    { label: 'AGENT', items: ['inspiration linker', 'Knowledge Linker'], links: ['', '/knowledge-linker.html'] },
-    { label: 'BOT', items: ['MeihuaBOT', 'JanusBOT'], links: ['/meihua.html', '/janus.html'] },
-    { label: 'TOOL', items: ['Workshop Manager'], links: ['/workshop.html'] },
+    { label: 'GAME', items: [
+      { name: 'Career Life Survival', desc: '职业人生模拟器', link: '/career-life.html' },
+      { name: 'AI Startup Survival', desc: 'AI 公司生存模拟', link: '/startup-survival.html' },
+    ]},
+    { label: 'AGENT', items: [
+      { name: 'inspiration linker', desc: '灵感引擎 Agent', link: '' },
+      { name: 'Knowledge Linker', desc: '知识管理 Agent', link: '/knowledge-linker.html' },
+    ]},
+    { label: 'BOT', items: [
+      { name: 'MeihuaBOT', desc: 'AI 决策助手', link: '/meihua.html' },
+      { name: 'JanusBOT', desc: '问答式自我挖掘助手', link: '/janus.html' },
+    ]},
+    { label: 'TOOL', items: [
+      { name: 'Workshop Manager', desc: '流程管理系统', link: '/workshop.html' },
+    ]},
   ];
 
   return (
@@ -727,21 +738,26 @@ const Showcase = () => {
           </div>
         </Reveal>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {cats.map((cat, i) => (
             <Reveal key={i} delay={i * 100}>
-              <div className="border-2 border-white/20 p-5 md:p-6 hover:border-[#FF0080] transition-all duration-300 group flex items-center gap-6">
-                <span className="font-mono text-[#FF0080] text-[10px] tracking-[0.3em] uppercase whitespace-nowrap w-16 md:w-20 flex-shrink-0">
+              <div className="border-2 border-white/20 p-5 md:py-7 md:px-8 hover:border-[#FF0080] transition-all duration-300 group flex flex-col md:flex-row md:items-center gap-3 md:gap-8">
+                <span className="font-syne font-black text-2xl md:text-4xl text-[#FF0080] uppercase tracking-tight whitespace-nowrap flex-shrink-0">
                   {cat.label}
                 </span>
-                <div className="flex flex-wrap gap-x-8 gap-y-1">
-                  {cat.items.map((name, j) => (
+                <div className="flex flex-wrap gap-x-8 md:gap-x-12 gap-y-2">
+                  {cat.items.map((item, j) => (
                     <a
                       key={j}
-                      href={cat.links[j] || '#'}
-                      className="font-syne font-bold text-lg md:text-2xl uppercase text-white hover:text-[#FF0080] transition-colors duration-300 leading-tight"
+                      href={item.link || '#'}
+                      className="group/item"
                     >
-                      {name}
+                      <span className="font-syne font-bold text-base md:text-xl uppercase text-white group-hover/item:text-[#FF0080] transition-colors duration-300 leading-tight block">
+                        {item.name}
+                      </span>
+                      <span className="text-white/40 text-xs md:text-sm leading-tight">
+                        {item.desc}
+                      </span>
                     </a>
                   ))}
                 </div>
