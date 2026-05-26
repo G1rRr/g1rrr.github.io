@@ -1092,7 +1092,7 @@ export default function App() {
       <div className="drop-in" style={{ animationDelay: '0.26s' }}>
         <div className="bg-[#0000FF] py-12 text-center">
           <p className="font-mono text-[#FF0080] text-xs tracking-[0.3em] uppercase mb-4">// G1rRr</p>
-          <span className="text-4xl md:text-7xl font-syne font-black text-white hover:text-[#FF0080] transition-colors duration-500">G<span className="text-[#FF0080]">1</span>rRr</span>
+          <span className="text-4xl md:text-7xl font-syne font-black text-white hover:text-[#FF0080] transition-colors duration-500">G<span style={{color:'#FF0080'}}>1</span>rRr</span>
         </div>
       </div>
       <div className="drop-in" style={{ animationDelay: '0.30s' }}><Showcase /></div>
