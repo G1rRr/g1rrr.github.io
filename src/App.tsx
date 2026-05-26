@@ -118,9 +118,10 @@ const GlobalStyles = () => (
 );
 
 // --- 自定义鼠标指针 ---
-const CustomCursor = () => {
+const CustomCursor = ({ color }: { color?: string }) => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
+  const cursorColor = color || '#FF0080';
 
   useEffect(() => {
     const updateCursor = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY });
@@ -149,15 +150,16 @@ const CustomCursor = () => {
   return (
     <>
       <div
-        className="fixed top-0 left-0 w-4 h-4 bg-[#FF0080] rounded-full pointer-events-none z-[99999] mix-blend-screen transition-transform duration-150 ease-out"
+        className="fixed top-0 left-0 w-4 h-4 rounded-full pointer-events-none z-[99999] mix-blend-screen transition-transform duration-150 ease-out"
         style={{
+          backgroundColor: cursorColor,
           transform: `translate3d(${pos.x - 8}px, ${pos.y - 8}px, 0) scale(${isHovering ? 2 : 1})`,
-          boxShadow: '0 0 10px #FF0080, 0 0 20px #FF0080'
+          boxShadow: `0 0 10px ${cursorColor}, 0 0 20px ${cursorColor}`
         }}
       />
       <div
-        className="fixed top-0 left-0 w-10 h-10 border border-[#FF0080] rounded-full pointer-events-none z-[99998] transition-all duration-300 ease-out opacity-50"
-        style={{ transform: `translate3d(${pos.x - 20}px, ${pos.y - 20}px, 0) scale(${isHovering ? 1.5 : 1})` }}
+        className="fixed top-0 left-0 w-10 h-10 border rounded-full pointer-events-none z-[99998] transition-all duration-300 ease-out opacity-50"
+        style={{ borderColor: cursorColor, transform: `translate3d(${pos.x - 20}px, ${pos.y - 20}px, 0) scale(${isHovering ? 1.5 : 1})` }}
       />
     </>
   );
@@ -1078,16 +1080,17 @@ export default function App() {
   const [showJanus, setShowJanus] = useState(false);
   const [showCognition, setShowCognition] = useState(false);
   const [showMeihua, setShowMeihua] = useState(false);
+  const [cursorColor, setCursorColor] = useState('#FF0080');
 
   return (
     <div className="relative antialiased">
       <GlobalStyles />
-      <CustomCursor />
+      <CustomCursor color={cursorColor} />
       {showJanus && <JanusDialog onClose={() => setShowJanus(false)} />}
       {showCognition && <CognitionDialog onClose={() => setShowCognition(false)} />}
       {showMeihua && <MeihuaDialog onClose={() => setShowMeihua(false)} />}
       <div className="drop-in" style={{ animationDelay: '0s' }}><Hero /></div>
-      <div className="drop-in" style={{ animationDelay: '0.12s' }}><About /></div>
+      <div className="drop-in" style={{ animationDelay: '0.12s' }} onMouseEnter={() => setCursorColor('#0000FF')} onMouseLeave={() => setCursorColor('#FF0080')}><About /></div>
       <div className="drop-in" style={{ animationDelay: '0.22s' }}><CrabWalker /></div>
       <div className="drop-in" style={{ animationDelay: '0.26s' }}>
         <div className="bg-[#0000FF] py-12 text-center">
@@ -1095,7 +1098,7 @@ export default function App() {
           <span className="text-4xl md:text-7xl font-syne font-black text-white hover:text-[#FF0080] transition-colors duration-500">G<span style={{color:'#FF0080'}}>1</span>rRr</span>
         </div>
       </div>
-      <div className="drop-in" style={{ animationDelay: '0.30s' }}><Showcase /></div>
+      <div className="drop-in" style={{ animationDelay: '0.30s' }} onMouseEnter={() => setCursorColor('#0000FF')} onMouseLeave={() => setCursorColor('#FF0080')}><Showcase /></div>
       <div className="drop-in" style={{ animationDelay: '0.38s' }}><Footer /></div>
     </div>
   );
