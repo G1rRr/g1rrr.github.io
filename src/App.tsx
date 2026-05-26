@@ -661,7 +661,7 @@ const About = () => {
           <Reveal>
             <div>
               <p className="font-mono text-[#FF0080] uppercase tracking-[0.3em] text-xs md:text-sm mb-4 md:mb-6">// Identity</p>
-              <h2 className="text-5xl md:text-8xl lg:text-[9rem] font-syne font-black leading-[0.9] animate-blue-pink">G1rRr
+              <h2 className="text-5xl md:text-8xl lg:text-[9rem] font-syne font-black text-[#0000FF] leading-[0.9]">G1rRr
               </h2>
             </div>
           </Reveal>
