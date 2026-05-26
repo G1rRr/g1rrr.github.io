@@ -90,7 +90,7 @@ canvas{display:block;margin:14px 0;background:#FAFAFF;border:1.5px solid #eee;wi
         <div class="flow-row"><div class="flow-node tool">parse_content 感知工具</div></div>
         <div class="flow-arrow">↓</div>
         <div class="flow-split">
-          <div><div class="flow-node" style="border-color:#ccc;color:#999">URL? → requests 抓取<br><span style="font-weight:400;font-size:8px">正文 ≥ 150字 → 返回</span></div><div class="flow-arrow" style="color:#ccc">↓</div><div class="flow-node" style="border-color:#ccc;color:#999;font-size:9px">不够 → Playwright 渲染<br><span style="font-weight:400;font-size:8px">拦截 API → 提取评论 Top3</span></div></div>
+          <div><div class="flow-node" style="border-color:#ccc;color:#999">URL? → requests 抓取<br><span style="font-weight:400;font-size:8px">正文 ≥ 150字 → 返回</span></div><div class="flow-arrow" style="color:#ccc">↓</div><div class="flow-node" style="border-color:#ccc;color:#999;font-size:9px">不够 → Playwright 渲染</div></div>
           <div><div class="flow-node" style="border-color:#ccc;color:#999">纯文本? → 截取 3000 字</div></div>
         </div>
         <div class="flow-arrow">↓</div>
