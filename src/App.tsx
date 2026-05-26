@@ -736,7 +736,7 @@ const Showcase = () => {
     <section className="bg-white py-20 md:py-28 px-6 relative z-10">
       <div className="max-w-5xl mx-auto">
         <Reveal>
-          <div className="mb-12 border-b border-white/20 pb-6">
+          <div className="mb-12 border-b border-black/10 pb-6">
             <p className="font-mono text-[#FF0080] text-xs tracking-[0.3em] uppercase mb-2">// Categories</p>
           </div>
         </Reveal>
@@ -749,7 +749,7 @@ const Showcase = () => {
                   <span className="inline-flex w-3 h-3 rounded-full bg-[#0000FF] breathe-dot" />
                   {cat.label}
                 </span>
-                <div className="flex flex-col gap-y-3 flex-1">
+                <div className="flex flex-col gap-y-3 flex-1 ml-[10%]">
                   {cat.items.map((item, j) => (
                     <a
                       key={j}
