@@ -150,9 +150,10 @@ const CustomCursor = ({ color }: { color?: string }) => {
   return (
     <>
       <div
-        className="fixed top-0 left-0 w-4 h-4 rounded-full pointer-events-none z-[99999] mix-blend-screen transition-transform duration-150 ease-out"
+        className="fixed top-0 left-0 w-4 h-4 rounded-full pointer-events-none z-[99999] transition-transform duration-150 ease-out"
         style={{
           backgroundColor: cursorColor,
+          mixBlendMode: cursorColor === '#FF0080' ? 'screen' : 'normal',
           transform: `translate3d(${pos.x - 8}px, ${pos.y - 8}px, 0) scale(${isHovering ? 2 : 1})`,
           boxShadow: `0 0 10px ${cursorColor}, 0 0 20px ${cursorColor}`
         }}
