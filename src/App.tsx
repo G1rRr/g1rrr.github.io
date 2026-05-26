@@ -727,19 +727,19 @@ const Showcase = () => {
           </div>
         </Reveal>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+        <div className="space-y-3">
           {cats.map((cat, i) => (
             <Reveal key={i} delay={i * 100}>
-              <div className="border-2 border-white/20 p-5 md:p-6 hover:border-[#FF0080] transition-all duration-300 group h-full flex flex-col">
-                <span className="font-mono text-[#FF0080] text-[10px] tracking-[0.3em] uppercase mb-4 block">
+              <div className="border-2 border-white/20 p-5 md:p-6 hover:border-[#FF0080] transition-all duration-300 group flex items-center gap-6">
+                <span className="font-mono text-[#FF0080] text-[10px] tracking-[0.3em] uppercase whitespace-nowrap w-16 md:w-20 flex-shrink-0">
                   {cat.label}
                 </span>
-                <div className="flex-1 space-y-2">
+                <div className="flex flex-wrap gap-x-8 gap-y-1">
                   {cat.items.map((name, j) => (
                     <a
                       key={j}
-                      href={cat.links[j]}
-                      className="block font-syne font-bold text-lg md:text-xl uppercase text-white hover:text-[#FF0080] transition-colors duration-300 leading-tight"
+                      href={cat.links[j] || '#'}
+                      className="font-syne font-bold text-lg md:text-2xl uppercase text-white hover:text-[#FF0080] transition-colors duration-300 leading-tight"
                     >
                       {name}
                     </a>
