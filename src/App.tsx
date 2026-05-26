@@ -1092,15 +1092,15 @@ export default function App() {
       {showMeihua && <MeihuaDialog onClose={() => setShowMeihua(false)} />}
       <div className="drop-in" style={{ animationDelay: '0s' }}><Hero /></div>
       <div className="drop-in" style={{ animationDelay: '0.12s' }} onMouseEnter={() => setCursorColor('#0000FF')} onMouseLeave={() => setCursorColor('#FF0080')}><About /></div>
-      <div className="drop-in" style={{ animationDelay: '0.22s' }} id="projects"><CrabWalker /></div>
-      <div className="drop-in" style={{ animationDelay: '0.26s' }}>
+      <div className="drop-in" style={{ animationDelay: '0.22s' }} id="projects" onMouseEnter={() => setCursorColor('#0000FF')} onMouseLeave={() => setCursorColor('#FF0080')}><Showcase /></div>
+      <div className="drop-in" style={{ animationDelay: '0.28s' }}><CrabWalker /></div>
+      <div className="drop-in" style={{ animationDelay: '0.32s' }}>
         <div className="bg-[#0000FF] py-12 text-center">
           <p className="font-mono text-[#FF0080] text-xs tracking-[0.3em] uppercase mb-4">// G1rRr</p>
           <span className="text-4xl md:text-7xl font-syne font-black text-white hover:text-[#FF0080] transition-colors duration-500">G<span style={{color:'#FF0080'}}>1</span>rRr</span>
         </div>
       </div>
-      <div className="drop-in" style={{ animationDelay: '0.30s' }} onMouseEnter={() => setCursorColor('#0000FF')} onMouseLeave={() => setCursorColor('#FF0080')}><Showcase /></div>
-      <div className="drop-in" style={{ animationDelay: '0.38s' }}><Footer /></div>
+      <div className="drop-in" style={{ animationDelay: '0.36s' }}><Footer /></div>
     </div>
   );
 }
