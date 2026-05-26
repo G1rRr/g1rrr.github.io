@@ -80,7 +80,7 @@ const GlobalStyles = () => (
       50% { color: #FF0080; }
     }
     .animate-blue-pink {
-      animation: blue-pink 4s ease-in-out infinite;
+      animation: blue-pink 10s ease-in-out infinite;
     }
 
     @keyframes drop-in {
