@@ -707,6 +707,51 @@ const About = () => {
   );
 };
 
+// --- 项目分类展示 ---
+const Showcase = () => {
+  const cats = [
+    { label: 'GAME', items: ['Career Life Survival', 'AI Startup Survival'], links: ['/career-life.html', '/startup-survival.html'] },
+    { label: 'BOT', items: ['MeihuaBOT', 'JanusBOT'], links: ['/meihua.html', '/janus.html'] },
+    { label: 'AGENT', items: ['knowledge linker'], links: ['/knowledge-linker.html'] },
+    { label: '工具', items: ['Workshop Manager'], links: ['/workshop.html'] },
+  ];
+
+  return (
+    <section className="bg-[#0000FF] py-20 md:py-28 px-6 relative z-10">
+      <div className="max-w-5xl mx-auto">
+        <Reveal>
+          <div className="mb-12 border-b border-white/20 pb-6">
+            <p className="font-mono text-[#FF0080] text-xs tracking-[0.3em] uppercase mb-2">// Projects</p>
+          </div>
+        </Reveal>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+          {cats.map((cat, i) => (
+            <Reveal key={i} delay={i * 100}>
+              <div className="border-2 border-white/20 p-5 md:p-6 hover:border-[#FF0080] transition-all duration-300 group h-full flex flex-col">
+                <span className="font-mono text-[#FF0080] text-[10px] tracking-[0.3em] uppercase mb-4 block">
+                  {cat.label}
+                </span>
+                <div className="flex-1 space-y-2">
+                  {cat.items.map((name, j) => (
+                    <a
+                      key={j}
+                      href={cat.links[j]}
+                      className="block font-syne font-bold text-lg md:text-xl uppercase text-white hover:text-[#FF0080] transition-colors duration-300 leading-tight"
+                    >
+                      {name}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // --- Footer：G1rRr 收束 ---
 const Footer = () => {
   return (
@@ -1030,7 +1075,8 @@ export default function App() {
       <div className="drop-in" style={{ animationDelay: '0s' }}><Hero /></div>
       <div className="drop-in" style={{ animationDelay: '0.12s' }}><About /></div>
       <div className="drop-in" style={{ animationDelay: '0.22s' }}><CrabWalker /></div>
-      <div className="drop-in" style={{ animationDelay: '0.32s' }}><Footer /></div>
+      <div className="drop-in" style={{ animationDelay: '0.28s' }}><Showcase /></div>
+      <div className="drop-in" style={{ animationDelay: '0.38s' }}><Footer /></div>
     </div>
   );
 }
