@@ -642,7 +642,7 @@ const About = () => {
   };
 
   return (
-    <section id="projects" className="relative bg-white text-black py-20 md:py-32 px-4 md:px-6 overflow-hidden">
+    <section className="relative bg-white text-black py-20 md:py-32 px-4 md:px-6 overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.04]">
         <span className="text-[18vw] font-syne font-black text-[#0000FF] leading-none">G1rRr</span>
       </div>
@@ -733,7 +733,7 @@ const Showcase = () => {
   ];
 
   return (
-    <section className="bg-white py-20 md:py-28 px-6 relative z-10">
+    <section id="projects" className="bg-white py-20 md:py-28 px-6 relative z-10">
       <div className="max-w-5xl mx-auto">
         <Reveal>
           <div className="mb-12 border-b border-black/10 pb-6">
@@ -741,10 +741,10 @@ const Showcase = () => {
           </div>
         </Reveal>
 
-        <div className="space-y-4">
-          {cats.map((cat, i) => (
-            <Reveal key={i} delay={i * 100}>
-              <div className="border-2 border-black/10 p-5 md:py-7 md:px-8 hover:border-[#FF0080] transition-all duration-300 group flex flex-col md:flex-row md:items-start gap-3 md:gap-8">
+        <Reveal>
+          <div className="space-y-4">
+            {cats.map((cat, i) => (
+              <div key={i} className="border-2 border-black/10 p-5 md:py-7 md:px-8 hover:border-[#FF0080] transition-all duration-300 group flex flex-col md:flex-row md:items-start gap-3 md:gap-8">
                 <span className="font-syne font-black text-2xl md:text-4xl text-[#FF0080] uppercase tracking-tight whitespace-nowrap flex-shrink-0 flex items-center gap-3 w-[100px] md:w-[150px] pt-1">
                   <span className="inline-flex w-3.5 h-3.5 rounded-full bg-[#0000FF] breathe-dot flex-shrink-0" />
                   {cat.label}
@@ -766,9 +766,9 @@ const Showcase = () => {
                   ))}
                 </div>
               </div>
-            </Reveal>
-          ))}
-        </div>
+            ))}
+          </div>
+        </Reveal>
       </div>
     </section>
   );
