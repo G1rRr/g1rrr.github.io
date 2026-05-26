@@ -730,20 +730,20 @@ const Showcase = () => {
   ];
 
   return (
-    <section className="bg-[#0000FF] py-20 md:py-28 px-6 relative z-10">
+    <section className="bg-white py-20 md:py-28 px-6 relative z-10">
       <div className="max-w-5xl mx-auto">
         <Reveal>
           <div className="mb-12 border-b border-white/20 pb-6">
-            <p className="font-mono text-[#FF0080] text-xs tracking-[0.3em] uppercase mb-2">// Projects</p>
+            <p className="font-mono text-[#FF0080] text-xs tracking-[0.3em] uppercase mb-2">// Categories</p>
           </div>
         </Reveal>
 
         <div className="space-y-4">
           {cats.map((cat, i) => (
             <Reveal key={i} delay={i * 100}>
-              <div className="border-2 border-white/20 p-5 md:py-7 md:px-8 hover:border-[#FF0080] transition-all duration-300 group flex flex-col md:flex-row md:items-start gap-3 md:gap-8">
+              <div className="border-2 border-black/10 p-5 md:py-7 md:px-8 hover:border-[#FF0080] transition-all duration-300 group flex flex-col md:flex-row md:items-start gap-3 md:gap-8">
                 <span className="font-syne font-black text-2xl md:text-4xl text-[#FF0080] uppercase tracking-tight whitespace-nowrap flex-shrink-0 flex items-center gap-3 pt-1">
-                  <span className="inline-flex w-3 h-3 rounded-full bg-white breathe-dot" />
+                  <span className="inline-flex w-3 h-3 rounded-full bg-[#FF0080] breathe-dot" />
                   {cat.label}
                 </span>
                 <div className="flex flex-wrap gap-x-8 md:gap-x-12 gap-y-3">
@@ -753,10 +753,10 @@ const Showcase = () => {
                       href={item.link || '#'}
                       className="group/item flex flex-col"
                     >
-                      <span className="font-syne font-bold text-base md:text-xl uppercase text-white group-hover/item:text-[#FF0080] transition-colors duration-300 leading-tight">
+                      <span className="font-syne font-bold text-base md:text-xl uppercase text-[#0000FF] group-hover/item:text-[#FF0080] transition-colors duration-300 leading-tight">
                         {item.name}
                       </span>
-                      <span className="text-white/40 text-xs md:text-sm leading-tight mt-0.5">
+                      <span className="text-black/40 text-xs md:text-sm leading-tight mt-0.5">
                         {item.desc}
                       </span>
                     </a>
