@@ -631,8 +631,8 @@ const About = () => {
   const projectActions: Record<string, { action?: () => void; link?: string }> = {
     "Career Life Survival": { link: "/career-life.html" },
     "AI Startup Survival": { link: "/startup-survival.html" },
-    "灵感引擎Agent": { link: "" },
-    "知识链接机Agent": { link: "/knowledge-linker.html" },
+    "inspiration linker": { link: "" },
+    "Knowledge Linker": { link: "/knowledge-linker.html" },
     MeihuaBOT: { link: "/meihua.html" },
     JanusBOT: { link: "/janus.html" },
     "Workshop Manager": { link: "/workshop.html" },
@@ -662,8 +662,8 @@ const About = () => {
               {[
                 "Career Life Survival",
                 "AI Startup Survival",
-                "灵感引擎Agent",
-                "知识链接机Agent",
+                "inspiration linker",
+                "Knowledge Linker",
                 "MeihuaBOT",
                 "JanusBOT",
                 "Workshop Manager",
