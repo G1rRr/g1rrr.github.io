@@ -745,7 +745,7 @@ const Showcase = () => {
             <Reveal key={i} delay={i * 100}>
               <div className="border-2 border-black/10 p-5 md:py-7 md:px-8 hover:border-[#FF0080] transition-all duration-300 group flex flex-col md:flex-row md:items-start gap-3 md:gap-8">
                 <span className="font-syne font-black text-2xl md:text-4xl text-[#FF0080] uppercase tracking-tight whitespace-nowrap flex-shrink-0 flex items-center gap-3 pt-1">
-                  <span className="inline-flex w-3 h-3 rounded-full bg-[#FF0080] breathe-dot" />
+                  <span className="inline-flex w-3 h-3 rounded-full bg-[#0000FF] breathe-dot" />
                   {cat.label}
                 </span>
                 <div className="flex flex-wrap gap-x-8 md:gap-x-12 gap-y-3">
