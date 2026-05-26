@@ -719,7 +719,6 @@ const MiniCrab = ({ size }: { size?: 'sm' | 'lg' }) => {
   useEffect(() => {
     const c = ref.current; if (!c) return;
     const ctx = c.getContext('2d')!; let t = 0, raf: number;
-    // 官方 Clawd 身体数据
     const B = [
       [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
       [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
@@ -732,10 +731,12 @@ const MiniCrab = ({ size }: { size?: 'sm' | 'lg' }) => {
     ];
     const P = big ? 3 : 2, W = 14, H = 8;
     const render = () => {
-      c.width = big ? 48 : 32; c.height = big ? 28 : 20;
+      const w = big ? Math.max(48, Math.round(window.innerWidth * 0.5)) : 32;
+      c.width = w; c.height = big ? 28 : 20;
       ctx.clearRect(0, 0, c.width, c.height);
-      const cx = Math.round(big ? 2 + Math.sin(t * 0.025) * 5 : 1 + Math.sin(t * 0.03) * 3);
-      const cy = Math.round(big ? 2 + Math.abs(Math.sin(t * 0.05)) * 1 : 1 + Math.abs(Math.sin(t * 0.06)) * 1);
+      const maxCX = Math.max(0, w - W * P - 4);
+      const cx = Math.round(maxCX / 2 + Math.sin(t * (big ? 0.004 : 0.03)) * (maxCX / 2 - 2));
+      const cy = Math.round(big ? 1 + Math.abs(Math.sin(t * 0.05)) * 1 : 1 + Math.abs(Math.sin(t * 0.06)) * 1);
       for (let r = 0; r < H; r++) for (let col = 0; col < W; col++)
         if (B[r][col]) { ctx.fillStyle = '#CD6E58'; ctx.fillRect(cx + col * P, cy + r * P, P, P); }
       ctx.fillStyle = '#000';
@@ -778,7 +779,6 @@ const Showcase = () => {
             <div className="flex items-center gap-3">
               <MiniCrab />
               <p className="font-mono text-[#FF0080] text-xs tracking-[0.3em] uppercase">// Categories</p>
-              <MiniCrab size="lg" />
             </div>
           </div>
         </Reveal>
