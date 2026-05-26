@@ -733,7 +733,7 @@ const Showcase = () => {
   ];
 
   return (
-    <section id="projects" className="bg-white py-20 md:py-28 px-6 relative z-10">
+    <section className="bg-white py-20 md:py-28 px-6 relative z-10">
       <div className="max-w-5xl mx-auto">
         <Reveal>
           <div className="mb-12 border-b border-black/10 pb-6">
@@ -1092,7 +1092,7 @@ export default function App() {
       {showMeihua && <MeihuaDialog onClose={() => setShowMeihua(false)} />}
       <div className="drop-in" style={{ animationDelay: '0s' }}><Hero /></div>
       <div className="drop-in" style={{ animationDelay: '0.12s' }} onMouseEnter={() => setCursorColor('#0000FF')} onMouseLeave={() => setCursorColor('#FF0080')}><About /></div>
-      <div className="drop-in" style={{ animationDelay: '0.22s' }}><CrabWalker /></div>
+      <div className="drop-in" style={{ animationDelay: '0.22s' }} id="projects"><CrabWalker /></div>
       <div className="drop-in" style={{ animationDelay: '0.26s' }}>
         <div className="bg-[#0000FF] py-12 text-center">
           <p className="font-mono text-[#FF0080] text-xs tracking-[0.3em] uppercase mb-4">// G1rRr</p>
