@@ -75,6 +75,14 @@ const GlobalStyles = () => (
       animation: breathe 2.4s infinite ease-in-out;
     }
 
+    @keyframes blue-pink {
+      0%, 100% { color: #0000FF; }
+      50% { color: #FF0080; }
+    }
+    .animate-blue-pink {
+      animation: blue-pink 4s ease-in-out infinite;
+    }
+
     @keyframes drop-in {
       0%   { transform: translateY(-120vh); opacity: 0; }
       55%  { transform: translateY(-5px); opacity: 1; }
@@ -653,8 +661,7 @@ const About = () => {
           <Reveal>
             <div>
               <p className="font-mono text-[#FF0080] uppercase tracking-[0.3em] text-xs md:text-sm mb-4 md:mb-6">// Identity</p>
-              <h2 className="text-5xl md:text-8xl lg:text-[9rem] font-syne font-black text-[#0000FF] hover:text-[#FF0080] transition-colors duration-500 leading-[0.9]">
-                G1rRr
+              <h2 className="text-5xl md:text-8xl lg:text-[9rem] font-syne font-black leading-[0.9] animate-blue-pink">G1rRr
               </h2>
             </div>
           </Reveal>
