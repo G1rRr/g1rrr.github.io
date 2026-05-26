@@ -749,12 +749,12 @@ const Showcase = () => {
                   <span className="inline-flex w-3 h-3 rounded-full bg-[#0000FF] breathe-dot" />
                   {cat.label}
                 </span>
-                <div className="flex flex-wrap gap-x-8 md:gap-x-12 gap-y-3">
+                <div className="flex flex-col gap-y-3">
                   {cat.items.map((item, j) => (
                     <a
                       key={j}
                       href={item.link || '#'}
-                      className="group/item flex flex-col"
+                      className="group/item flex flex-row md:flex-col"
                     >
                       <span className="font-syne font-bold text-base md:text-xl uppercase text-[#0000FF] group-hover/item:text-[#FF0080] transition-colors duration-300 leading-tight">
                         {item.name}
