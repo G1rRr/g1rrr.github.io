@@ -771,7 +771,7 @@ const Showcase = () => {
     ]},
     { label: 'BOT', items: [
       { name: 'MeihuaBOT', desc: 'AI 决策助手', link: '/meihua.html' },
-      { name: 'JanusBOT', desc: '问答式自我挖掘助手', link: '/janus.html' },
+      { name: 'JanusBOT', desc: '自我挖掘助手', link: '/janus.html' },
     ]},
     { label: 'TOOL', items: [
       { name: 'Workshop Manager', desc: '流程管理系统', link: '/workshop.html' },
