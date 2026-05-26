@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Life Survival | 职业人生模拟器</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#0000FF;--pink:#FF0080;--white:#fff;--black:#111;
+  --text:rgba(0,0,0,.85);--text2:rgba(0,0,0,.55);--text3:rgba(0,0,0,.25);
+  --border:rgba(0,0,0,.08);--border-hover:rgba(0,0,0,.15);
+  --surface:rgba(0,0,0,.02);--surface-hover:rgba(0,0,0,.04);
+  --green:#00aa66;--red:#ee3355;--yellow:#cc9900;
+}
+body{
+  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--white);color:var(--text);min-height:100vh;
+  display:flex;justify-content:center;align-items:flex-start;
+  padding:32px 24px;
+  line-height:1.6;
+}
+#app{width:100%;max-width:680px;min-height:100vh;display:flex;flex-direction:column;gap:2px}
+
+#status-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 24px;border:2px solid var(--blue);
+  font-size:14px;flex-wrap:wrap;gap:12px;
+}
+.status-item{display:flex;align-items:center;gap:8px}
+.status-label{color:var(--blue);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;opacity:.7}
+.status-item span:last-child{font-weight:600;font-size:15px;color:var(--text)}
+.economy-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.economy-dot.boom{background:var(--green)}
+.economy-dot.stable{background:var(--yellow)}
+.economy-dot.recession{background:var(--red)}
+
+#main-content{
+  flex:1;border:1px solid var(--border);
+  padding:40px 36px;min-height:480px;
+}
+#main-content h2{font-size:24px;margin-bottom:14px;color:var(--black);font-weight:700}
+.narrative{line-height:2;margin:18px 0;color:var(--text2);font-size:15px}
+
+.score-display{text-align:center;font-size:80px;font-weight:900;color:var(--blue);margin:24px 0;letter-spacing:-3px}
+.score-label{text-align:center;color:var(--text3);font-size:12px;margin-bottom:8px;letter-spacing:3px;text-transform:uppercase}
+
+.year-tag{
+  display:inline-block;border:1px solid var(--blue);color:var(--blue);
+  font-size:13px;padding:4px 14px;margin-bottom:14px;font-weight:600;
+}
+.event-tag{display:inline-block;font-size:11px;padding:3px 12px;margin-bottom:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.event-tag.crisis{border:1px solid var(--red);color:var(--red)}
+.event-tag.opportunity{border:1px solid var(--green);color:var(--green)}
+
+.news-card{
+  border:1px solid var(--border);border-left:4px solid var(--blue);
+  padding:18px 20px;margin:16px 0;
+}
+.news-card.opportunity{border-left-color:var(--green)}
+.news-card.crisis{border-left-color:var(--red)}
+.news-card .news-icon{font-size:22px;margin-bottom:8px}
+.news-card .news-text{color:var(--text);line-height:1.9;font-size:15px}
+.news-card .news-reaction{color:var(--text3);font-size:13px;margin-top:10px;font-style:italic}
+
+.btn-group{display:flex;flex-direction:column;gap:8px;margin-top:24px}
+.btn{
+  display:block;width:100%;padding:16px 20px;
+  background:transparent;color:var(--text);border:1px solid var(--border);
+  font-size:15px;cursor:pointer;text-align:left;transition:all .2s ease;
+  font-family:inherit;
+}
+.btn:hover{background:var(--pink);border-color:var(--pink);color:var(--white)}
+.btn:active{background:var(--pink);opacity:.8}
+.btn .btn-title{font-weight:600;font-size:15px}
+.btn .btn-sub{font-size:12px;color:var(--text3);margin-top:3px}
+.btn.disabled{opacity:.2;cursor:not-allowed;pointer-events:none}
+.btn.disabled:hover{background:transparent;border-color:var(--border);color:var(--text)}
+.btn.primary{
+  background:var(--blue);color:var(--white);text-align:center;font-weight:700;border-color:var(--blue);
+}
+.btn.primary:hover{background:var(--pink);color:var(--white);border-color:var(--pink)}
+
+.slider-group{margin:24px 0}
+.slider-group input[type=range]{width:100%;accent-color:var(--pink);height:6px}
+.slider-row{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.slider-val{font-size:32px;font-weight:900;color:var(--black);min-width:60px;text-align:center}
+
+.major-category{border:1px solid var(--border);margin-bottom:4px}
+.major-category .cat-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 16px;cursor:pointer;user-select:none;
+}
+.major-category .cat-header:hover{background:var(--surface)}
+.major-category .cat-name{font-weight:600;font-size:15px}
+.major-category .cat-sub{font-size:11px;color:var(--text3)}
+.major-category .cat-body{padding:0 16px 14px;display:none}
+.major-category.open .cat-body{display:block}
+.major-item{
+  display:inline-block;padding:7px 14px;margin:4px 5px;
+  border:1px solid var(--border);font-size:14px;cursor:pointer;transition:all .2s;
+}
+.major-item:hover{border-color:var(--pink);color:var(--pink)}
+.major-item.locked{opacity:.2;cursor:not-allowed;text-decoration:line-through}
+.major-item.locked:hover{border-color:var(--border);color:var(--text)}
+.major-item.selected{border-color:var(--pink);color:var(--pink);background:rgba(255,0,128,.05)}
+
+.attr-row{display:flex;gap:2px}
+.attr-card{
+  flex:1;border:1px solid var(--border);
+  padding:14px 16px;text-align:center;
+}
+.attr-card .attr-label{font-size:10px;color:var(--text3);margin-bottom:6px;letter-spacing:2px;text-transform:uppercase}
+.attr-card .attr-val{font-size:16px;font-weight:600;color:var(--black)}
+
+.history-panel{margin-top:24px;border-top:1px solid var(--border);padding-top:16px}
+.history-toggle{color:var(--text3);font-size:13px;cursor:pointer;user-select:none}
+.history-toggle:hover{color:var(--pink)}
+.history-list{display:none;margin-top:12px;font-size:13px;color:var(--text3);line-height:2.2}
+.history-list.open{display:block}
+.history-item{padding:3px 0;border-bottom:1px solid var(--border)}
+
+#transition-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;z-index:100;
+  background:var(--white);display:flex;flex-direction:column;
+  justify-content:center;align-items:center;animation:fadeIn .3s ease-out;
+}
+#transition-overlay.fade-out{animation:fadeOut .5s ease-in forwards}
+#transition-overlay .trans-year{font-size:80px;font-weight:900;color:var(--black);margin-bottom:10px;letter-spacing:-4px}
+#transition-overlay .trans-title{font-size:20px;color:var(--text2);margin-bottom:6px;letter-spacing:3px}
+#transition-overlay .trans-sub{font-size:15px;color:var(--pink)}
+#transition-overlay .trans-bar{width:80px;height:2px;background:var(--blue);margin-top:28px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+.fade-in{animation:fadeIn .35s ease-out}
+
+.ending-card{text-align:center;padding:40px 0}
+.ending-card .ending-title{font-size:40px;font-weight:900;color:var(--black);margin-bottom:24px;letter-spacing:-2px}
+.ending-card .ending-narrative{line-height:2.3;color:var(--text2);margin-bottom:32px;font-size:16px}
+.ending-card .ending-panel{border:1px solid var(--border);padding:24px;margin-bottom:28px}
+.ending-card .ending-panel .row{display:flex;justify-content:space-around;margin:8px 0}
+.ending-card .ending-panel .stat{text-align:center}
+.ending-card .ending-panel .stat-val{font-size:28px;font-weight:900;color:var(--black)}
+.ending-card .ending-summary{font-size:19px;color:var(--text);margin:24px 0;font-weight:600}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border)}
+
+/* Tablet */
+@media(max-width:768px){
+  body{padding:20px 16px}
+  #app{max-width:100%}
+  #main-content{padding:32px 24px;min-height:400px}
+  #main-content h2{font-size:22px}
+  .score-display{font-size:64px}
+  #transition-overlay .trans-year{font-size:64px}
+  .ending-card .ending-title{font-size:32px}
+}
+
+/* Mobile */
+@media(max-width:480px){
+  body{padding:12px 8px}
+  #status-bar{padding:12px 16px;font-size:12px;gap:8px}
+  .status-item span:last-child{font-size:13px}
+  #main-content{padding:24px 16px;min-height:360px}
+  #main-content h2{font-size:20px}
+  .narrative{font-size:14px;line-height:1.8;margin:14px 0}
+  .score-display{font-size:52px;letter-spacing:-1px}
+  .score-label{font-size:10px;letter-spacing:2px}
+  .btn{padding:14px 16px;font-size:14px}
+  .btn .btn-title{font-size:14px}
+  .btn-group{gap:6px;margin-top:18px}
+  .major-category .cat-header{padding:12px 14px}
+  .major-category .cat-name{font-size:14px}
+  .major-item{padding:6px 10px;margin:3px;font-size:13px}
+  .attr-card{padding:10px 12px}
+  .attr-card .attr-val{font-size:14px}
+  .year-tag{font-size:11px;padding:3px 10px}
+  .news-card{padding:14px;margin:12px 0}
+  .news-card .news-text{font-size:14px}
+  .ending-card{padding:20px 0}
+  .ending-card .ending-title{font-size:28px;letter-spacing:-1px}
+  .ending-card .ending-narrative{font-size:14px}
+  .ending-card .ending-panel .stat-val{font-size:22px}
+  #transition-overlay .trans-year{font-size:48px;letter-spacing:-2px}
+  #transition-overlay .trans-title{font-size:16px}
+  #transition-overlay .trans-sub{font-size:13px}
+  #transition-overlay .trans-bar{width:50px}
+  .slider-val{font-size:24px}
+}
+</style>
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="transition-overlay" style="display:none"></div>
+<script>
+// ============================================================
+// Career Life Survival | 职业人生模拟器 v2.3
+// ============================================================
+
+const state = {
+  chapter:'prologue', age:18, year:2018, score:0,
+  majorCat:null, majorName:null,
+  scorePenalty:false, hasPostgrad:false,
+  path:null, gapYears:0, gapAttempts:0, gapResult:null,
+  careerYear:0, careerDirection:null,
+  careerNode:1, // 1=第1年, 2=第2年, 3=第3年, 5=第5年, 7=第7年, 10=第10年, 15,20,25,30,35,40
+  careerEvent:null,
+  careerResult:null, // {type, title, icon, text, nextNode}
+  wealth:50, stability:50, stress:20,
+  economy:'stable', economyLabel:'平稳',
+  history:[],
+  choices:{
+    node1:null,node2:null,node3:null,node7:null,node10:null,node15:null,node20:null,
+    changedCareer:false,changedCareerSuccess:false,
+    startedBusiness:false,freelance:false,sideHustle:false,
+    civilSuccess:false,postgradSuccess:false,
+  },
+  endingType:null,
+  eventQueue:[], // 待触发的事件
+};
+
+// --- 工具 ---
+function rng(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
+function normalRandom(mean,std){let u1=Math.random(),u2=Math.random();return clamp(Math.round(mean+Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2)),400,750)}
+
+// --- 专业 ---
+const MAJORS=[
+  {cat:'理学',recScore:550,sub:['数学','物理学','化学','生物科学','统计学','其他'],changeGroup:'wide'},
+  {cat:'工学',recScore:500,sub:['计算机科学与技术','电气工程','机械工程','材料科学','土木工程','化学工程','其他'],changeGroup:'wide'},
+  {cat:'医学',recScore:580,sub:['临床医学','药学','护理学','公共卫生','其他'],changeGroup:'restricted'},
+  {cat:'经济学',recScore:550,sub:['经济学','国际贸易','统计学','金融学','其他'],changeGroup:'mid'},
+  {cat:'管理学',recScore:500,sub:['工商管理','会计学','人力资源管理','物流管理','其他'],changeGroup:'mid'},
+  {cat:'法学',recScore:520,sub:['法学','政治学','社会学','国际关系','其他'],changeGroup:'mid'},
+  {cat:'文学/语言',recScore:500,sub:['汉语言文学','英语','翻译','新闻传播','其他'],changeGroup:'mid'},
+  {cat:'历史/哲学',recScore:500,sub:['历史学','哲学','考古学','其他'],changeGroup:'restricted'},
+  {cat:'艺术',recScore:500,sub:['平面设计','视觉传达','音乐','影视编导','其他'],changeGroup:'restricted'},
+  {cat:'教育/师范',recScore:500,sub:['教育学','小学教育','学前教育','心理学','其他'],changeGroup:'mid'},
+  {cat:'农林',recScore:400,sub:['农学','林学','动物科学','食品科学','其他'],changeGroup:'restricted'},
+  {cat:'体育',recScore:400,sub:['体育教育','运动训练','社会体育','其他'],changeGroup:'restricted'},
+  {cat:'军事/公安',recScore:580,sub:['国防生','警察学院','消防工程','其他'],changeGroup:'restricted',lockScore:580},
+];
+function getMajorData(n){return MAJORS.find(m=>m.cat===n)}
+function getAIImpact(c){
+  const m=getMajorData(c);if(!m)return'mid';
+  if(m.changeGroup==='wide')return'low';if(m.changeGroup==='mid')return'mid';return'high';
+}
+
+// --- 经济 ---
+const ECON=[{id:'boom',label:'景气',icon:'🟢'},{id:'stable',label:'平稳',icon:'🟡'},{id:'recession',label:'低迷',icon:'🔴'}];
+function refreshEconomy(){const r=Math.random();state.economy=r<0.3?'boom':r<0.7?'stable':'recession';state.economyLabel=ECON.find(e=>e.id===state.economy).label}
+
+// --- 属性 ---
+function wealthLabel(){if(state.careerYear<=5&&state.chapter==='career')return'月光';if(state.choices.startedBusiness&&state.wealth>=95)return'财富自由';if(state.wealth>=90)return'千万';if(state.wealth>=75)return'百万';if(state.wealth>=25)return'十万';return'月光'}
+function stabilityLabel(){if(state.stability<20)return'岌岌可危';if(state.stability<60)return'站稳了脚跟';return'铁打的位置'}
+function stressLabel(){if(state.stress<30)return'岁月静好';if(state.stress<65)return'有点焦虑';return'快撑不住了'}
+
+// --- 惩罚/加成 ---
+function penalty(){return state.scorePenalty?0.15:0}
+function pgBonus(){return state.hasPostgrad?1.3:1.0}
+function wealthSlow(){return state.scorePenalty?0.6:1.0}
+
+// --- 转行 ---
+function getChangeOptions(){
+  const m=getMajorData(state.majorCat);const g=m?m.changeGroup:'mid';
+  if(g==='wide')return[{name:'AI产品经理',baseRate:70},{name:'数据分析师',baseRate:75},{name:'金融科技',baseRate:55},{name:'技术管理',baseRate:80}];
+  if(g==='mid')return[{name:'运营/品牌策划',baseRate:65},{name:'财富管理顾问',baseRate:55},{name:'教育培训',baseRate:70},{name:'自媒体创业',baseRate:40}];
+  return[{name:'体制内（考编/考公）',baseRate:60},{name:'服务业管理',baseRate:65},{name:'自媒体',baseRate:35},{name:'考研换专业',baseRate:50}];
+}
+
+// --- 职业方向 ---
+function getDirections(){
+  const m=getMajorData(state.majorCat);
+  if(m&&m.changeGroup==='restricted'){
+    return state.hasPostgrad?['本专业高级岗位','考虑转行']:['本专业相关工作','考虑转行'];
+  }
+  let b=[];
+  switch(state.majorCat){
+    case'工学':b=['前端/后端开发','算法工程师','产品经理','数据分析师'];break;
+    case'理学':b=['数据分析师','科研助理','教育培训','金融量化'];break;
+    case'经济学':b=['金融分析师','经济研究员','数据运营','投行助理'];break;
+    case'管理学':b=['管理培训生','人力资源','市场运营','咨询顾问'];break;
+    case'法学':b=['律师助理','法务专员','合规岗','公证员助理'];break;
+    case'文学/语言':b=['内容编辑','新媒体运营','翻译','文案策划'];break;
+    case'教育/师范':b=['中小学教师','培训讲师','教育产品','课程研发'];break;
+    default:b=['专业对口岗位','通用管理岗','自由职业'];
+  }
+  if(state.hasPostgrad){const e={工学:['AI研究员','高级架构师','技术总监助理'],理学:['数据科学家','量化研究员','实验室主管'],经济学:['宏观研究员','投行经理','首席分析师'],管理学:['战略顾问','CEO助理','高级项目经理'],法学:['执业律师','法务经理','政策研究员']};b=[...(e[state.majorCat]||['高级研究岗','项目管理岗','技术专家岗']),...b]}
+  return b;
+}
+
+// --- 危机/机遇事件池 ---
+const CRISIS_EVENTS=[
+  {text:'公司宣布裁员，你的部门被列入名单。',icon:'🔴',tag:'危机',
+    opts:[
+      {label:'疯狂加班保住位置',eff:()=>{state.stability+=5;state.stress+=20}},
+      {label:'趁这个机会多陪陪家人，听天由命',eff:()=>{state.stability-=15;state.stress-=5}},
+    ]},
+  {text:'AI接管了你日常工作的40%，老板找你谈话。',icon:'🤖',tag:'危机',
+    opts:[
+      {label:'拼命学AI，周末报班充电',eff:()=>{state.stability+=8;state.stress+=15}},
+      {label:'算了，周末去爬山，工作的事再说',eff:()=>{state.stability-=10;state.stress-=10}},
+    ]},
+  {text:'行业龙头倒闭，整个行业开始洗牌。',icon:'💥',tag:'危机',
+    opts:[
+      {label:'疯狂投简历，接触新行业',eff:()=>{state.stability-=5;state.stress+=12}},
+      {label:'回老家待一阵子，陪陪父母',eff:()=>{state.stability-=20;state.stress-=8}},
+    ]},
+  {text:'你负责的大项目黄了，上面开始追究责任。',icon:'📉',tag:'危机',
+    opts:[
+      {label:'住进公司，亲手把项目救回来',eff:()=>{state.stability+=5;state.stress+=20;state.wealth+=5}},
+      {label:'该我的责任我认，但下班时间是我的',eff:()=>{state.stability-=12;state.stress+=5}},
+    ]},
+  {text:'比你年轻十岁的同事用AI完成了你一周的工作量。',icon:'😰',tag:'危机',
+    opts:[
+      {label:'咬牙学AI，哪怕从零开始',eff:()=>{state.stability+=5;state.stress+=10}},
+      {label:'接受自己的节奏，把擅长的做到极致',eff:()=>{state.stability+=3;state.stress-=3}},
+    ]},
+];
+const OPP_EVENTS=[
+  {text:'猎头打来电话，给了一个薪资翻倍的机会。',icon:'📞',tag:'机遇',
+    opts:[
+      {label:'冲！去新公司拼一把',eff:()=>{state.wealth+=20;state.stability-=10;state.stress+=8}},
+      {label:'不折腾了，现在的同事挺好的',eff:()=>{state.stability+=5;state.stress-=3}},
+    ]},
+  {text:'你的副业突然火了，一个周末赚了一个月的钱。',icon:'🔥',tag:'机遇',
+    opts:[
+      {label:'辞职all-in副业',eff:()=>{state.wealth+=25;state.stability-=15;state.choices.sideHustle=true}},
+      {label:'当个额外收入就行，主业不能丢',eff:()=>{state.wealth+=8;state.stability+=3}},
+    ]},
+  {text:'VP很赏识你，点名让你负责核心项目——代价是几乎没有周末。',icon:'⭐',tag:'机遇',
+    opts:[
+      {label:'拼了！这是职场跃升的关键机会',eff:()=>{state.stability+=15;state.stress+=12;state.wealth+=8}},
+      {label:'婉拒，想把周末留给自己的爱好',eff:()=>{state.stability+=3;state.stress-=10}},
+    ]},
+  {text:'你的技能成了市场紧缺货，同行纷纷来挖。',icon:'💎',tag:'机遇',
+    opts:[
+      {label:'价高者得，去最好的平台',eff:()=>{state.wealth+=15;state.stability-=5;state.stress+=5}},
+      {label:'跟老板谈涨薪，留在熟悉的地方',eff:()=>{state.wealth+=8;state.stability+=10}},
+    ]},
+  {text:'多年前帮过的人成了行业大佬，主动找你合作。',icon:'🤝',tag:'机遇',
+    opts:[
+      {label:'抓住人脉，全力投入合作',eff:()=>{state.stability+=8;state.wealth+=15;state.stress+=5}},
+      {label:'吃个饭叙叙旧就行，人情债最难还',eff:()=>{state.stability+=5}},
+    ]},
+];
+
+// --- 结局 ---
+function determineEnding(){
+  const{wealth,stability,stress,choices}=state;
+  if(choices.civilSuccess)return'上岸了';
+  if((state.path==='postgrad'||state.path==='civil')&&state.gapAttempts>=3&&!choices.postgradSuccess&&!choices.civilSuccess)return'三战皆败，重启';
+  if(choices.startedBusiness&&wealth>=95)return'创业这件事';
+  if(choices.startedBusiness&&wealth<95)return'创业失败';
+  if(choices.changedCareerSuccess&&wealth>=60)return'弯道超车';
+  if(wealth>=95&&stress<50)return'提前退场（FIRE）';
+  if(stress>=90)return'倦怠离场';
+  if(choices.freelance&&wealth>=40)return'自由漂流';
+  if(choices.sideHustle&&wealth>=70)return'副业翻身';
+  const ai=getAIImpact(state.majorCat);
+  if(ai==='high'&&!choices.changedCareer&&wealth<30&&stress>60)return'35岁的下午';
+  if(wealth<25&&stability<25&&stress>75)return'困在系统里';
+  return'勤恳退休';
+}
+
+const ENDINGS={
+  '35岁的下午':{title:'35岁的下午',tone:'悲',narrative:'35岁那年的一个普通下午，你收到HR的邮件，上面写着"因业务调整，您的岗位将被优化"。\n\n你走出写字楼，阳光刺眼。你想起18岁那年填下的志愿，想起大学时刷到的那条新闻。一切伏笔，原来早已埋下。',summary:'时代的灰尘，落在一个人身上就是一座山。'},
+  '勤恳退休':{title:'勤恳退休',tone:'平',narrative:'你没有大起大落，也没有逆天改命。你在这条路上一步一步走到了退休。\n\n有人觉得这很无聊，但你知道：平稳地度过一生，本身就已经是一种幸运。\n\n退休那天，同事们给你办了个简单的欢送会。你看着窗外的夕阳，觉得这样也挺好。',summary:'平凡不是失败，能坚持到底就是胜利。'},
+  '上岸了':{title:'上岸了',tone:'喜',narrative:'经过漫长的备考，你终于——上岸了。\n\n公示那天，你把截图发到了家庭群。妈妈秒回了一串鞭炮emoji。\n\n你知道体制内不是天堂，但至少，你不再需要每天醒来第一件事就是担心被优化。',summary:'体制内不是终点，但至少是一个避风港。'},
+  '三战皆败，重启':{title:'三战皆败，重启',tone:'转折',narrative:'三年，你给了它三年。\n\n第三次落榜后，你终于接受了——这条路走不通了。\n\n你收起书本，重新写了一份简历。晚了三年进入职场，但你比任何人都知道：什么时候开始都不算晚。',summary:'承认失败需要勇气，重新开始更需要。'},
+  '弯道超车':{title:'弯道超车',tone:'喜',narrative:'你做了一个所有人都觉得冒险的决定——转行。\n\n那段时间，你白天上班，晚上学习，周末做项目。半年后，你拿到了第一个offer。\n\n新行业里，你的旧经验反而成了独一无二的优势。',summary:'危机就是转机，关键是你有没有迈出那一步。'},
+  '困在系统里':{title:'困在系统里',tone:'悲',narrative:'你试过转型，试过跳槽，试过很多次。\n\n但每一次，要么差一点，要么时机不对，要么行业本身就在萎缩。你感觉自己像在跑步机上——一直在跑，却始终停在原地。',summary:'有时候，困住你的不是你自己，而是整个系统。'},
+  '自由漂流':{title:'自由漂流',tone:'开放',narrative:'你没有走传统的路。你在自媒体上积累了一批自己的读者，接一些项目，做一些咨询。\n\n收入不稳定，但时间是你自己的。你不再需要"请假"，也不再需要在周日的晚上焦虑周一。',summary:'自由职业不是逃避，是另一种活法。'},
+  '创业这件事':{title:'创业这件事',tone:'喜',narrative:'你all-in了。那几年你几乎没有周末，见了无数投资人，被拒绝了无数次。\n\n但产品终于跑通了。第一轮融资到账那天，你在空荡荡的办公室里坐了很久。\n\n你赢了——至少到目前为止。',summary:'创业是一场豪赌，你赌赢了。'},
+  '创业失败':{title:'创业这件事',tone:'悲',narrative:'你all-in了。两年时间，烧光了积蓄，团队散了。\n\n关掉公司那天，你一个人收拾着空荡荡的办公室，发现自己老了五岁。\n\n但你不后悔。至少你试过。',summary:'创业是一场豪赌，你赌输了。'},
+  '提前退场（FIRE）':{title:'提前退场（FIRE）',tone:'喜',narrative:'你做到了大多数人梦寐以求的事——提前退场。\n\n那天你递交了辞呈，走出公司大门，第一次觉得空气是甜的。\n\n你才四十出头，剩下的日子都是你自己的。你打算先去一趟冰岛，再看一场极光。',summary:'人生的目的不是工作，而是生活本身。'},
+  '倦怠离场':{title:'倦怠离场',tone:'悲中带释然',narrative:'你不知道从哪天开始，每天早上起床变成了一件需要勇气的事。\n\n你终于决定：不卷了。你回到老家，做一份不那么体面但也不那么累的工作。别人说你"废了"，你不反驳。因为你知道，能喘得过气来，已经不容易了。',summary:'有时候，退一步是为了还能继续往前走。'},
+  '副业翻身':{title:'副业翻身',tone:'喜',narrative:'谁也想不到，当初随手做的副业，竟然成了你的主业。\n\n粉丝从几百到几万到几十万，你发现自己不需要再为别人打工了。\n\n你把工牌扔进了抽屉最深处，再也没有拿出来过。',summary:'人生最精彩的，往往是计划之外的那条路。'},
+};
+
+// ============================================================
+// 过渡动画
+// ============================================================
+function showTransition(title,subtitle,cb){
+  const o=document.getElementById('transition-overlay');
+  o.style.display='flex';o.classList.remove('fade-out');
+  o.innerHTML=`<div class="trans-year">${title}</div><div class="trans-title">${subtitle}</div><div class="trans-bar"></div>`;
+  setTimeout(()=>{o.classList.add('fade-out');setTimeout(()=>{o.style.display='none';cb()},500)},1400);
+}
+
+// ============================================================
+// 渲染
+// ============================================================
+const app=document.getElementById('app');
+function render(){
+  app.innerHTML=statusBar()+attrs()+'<div id="main-content" class="fade-in">'+renderChapter()+'</div>'+hist();
+  bindEvents();
+  document.getElementById('main-content').scrollIntoView({behavior:'smooth'});
+}
+function statusBar(){
+  const e=ECON.find(e=>e.id===state.economy);
+  return`<div id="status-bar">
+    <div class="status-item"><span class="status-label">年份</span><span>${state.year}</span></div>
+    <div class="status-item"><span class="status-label">年龄</span><span>${state.age}岁${state.hasPostgrad?' 🎓':''}</span></div>
+    <div class="status-item"><span class="status-label">就业环境</span><span class="economy-dot ${state.economy}"></span>${e.label}</span></div>
+  </div>`;
+}
+function attrs(){
+  const preCareer=['prologue','major_select','university','crossroads','gap_year'];
+  if(preCareer.includes(state.chapter)){
+    return`<div class="attr-row">
+      <div class="attr-card"><div class="attr-label">财富</div><div class="attr-val" style="color:var(--text3)">—</div></div>
+      <div class="attr-card"><div class="attr-label">压力</div><div class="attr-val">${stressLabel()}</div></div>
+    </div>`;
+  }
+  return`<div class="attr-row">
+    <div class="attr-card"><div class="attr-label">财富</div><div class="attr-val">${wealthLabel()}</div></div>
+    <div class="attr-card"><div class="attr-label">压力</div><div class="attr-val">${stressLabel()}</div></div>
+  </div>`;
+}
+function hist(){
+  if(!state.history.length)return'';
+  return`<div class="history-panel"><div class="history-toggle" id="history-toggle">📋 人生轨迹（${state.history.length}条）▾</div><div class="history-list" id="history-list">${state.history.map(h=>`<div class="history-item">${h.age}岁 · ${h.text}</div>`).join('')}</div></div>`;
+}
+function addHistory(t){state.history.push({age:state.age,text:t})}
+
+function renderChapter(){
+  switch(state.chapter){
+    case'prologue':return renderPrologue();
+    case'major_select':return renderMajors();
+    case'university':return renderUni();
+    case'crossroads':return renderCross();
+    case'gap_year':return renderGap();
+    case'career':return renderCareerNode();
+    case'crisis':return renderCrisis();
+    case'career_change':return renderChange();
+    case'ending':return renderEnding();
+    default:return'<p>...</p>';
+  }
+}
+
+// --- 序章 ---
+function renderPrologue(){
+  if(state.score>0){
+    return`<h2>高考放榜</h2><div class="score-label">你的高考成绩</div><div class="score-display">${state.score}<span style="font-size:24px">分</span></div>
+    <div class="btn-group"><button class="btn primary" id="btn-continue">继续 → 选专业</button></div>`;
+  }
+  return`<h2>高考放榜日</h2><div class="narrative">18岁那年夏天，你走出高考考场。接下来的人生，将从这一组数字开始。</div>
+  <div class="btn-group">
+    <button class="btn" id="btn-random"><div class="btn-title">🎲 随机命运</div></button>
+    <button class="btn" id="btn-manual"><div class="btn-title">✏️ 我要指定</div></button>
+  </div><div id="slider-area"></div>`;
+}
+
+// --- 选专业 ---
+function renderMajors(){
+  let h=`<h2>选择专业</h2><div class="narrative">高考成绩：<b style="color:var(--black)">${state.score}分</b></div>`;
+  MAJORS.forEach(m=>{
+    const l=m.lockScore&&state.score<m.lockScore;
+    h+=`<div class="major-category${l?'':' open'}">
+      <div class="cat-header"><span class="cat-name">${l?'🔒 ':''}${m.cat}</span><span class="cat-sub">${l?`要求${m.lockScore}分`:`推荐${m.recScore}分`}</span></div>
+      <div class="cat-body">${m.sub.map(s=>{const sel=state.majorCat===m.cat&&state.majorName===s;return`<span class="major-item${l?' locked':''}${sel?' selected':''}" data-cat="${m.cat}" data-name="${s}">${s}</span>`}).join('')}</div></div>`;
+  });
+  h+=`<div class="btn-group"><button class="btn primary${state.majorCat?'':' disabled'}" id="btn-confirm-major">确认专业，进入大学</button></div>`;
+  return h;
+}
+
+// --- 大学 ---
+function renderUni(){
+  return`<h2>大学时光 <span class="year-tag">${state.age}岁</span></h2>
+  <div class="narrative">你进入了${state.majorCat}·${state.majorName}专业。日子一天天过去，你在图书馆和教室之间穿梭。</div>
+  <div class="news-card"><div class="news-icon">📰</div><div class="news-text">OpenAI发布GPT-3，朋友圈有人说"AI要替代所有写作工作了"。</div><div class="news-reaction">— 你觉得有点夸张，继续准备期末考试。</div></div>
+  <div class="btn-group"><button class="btn primary" id="btn-to-crossroads">四年过去，面对毕业</button></div>`;
+}
+
+// --- 毕业三叉口 ---
+function renderCross(){
+  return`<h2><span class="year-tag">毕业 · 22岁</span></h2>
+  <div class="narrative">你拿到了${state.majorCat}·${state.majorName}的毕业证书。</div>
+  <div class="btn-group">
+    <button class="btn" id="btn-employment"><div class="btn-title">💼 直接就业</div></button>
+    <button class="btn" id="btn-postgrad"><div class="btn-title">📚 考研/升学</div></button>
+    <button class="btn" id="btn-civil"><div class="btn-title">🏛️ 考公/考编</div></button>
+  </div>`;
+}
+
+// --- 空窗期 ---
+const GAP_DESC={
+  postgrad:[
+    '在学校图书馆占了固定座位，每天六点起床去排队。自习室里坐满了和你一样的人。',
+    '家里支持你再试一年。你在学校附近租了个小单间，月租800，没有窗户，但离图书馆近。',
+    '这是最后一次了。出租屋里堆满了复习资料，墙上贴满了便签。你已经很久没和人说过话了。',
+  ],
+  civil:[
+    '买了全套辅导书，开始刷行测和申论。朋友圈里有人在晒offer，你默默把朋友圈关了。',
+    '在家里的支持下，你报了个培训班。每天早上七点出门，晚上十点回到出租屋，日复一日。',
+    '第三次走进考场。你看着试卷，心里比任何时候都平静——或者说，已经麻木了。',
+  ],
+};
+
+function renderGap(){
+  const L=state.path==='postgrad'?'考研':'考公';
+  const rates=[15,35,45];const br=rates[Math.min(state.gapAttempts,2)];
+  const er=Math.max(5,br-(state.path==='postgrad'?15:0)*penalty());
+  const al=['一','二','三'][state.gapAttempts]||'三';
+  const desc=GAP_DESC[state.path][Math.min(state.gapAttempts,2)];
+  if(state.gapResult==='failed'){
+    return`<h2>${L}备考中 <span class="year-tag">${state.age}岁</span></h2>
+    <div class="narrative">第${al}次尝试。${desc}</div>
+    <div class="news-card"><div class="news-icon">😞</div><div class="news-text">落榜了。${L}竞争越来越激烈，你差了不到10分。</div></div>
+    <div class="narrative">要继续吗？还剩<b>${Math.max(0,3-state.gapAttempts)}</b>次机会。</div>
+    <div class="btn-group">
+      <button class="btn" id="btn-gap-retry">继续备考</button>
+      <button class="btn" id="btn-gap-quit">放弃，直接就业（晚${state.gapYears}年）</button>
+    </div>`;
+  }
+  return`<h2>${L}备考中 <span class="year-tag">${state.age}岁</span></h2>
+  <div class="narrative">第${al}次尝试。${desc}</div>
+  <div class="btn-group"><button class="btn primary" id="btn-gap-check">查看结果</button></div>`;
+}
+
+// ============================================================
+// 职业节点调度
+// ============================================================
+const NODE_YEARS=[1,2,3,5,7,10,15,20,25,30];
+
+function renderCareerNode(){
+  // 结果画面
+  if(state.careerResult){
+    const r=state.careerResult;
+    return`<div style="text-align:center;padding:20px 0">
+      <div style="font-size:56px;margin-bottom:12px">${r.icon}</div>
+      <h2 style="margin-bottom:8px">${r.title}</h2>
+      <div class="narrative">${r.text}</div>
+      <div class="btn-group"><button class="btn primary" id="btn-result-continue">继续</button></div>
+    </div>`;
+  }
+  // 先检查是否有待触发的事件
+  if(state.eventQueue.length>0){
+    const evt=state.eventQueue.shift();
+    state._currentEvent=evt;
+    return renderEventCard(evt);
+  }
+  switch(state.careerNode){
+    case 1:return renderY1();
+    case 2:return renderY2();
+    case 3:return renderY3();
+    case 5:return renderY5();
+    case 7:return renderY7();
+    case 10:return renderY10();
+    case 15:return renderY15();
+    case 20:return renderY20();
+    case 25:return renderY25();
+    case 30:return renderY30();
+    default:return'<p>...</p>';
+  }
+}
+
+function renderEventCard(evt){
+  const cls=evt.tag==='危机'?'crisis':'opportunity';
+  return`<span class="event-tag ${cls}">${evt.tag}</span>
+  <div class="news-card ${cls}"><div class="news-icon">${evt.icon}</div><div class="news-text">${evt.text}</div></div>
+  <div class="btn-group">
+    <button class="btn" id="btn-event-opt0" data-idx="0"><div class="btn-title">${evt.opts[0].label}</div></button>
+    <button class="btn" id="btn-event-opt1" data-idx="1"><div class="btn-title">${evt.opts[1].label}</div></button>
+  </div>`;
+}
+
+function handleEventChoice(idx){
+  const evt=state._currentEvent;
+  if(!evt)return;
+  evt.opts[idx].eff();
+  addHistory(`${evt.tag}：${evt.icon} ${evt.text} — ${evt.opts[idx].label}`);
+  state._currentEvent=null;
+  render();
+}
+
+// --- 第1年：入职 ---
+function renderY1(){
+  const dirs=getDirections();
+  if(state.careerDirection){
+    addHistory(`入职：${state.careerDirection}${state.hasPostgrad?'（硕士）':''}`);
+    return`<h2><span class="year-tag">第1年 · ${state.age}岁</span> 入职</h2>
+    <div class="narrative">你成为了一名<b>${state.careerDirection}</b>。${state.hasPostgrad?'硕士学历让你起点更高。':''}</div>
+    <div class="btn-group">
+      <button class="btn" id="btn-y1-solid"><div class="btn-title">📖 夯实专业知识</div></button>
+      <button class="btn" id="btn-y1-skill"><div class="btn-title">💡 学习新技能</div></button>
+      <button class="btn" id="btn-y1-media"><div class="btn-title">📱 发展自媒体</div></button>
+      <button class="btn" id="btn-y1-lieflat"><div class="btn-title">😴 躺平</div><div class="btn-sub">躺平可能延长寿命 🐶</div></button>
+    </div>`;
+  }
+  return`<h2><span class="year-tag">第1年 · ${state.age}岁</span> 入职</h2>
+  <div class="narrative">你拿着${state.majorCat}·${state.majorName}的文凭${state.hasPostgrad?'和硕士学位':''}，开始找工作。</div>
+  <div class="btn-group">${dirs.map(d=>`<button class="btn" data-dir="${d}" id="btn-dir"><div class="btn-title">${d}</div></button>`).join('')}</div>`;
+}
+
+// --- 第2年：小事件 ---
+function renderY2(){
+  const evt=pick([{text:'公司来了个新同事，比你年轻，干活比你快。',icon:'😅'},{text:'你负责的项目顺利上线，主管点名表扬了你。',icon:'🌟'},{text:'加班越来越多，你开始怀疑自己是否选错了行。',icon:'😮‍💨'},{text:'公司组织了AI工具培训，你学得很认真。',icon:'🤖'},{text:'平平淡淡，没什么大事发生。',icon:'😐'}]);
+  if(!state.careerEvent){state.careerEvent=evt;addHistory(`第2年：${evt.text}`)}
+  return`<h2><span class="year-tag">第2年 · ${state.age}岁</span></h2>
+  <div class="news-card"><div class="news-icon">${evt.icon}</div><div class="news-text">${evt.text}</div></div>
+  <div class="btn-group"><button class="btn primary" id="btn-next-node">继续 → 第3年</button></div>`;
+}
+
+// --- 第3年：升职/跳槽 ---
+function renderY3(){
+  if(!state.careerEvent)state.careerEvent=pick([{id:'promoted',text:'主管找你谈升职——你被器重了。',icon:'⬆️'},{id:'headhunt',text:'同事要跳槽，问你要不要一起走。',icon:'🤝'},{id:'shrink',text:'部门被合并，你的位置有点微妙。',icon:'⚠️'},{id:'ai_tool',text:'公司要求全员学习新AI系统。',icon:'🤖'},{id:'calm',text:'什么都没发生，又一年。',icon:'😐'}]);
+  if(state.scorePenalty&&state.careerEvent.id==='promoted'&&Math.random()<0.4)state.careerEvent={id:'calm',text:'什么都没发生，又一年。',icon:'😐'};
+  const e=state.careerEvent;let o='';
+  if(e.id==='promoted')o=`<button class="btn" id="btn-y3-accept"><div class="btn-title">接受升职</div></button><button class="btn" id="btn-y3-decline"><div class="btn-title">婉拒，保持现状</div></button>`;
+  else if(e.id==='headhunt')o=`<button class="btn" id="btn-y3-jump"><div class="btn-title">跳槽</div></button><button class="btn" id="btn-y3-stay"><div class="btn-title">留下</div></button>`;
+  else if(e.id==='shrink')o=`<button class="btn" id="btn-y3-watch"><div class="btn-title">观望一阵</div></button><button class="btn" id="btn-y3-civil"><div class="btn-title">趁早考公</div></button>`;
+  else if(e.id==='ai_tool')o=`<button class="btn" id="btn-y3-learn"><div class="btn-title">🤖 学AI，加班充电</div></button><button class="btn" id="btn-y3-ignore"><div class="btn-title">🏔️ 不卷了，周末去爬山</div></button>`;
+  else o=`<button class="btn" id="btn-y3-continue"><div class="btn-title">继续前行</div></button>`;
+  return`<h2><span class="year-tag">第3年 · ${state.age}岁</span></h2>
+  <div class="news-card"><div class="news-icon">${e.icon}</div><div class="news-text">${e.text}</div></div>
+  <div class="btn-group">${o}</div>`;
+}
+
+// --- 第5年：分水岭 ---
+function renderY5(){
+  const c1=state.choices.node1;const c2=state.choices.node2;let r;
+  if((c1==='solid'||c1==='skill')&&(c2==='promoted'||c2==='learn')&&state.economy!=='recession'){r={id:'breakthrough',text:'突飞猛进！你的努力得到了回报。升职加薪，一切都在往上走。',icon:'🚀'};state.choices.node3='breakthrough';state.wealth+=Math.round(20*pgBonus()*wealthSlow());state.stability+=10}
+  else if(c1==='lieflat'||c2==='ignore'||(c2==='calm'&&state.economy==='recession')){r={id:'bottleneck',text:'你遇到了瓶颈。AI的冲击开始显现，而你的技能树似乎没有跟上。',icon:'🧱'};state.choices.node3='bottleneck';state.stability-=10;state.stress+=15}
+  else{r={id:'steady',text:'平平淡淡。没有大突破，也没有大危机。日子就这么过着。',icon:'🚶'};state.choices.node3='steady';state.wealth+=Math.round(5*pgBonus()*wealthSlow())}
+  addHistory(`第5年：${r.text}`);
+  return`<h2><span class="year-tag">第5年 · ${state.age}岁</span></h2>
+  <div class="news-card"><div class="news-icon">${r.icon}</div><div class="news-text">${r.text}</div></div>
+  <div class="news-card"><div class="news-icon">📰</div><div class="news-text">AI替代话题开始频繁出现在行业讨论中。招聘市场上，初级岗位的数量在减少。</div></div>
+  <div class="btn-group"><button class="btn primary" id="btn-next-node">继续 → 第7年</button></div>`;
+}
+
+// --- 第7年：AI冲击+中期抉择 ---
+function renderY7(){
+  const ai=getAIImpact(state.majorCat);
+  let t=ai==='high'?'你所在的行业，AI替代率已经超过40%。招聘岗位数量腰斩。':ai==='mid'?'你的行业受到了一定的冲击。寒意已经很明显了。':'你的行业相对安全。但身边的同事在悄悄学习新技能。';
+  return`<h2><span class="year-tag">第7年 · ${state.age}岁</span></h2>
+  <div class="news-card"><div class="news-icon">📰</div><div class="news-text">${t}</div><div class="news-reaction">— 你第一次认真思考自己的位置。</div></div>
+  <div class="btn-group">
+    <button class="btn" id="btn-y7-change"><div class="btn-title">🔄 开始考虑转行</div></button>
+    <button class="btn" id="btn-y7-upskill"><div class="btn-title">📚 深耕现有领域</div></button>
+    <button class="btn" id="btn-y7-civil"><div class="btn-title">🏛️ 考虑考公</div></button>
+    <button class="btn" id="btn-y7-wait"><div class="btn-title">😐 再等等看</div></button>
+  </div>`;
+}
+
+// --- 第10年：危机期 ---
+function renderY10(){
+  const ai=getAIImpact(state.majorCat);
+  let t=ai==='high'?'公司发来邮件：为响应降本增效，部分岗位将由AI系统接替。HR会在本周内与相关同事沟通。':ai==='mid'?'招聘网站上，你的岗位需求少了三分之一。薪资区间也在往下走。':'你的同学群开始有人发"求内推"。你还好，但不确定还能好多久。';
+  return`<h2><span class="year-tag">第10年 · ${state.age}岁</span></h2>
+  <div class="news-card"><div class="news-icon">📰</div><div class="news-text">${t}</div><div class="news-reaction">— 你看了看工位上的咖啡杯，突然不知道该怎么办。</div></div>
+  ${state.scorePenalty?'<div class="narrative" style="color:var(--red)">更糟的是，当初低分进专业的基础薄弱，现在开始显现——比你年轻的同事，学得比你快。</div>':''}
+  <div class="btn-group">
+    <button class="btn" id="btn-crisis-change"><div class="btn-title">🔄 转行</div></button>
+    <button class="btn" id="btn-crisis-civil"><div class="btn-title">🏛️ 考公/考编（最后窗口）</div></button>
+    <button class="btn" id="btn-crisis-biz"><div class="btn-title">🚀 创业</div></button>
+    <button class="btn" id="btn-crisis-freelance"><div class="btn-title">🆓 自由职业</div></button>
+    <button class="btn" id="btn-crisis-stay"><div class="btn-title">😐 继续熬</div></button>
+  </div>`;
+}
+
+// --- 第15年：中年转折 ---
+function renderY15(){
+  const evt=Math.random()<0.5?'crisis':'opportunity';
+  if(!state.careerEvent){state.careerEvent=evt}
+  if(evt==='crisis'){
+    return`<h2><span class="year-tag">第15年 · ${state.age}岁</span></h2>
+    <div class="news-card crisis"><div class="news-icon">⚠️</div><div class="news-text">行业格局发生了翻天覆地的变化。你认识的很多人已经被迫转行或"退休"了。你还在，但已经是少数。</div></div>
+    <div class="btn-group">
+      <button class="btn" id="btn-y15-fight"><div class="btn-title">💪 杀出一条血路</div></button>
+      <button class="btn" id="btn-y15-accept"><div class="btn-title">🧘 接受现实，稳定就行</div></button>
+      <button class="btn" id="btn-y15-change"><div class="btn-title">🔄 现在转行还来得及</div></button>
+    </div>`;
+  }
+  return`<h2><span class="year-tag">第15年 · ${state.age}岁</span></h2>
+  <div class="news-card opportunity"><div class="news-icon">🌟</div><div class="news-text">你积累的经验和人脉在这个阶段集中爆发。有人主动找你合伙，有人开出高薪挖你。这是属于你的黄金期。</div></div>
+  <div class="btn-group">
+    <button class="btn" id="btn-y15-jump"><div class="btn-title">🚀 抓住机会，大干一场</div></button>
+    <button class="btn" id="btn-y15-steady"><div class="btn-title">🛡️ 稳扎稳打，不冒险</div></button>
+    <button class="btn" id="btn-y15-biz"><div class="btn-title">💼 考虑自己创业</div></button>
+  </div>`;
+}
+
+// --- 第20年：稳固or动荡 ---
+function renderY20(){
+  const w=state.wealth;const s=state.stability;
+  let mood=w>=60&&s>=50?'你现在是行业里的"老人"了，年轻人开始叫你"老师"。位置还算稳固。':w<30||s<30?'二十年了，你还在漂。同期入行的人，有的已经是VP，有的已经财务自由。你还在为每月的房贷发愁。':'不上不下，不好不坏。你已经习惯了这种状态。';
+  return`<h2><span class="year-tag">第20年 · ${state.age}岁</span></h2>
+  <div class="narrative">${mood}</div>
+  <div class="btn-group"><button class="btn primary" id="btn-next-node">继续 → 第25年</button></div>`;
+}
+
+// --- 第25年：家庭压力 ---
+function renderY25(){
+  return`<h2><span class="year-tag">第25年 · ${state.age}岁</span></h2>
+  <div class="narrative">上有老下有小，房贷还没还完。你的每一个职业决定，都不再只关乎你一个人。</div>
+  <div class="news-card"><div class="news-icon">💰</div><div class="news-text">孩子要上补习班，父母身体开始出问题。你第一次发现，钱是真的不够用。</div></div>
+  <div class="btn-group">
+    <button class="btn" id="btn-y25-side"><div class="btn-title">💡 开发副业，增加收入</div></button>
+    <button class="btn" id="btn-y25-cut"><div class="btn-title">📉 节衣缩食，维持现状</div></button>
+    <button class="btn" id="btn-y25-risk"><div class="btn-title">🎲 赌一把，博个大的</div></button>
+  </div>`;
+}
+
+// --- 第30年：职场末期 ---
+function renderY30(){
+  const w=state.wealth;const s=state.stability;
+  let t;
+  if(w>=70&&s>=60)t={text:'你已经是行业里的权威。年轻人以认识你为荣。你的经验反而成了最稀缺的东西。',icon:'👑'};
+  else if(w<25||s<25)t={text:'你成了办公室里年龄最大的那批人。每次路过HR的工位，你都不自觉地加快了脚步。',icon:'😰'};
+  else t={text:'你还在这个位置上，做着熟悉的工作。不算好，也不算坏。',icon:'🚶'};
+  return`<h2><span class="year-tag">第30年 · ${state.age}岁</span></h2>
+  <div class="news-card"><div class="news-icon">${t.icon}</div><div class="news-text">${t.text}</div></div>
+  <div class="narrative">退休倒计时开始了。退休金够不够？身体还撑得住吗？</div>
+  <div class="btn-group">
+    <button class="btn" id="btn-y30-retire"><div class="btn-title">🏖️ 提前退休，享受生活</div></button>
+    <button class="btn" id="btn-y30-keep"><div class="btn-title">💼 继续工作，做到做不动</div></button>
+    <button class="btn" id="btn-y30-consult"><div class="btn-title">🎓 转型做顾问/培训</div></button>
+  </div>`;
+}
+
+// --- 危机期（转行专用） ---
+function renderCrisis(){
+  const ai=getAIImpact(state.majorCat);
+  let t=ai==='high'?'公司发来邮件：部分岗位将由AI系统接替。HR会在本周内与相关同事沟通。':ai==='mid'?'招聘网站上，你的岗位需求少了三分之一。':'你的同学群开始有人发"求内推"。你还好，但不确定还能好多久。';
+  return`<h2><span class="year-tag">危机 · ${state.age}岁</span></h2>
+  <div class="news-card"><div class="news-icon">📰</div><div class="news-text">${t}</div></div>
+  <div class="btn-group">
+    <button class="btn" id="btn-crisis-change"><div class="btn-title">🔄 转行</div></button>
+    <button class="btn" id="btn-crisis-civil"><div class="btn-title">🏛️ 考公/考编</div></button>
+    <button class="btn" id="btn-crisis-biz"><div class="btn-title">🚀 创业</div></button>
+    <button class="btn" id="btn-crisis-freelance"><div class="btn-title">🆓 自由职业</div></button>
+    <button class="btn" id="btn-crisis-stay"><div class="btn-title">😐 继续熬</div></button>
+  </div>`;
+}
+
+// --- 转行 ---
+function renderChange(){
+  if(state.careerResult){
+    const r=state.careerResult;
+    return`<div style="text-align:center;padding:20px 0">
+      <div style="font-size:56px;margin-bottom:12px">${r.icon}</div>
+      <h2 style="margin-bottom:8px">${r.title}</h2>
+      <div class="narrative">${r.text}</div>
+      <div class="btn-group"><button class="btn primary" id="btn-result-continue">继续</button></div>
+    </div>`;
+  }
+  const opts=getChangeOptions();
+  return`<h2>AI职业建议</h2>
+  <div class="narrative" style="color:var(--green)">💬 你打开AI助手，输入："我是${state.majorCat}·${state.majorName}专业，感觉工作快不保了，我能做什么？"</div>
+  <div class="btn-group">${opts.map(o=>`<button class="btn" data-career="${o.name}" data-rate="${o.baseRate}" id="btn-change-opt"><div class="btn-title">${o.name}</div></button>`).join('')}</div>
+  <button class="btn" id="btn-change-cancel" style="margin-top:8px;text-align:center;color:var(--text3)">算了，不转了</button>`;
+}
+
+// --- 结局 ---
+function renderEnding(){
+  if(!state.endingType)state.endingType=determineEnding();
+  const e=ENDINGS[state.endingType]||ENDINGS['勤恳退休'];
+  const tm={'喜':'🟢','悲':'🔴','平':'🟡','转折':'🔄','开放':'💭','悲中带释然':'🔵'};
+  return`<div class="ending-card">
+    <div class="ending-title">${tm[e.tone]||''} ${e.title}</div>
+    <div class="ending-narrative">${e.narrative.replace(/\n/g,'<br>')}</div>
+    <div class="ending-panel">
+      <div class="row">
+        <div class="stat"><div style="font-size:12px;color:var(--text3)">财富</div><div class="stat-val" style="color:${state.wealth>=90?'var(--pink)':state.wealth>=75?'var(--green)':state.wealth>=25?'var(--yellow)':'var(--red)'}">${wealthLabel()}</div></div>
+        <div class="stat"><div style="font-size:12px;color:var(--text3)">压力</div><div class="stat-val" style="color:${state.stress<40?'var(--green)':state.stress<65?'var(--yellow)':'var(--red)'}">${stressLabel()}</div></div>
+      </div>
+    </div>
+    <div class="ending-summary">"${e.summary}"</div>
+    <button class="btn primary" id="btn-restart" style="width:auto;display:inline-block;padding:12px 40px">🔄 重新开始</button>
+  </div>`;
+}
+
+// ============================================================
+// 节点推进
+// ============================================================
+function getNextNode(){const idx=NODE_YEARS.indexOf(state.careerNode);return idx>=0&&idx<NODE_YEARS.length-1?NODE_YEARS[idx+1]:null}
+function advanceTo(nextNode){
+  const yearGap=nextNode-state.careerYear;
+  state.careerNode=nextNode;
+  state.age+=yearGap;
+  state.year+=yearGap;
+  state.careerYear=nextNode;
+  state.careerEvent=null;
+  refreshEconomy();
+  // 按年份跨度插入随机事件（每2年最多1个事件）
+  const events=[];
+  const maxEvents=Math.min(Math.floor(yearGap/2),3);
+  for(let i=0;i<maxEvents;i++){
+    if(Math.random()<0.45){
+      events.push(Math.random()<0.5?pick(CRISIS_EVENTS):pick(OPP_EVENTS));
+    }
+  }
+  if(events.length>0){
+    state.eventQueue=events;
+  }
+  const label=`第${nextNode}年`;
+  if(nextNode>=15){
+    showTransition(label,`${state.age}岁 · 人生下半场`,()=>render());
+  }else{
+    render();
+  }
+}
+
+// ============================================================
+// 事件绑定
+// ============================================================
+function bindEvents(){
+  // 序章
+  document.getElementById('btn-random')?.addEventListener('click',()=>{
+    state.score=normalRandom(550,80);state.age=18;state.year=2018;addHistory(`高考成绩：${state.score}分`);render();
+  });
+  document.getElementById('btn-manual')?.addEventListener('click',()=>{
+    document.getElementById('slider-area').innerHTML=`
+    <div class="slider-group"><div class="slider-row">
+      <input type="range" min="400" max="750" value="550" id="score-slider" style="flex:1">
+      <span class="slider-val" id="slider-val">550</span>
+    </div>
+    <button class="btn primary" id="btn-confirm-score" style="margin-top:12px">确认分数</button></div>`;
+    document.getElementById('score-slider').addEventListener('input',function(){document.getElementById('slider-val').textContent=this.value});
+    document.getElementById('btn-confirm-score').addEventListener('click',function(){state.score=parseInt(document.getElementById('score-slider').value);addHistory(`高考成绩：${state.score}分`);render()});
+  });
+  document.getElementById('btn-continue')?.addEventListener('click',()=>{state.chapter='major_select';render()});
+
+  // 选专业
+  document.querySelectorAll('.major-category .cat-header').forEach(h=>{h.addEventListener('click',function(){this.parentElement.classList.toggle('open')})});
+  document.querySelectorAll('.major-item:not(.locked)').forEach(item=>{item.addEventListener('click',function(){
+    document.querySelectorAll('.major-item').forEach(i=>i.classList.remove('selected'));
+    this.classList.add('selected');state.majorCat=this.dataset.cat;state.majorName=this.dataset.name;
+    const m=getMajorData(state.majorCat);state.scorePenalty=state.score<(m?m.recScore:0);
+    document.getElementById('btn-confirm-major')?.classList.remove('disabled');
+  })});
+  document.getElementById('btn-confirm-major')?.addEventListener('click',()=>{
+    if(!state.majorCat)return;
+    state.chapter='university';state.age=20;state.year=2020;
+    const m=getMajorData(state.majorCat);state.scorePenalty=state.score<(m?m.recScore:0);
+    addHistory(`选择专业：${state.majorCat}·${state.majorName}${state.scorePenalty?'（低于推荐线）':''}`);
+    showTransition('大学','选专业 · '+state.majorCat,()=>render());
+  });
+
+  // 大学
+  document.getElementById('btn-to-crossroads')?.addEventListener('click',()=>{
+    state.chapter='crossroads';state.age=22;state.year=2022;
+    showTransition('毕业','三叉口 · 22岁',()=>render());
+  });
+
+  // 毕业三叉口
+  document.getElementById('btn-employment')?.addEventListener('click',()=>{
+    state.path='employment';state.careerYear=1;state.careerNode=1;state.chapter='career';
+    addHistory('选择：直接就业');refreshEconomy();
+    showTransition('职业期','第1年 · 23岁',()=>render());
+  });
+  document.getElementById('btn-postgrad')?.addEventListener('click',()=>{
+    state.path='postgrad';state.gapYears=0;state.gapAttempts=0;state.gapResult=null;
+    state.chapter='gap_year';addHistory('选择：考研升学');render();
+  });
+  document.getElementById('btn-civil')?.addEventListener('click',()=>{
+    state.path='civil';state.gapYears=0;state.gapAttempts=0;state.gapResult=null;
+    state.chapter='gap_year';addHistory('选择：考公/考编');render();
+  });
+
+  // 空窗期
+  document.getElementById('btn-gap-check')?.addEventListener('click',()=>{
+    const rates=[15,35,45];const br=rates[Math.min(state.gapAttempts,2)];
+    const er=Math.max(5,br-(state.path==='postgrad'?15:0)*penalty());
+    const ok=Math.random()*100<er;state.gapYears++;state.age++;state.year++;
+    if(ok){
+      if(state.path==='postgrad'){
+        state.choices.postgradSuccess=true;state.hasPostgrad=true;state.age+=2;state.year+=2;
+        state.wealth+=18;state.stability+=12;addHistory('考研上岸，硕士毕业');
+        state.careerYear=1;state.careerNode=1;state.chapter='career';refreshEconomy();
+        showTransition('硕士毕业','更高起点 · '+state.age+'岁',()=>render());
+        return;
+      }else{state.choices.civilSuccess=true;state.stability=90;state.stress=10;state.wealth+=10;state.careerDirection='公务员';addHistory('考公上岸，进入体制内');state.careerYear=1;state.careerNode=1;state.chapter='career';refreshEconomy();showTransition('上岸','体制内 · '+state.age+'岁',()=>render());return}
+    }else{
+      state.gapAttempts++;state.gapResult='failed';addHistory(`第${state.gapAttempts}次${state.path==='postgrad'?'考研':'考公'}落榜`);
+      if(state.gapAttempts>=3){state.path='employment';state.wealth-=15;state.stress+=25;state.stability-=20;state.choices.postgradSuccess=false;state.choices.civilSuccess=false;addHistory('三年备考未果，被迫就业');state.careerYear=1;state.careerNode=1;state.chapter='career';refreshEconomy();showTransition('三年未果','被迫就业 · '+state.age+'岁',()=>render());return}
+    }
+    render();
+  });
+  document.getElementById('btn-gap-retry')?.addEventListener('click',()=>{state.gapResult=null;render()});
+  document.getElementById('btn-gap-quit')?.addEventListener('click',()=>{
+    state.path='employment';state.wealth-=5;state.stress+=10;addHistory(`放弃备考，晚${state.gapYears}年进入职场`);
+    state.careerYear=1;state.careerNode=1;state.chapter='career';refreshEconomy();
+    showTransition('进入职场','晚起步 · '+state.age+'岁',()=>render());
+  });
+
+  // --- 职业节点通用按钮 ---
+  // 事件选择
+  document.getElementById('btn-event-opt0')?.addEventListener('click',()=>handleEventChoice(0));
+  document.getElementById('btn-event-opt1')?.addEventListener('click',()=>handleEventChoice(1));
+  // 结果画面继续
+  document.getElementById('btn-result-continue')?.addEventListener('click',()=>{
+    const next=state.careerResult.nextNode;
+    state.careerResult=null;
+    state.chapter='career';
+    if(next==='ending'){state.chapter='ending';render()}
+    else advanceTo(next);
+  });
+
+  // "继续"按钮：推进到下一个节点
+  document.getElementById('btn-next-node')?.addEventListener('click',()=>{
+    const nxt=getNextNode();if(nxt)advanceTo(nxt);
+  });
+
+  // 第1年：选方向
+  document.querySelectorAll('#btn-dir').forEach(b=>{b.addEventListener('click',function(){
+    state.careerDirection=this.dataset.dir;
+    if(this.dataset.dir==='考虑转行'||this.dataset.dir==='本专业相关工作'||this.dataset.dir==='本专业高级岗位'){
+      state.choices.changedCareer=(this.dataset.dir==='考虑转行');
+      addHistory(`入职方向：${this.dataset.dir}`);
+    }
+    render();
+  })});
+  document.getElementById('btn-y1-solid')?.addEventListener('click',()=>{
+    state.stability+=20;state.stress-=5;state.choices.node1='solid';addHistory('第1年：夯实专业');
+    state.careerResult={icon:'📖',title:'稳扎稳打',text:'你每天最早到公司，最晚走。基本功越来越扎实，主管开始把重要项目交给你。',nextNode:2};render();
+  });
+  document.getElementById('btn-y1-skill')?.addEventListener('click',()=>{
+    state.wealth+=Math.round(10*pgBonus()*wealthSlow());state.choices.node1='skill';addHistory('第1年：学新技能');
+    state.careerResult={icon:'💡',title:'技能点亮',text:'你用业余时间啃下了AI工具和新框架。虽然暂时用不到，但你隐约觉得这些东西以后会派上用场。',nextNode:2};render();
+  });
+  document.getElementById('btn-y1-media')?.addEventListener('click',()=>{
+    state.stability-=8;const hit=Math.random()<0.2;if(hit)state.wealth+=25;state.choices.node1='media';
+    addHistory('第1年：发展自媒体'+(hit?'（小爆）':''));
+    state.careerResult={icon:'📱',title:hit?'意外之喜':'默默耕耘',text:hit?'你发的一条内容突然火了，涨了几万粉。虽然还没变现，但你觉得这条路有戏。':'你坚持更新了半年，粉丝涨到几百个。虽然没什么收入，但你乐在其中。',nextNode:2};render();
+  });
+  document.getElementById('btn-y1-lieflat')?.addEventListener('click',()=>{
+    state.stress-=10;state.choices.node1='lieflat';addHistory('第1年：躺平');
+    state.careerResult={icon:'😴',title:'舒适区',text:'你做好本职工作，准点下班，周末绝不看工作群。同事们加班到深夜时，你已经在家里追完了三部剧。',nextNode:2};render();
+  });
+
+  // 第3年
+  document.getElementById('btn-y3-accept')?.addEventListener('click',()=>{
+    state.stability+=15;state.stress+=10;state.wealth+=Math.round(10*pgBonus()*wealthSlow());state.choices.node2='promoted';addHistory('第3年：接受升职');
+    state.careerResult={icon:'⬆️',title:'升职了',text:'恭喜。名片上的title变长了，工资也跟着涨了。当然，要管的人多了，要开的会也多了。',nextNode:5};render();
+  });
+  document.getElementById('btn-y3-decline')?.addEventListener('click',()=>{
+    state.stress-=5;state.choices.node2='decline';addHistory('第3年：婉拒升职');
+    state.careerResult={icon:'🧘',title:'婉拒了',text:'你礼貌地跟主管说"还想再积累一段时间"。实际原因是——你不想管人，也不想每天晚上十点还在回邮件。',nextNode:5};render();
+  });
+  document.getElementById('btn-y3-jump')?.addEventListener('click',()=>{
+    const ok=Math.random()<0.5;state.choices.node2='jump';
+    if(ok){state.wealth+=20;state.stability-=10;state.stress+=5;addHistory('第3年：跳槽成功');
+      state.careerResult={icon:'🎉',title:'跳槽成功！',text:'新公司薪资翻倍，职位更高，你终于有了自己的独立办公室。同事看起来也比上一家靠谱。',nextNode:5};
+    }else{state.wealth=Math.max(0,Math.round(state.wealth/2));state.stability-=25;state.stress+=20;addHistory('第3年：跳槽失败');
+      state.careerResult={icon:'💸',title:'跳槽失败',text:'新公司干了半年就裁员了。你只能重新找工作，薪资腰斩，从头开始。',nextNode:5};
+    }render();
+  });
+  document.getElementById('btn-y3-stay')?.addEventListener('click',()=>{
+    state.choices.node2='stay';addHistory('第3年：留下');
+    state.careerResult={icon:'🤝',title:'选择留下',text:'你婉拒了同事的邀请。虽然现在的公司不是最好的，但至少稳定，你对这里的业务已经很熟了。',nextNode:5};render();
+  });
+  document.getElementById('btn-y3-watch')?.addEventListener('click',()=>{
+    state.stress+=5;state.choices.node2='watch';addHistory('第3年：观望');
+    state.careerResult={icon:'👀',title:'静观其变',text:'你决定先不动。部门合并后的局面还不明朗，贸然行动未必是好事。只是每天的焦虑感又多了一点。',nextNode:5};render();
+  });
+  document.getElementById('btn-y3-civil')?.addEventListener('click',()=>{
+    const ok=Math.random()<0.4;
+    if(ok){state.choices.civilSuccess=true;state.stability=90;state.stress=10;state.wealth+=8;state.careerDirection='公务员';addHistory('第3年考公上岸');
+      state.careerResult={icon:'🏛️',title:'上岸了！',text:'公示那天你把截图发到家庭群。妈妈秒回了一串鞭炮。从此体制内，稳定压倒一切。',nextNode:5};
+    }else{state.stress+=10;addHistory('第3年考公失败');state.choices.node2='civil_fail';
+      state.careerResult={icon:'😞',title:'差了一点',text:'差了几分进面。你看着成绩单，心想明年还要不要再试。但眼下，还是得先把工作做好。',nextNode:5};
+    }render();
+  });
+  document.getElementById('btn-y3-learn')?.addEventListener('click',()=>{
+    state.stability+=10;state.stress+=10;state.choices.node2='learn';addHistory('第3年：学AI加班');
+    state.careerResult={icon:'🤖',title:'技术跟上来了',text:'你成了公司最早掌握AI工具的人。代价是周末全用来上课了，女朋友抱怨你连一起吃饭的时间都没有。',nextNode:5};render();
+  });
+  document.getElementById('btn-y3-ignore')?.addEventListener('click',()=>{
+    state.stability-=8;state.stress-=10;state.choices.node2='ignore';addHistory('第3年：选择生活');
+    state.careerResult={icon:'🏔️',title:'山在那里',text:'你没去学AI——你去了黄山。站在云海之上，你觉得有些东西比技术更重要。当然，周一回到公司，你的工位旁边多了个AI实习生。',nextNode:5};render();
+  });
+  document.getElementById('btn-y3-continue')?.addEventListener('click',()=>{
+    state.choices.node2='calm';addHistory('第3年：平淡度过');
+    state.careerResult={icon:'😐',title:'风平浪静',text:'什么都没发生。没有惊喜，也没有惊吓。在职场里，这已经是难得的福气。',nextNode:5};render();
+  });
+
+  // 第7年
+  document.getElementById('btn-y7-change')?.addEventListener('click',()=>{
+    state.choices.node7='consider_change';state.stability-=5;addHistory('第7年：考虑转行');
+    state.careerResult={icon:'🔄',title:'萌生去意',text:'你开始在深夜刷招聘网站，看其他行业在招什么人。虽然还没行动，但心里已经埋下了一颗种子。',nextNode:10};render();
+  });
+  document.getElementById('btn-y7-upskill')?.addEventListener('click',()=>{
+    state.choices.node7='upskill';state.stability+=8;state.stress+=5;addHistory('第7年：深耕领域');
+    state.careerResult={icon:'📚',title:'向下扎根',text:'你决定不再左右观望，而是把一件事做到极致。报了两个高级课程，每周学习十几个小时。',nextNode:10};render();
+  });
+  document.getElementById('btn-y7-civil')?.addEventListener('click',()=>{
+    const ok=Math.random()<0.25;
+    if(ok){state.choices.civilSuccess=true;state.stability=90;state.stress=10;state.wealth+=8;state.careerDirection='公务员';addHistory('第7年考公上岸');
+      state.careerResult={icon:'🏛️',title:'终于上岸',text:'三十岁前最后的窗口，你抓住了。公示那天你长出一口气——往后余生，不用再担心被优化了。',nextNode:10};
+    }else{state.stress+=10;state.choices.node7='civil_fail';addHistory('第7年考公失败');
+      state.careerResult={icon:'😞',title:'又差一点',text:'竞争比想象中激烈得多。你开始怀疑这条路的可行性。也许该换一种策略了。',nextNode:10};
+    }render();
+  });
+  document.getElementById('btn-y7-wait')?.addEventListener('click',()=>{
+    state.choices.node7='wait';state.stress+=8;addHistory('第7年：等待');
+    state.careerResult={icon:'⏳',title:'再等等',text:'你决定按兵不动。也许行业会回暖，也许AI的冲击没那么大。希望你的判断是对的。',nextNode:10};render();
+  });
+
+  // 第10年危机
+  document.getElementById('btn-crisis-change')?.addEventListener('click',()=>{state.chapter='career_change';render()});
+  document.getElementById('btn-crisis-civil')?.addEventListener('click',()=>{
+    const ok=Math.random()<0.3;
+    if(ok){state.choices.civilSuccess=true;state.stability=90;state.stress=10;state.wealth+=8;state.careerDirection='公务员';addHistory('危机期考公上岸');
+      state.careerResult={icon:'🏛️',title:'最后关头上了岸',text:'35岁前夕，你抓住了体制内最后的入场券。从此不用再看HR的脸色，不用再担心凌晨收到裁员邮件。',nextNode:15};
+    }else{state.stress+=15;state.wealth-=5;addHistory('考公失败');
+      state.careerResult={icon:'😞',title:'窗口关闭了',text:'分数差了一大截。35岁的门槛就在眼前，考公这条路算是走到头了。你得想别的办法。',nextNode:15};
+    }render();
+  });
+  document.getElementById('btn-crisis-biz')?.addEventListener('click',()=>{
+    const ok=Math.random()<0.45;state.choices.startedBusiness=true;state.choices.node10='biz';
+    if(ok){state.wealth+=40;state.stability=25;state.stress+=10;addHistory('第10年：创业成功');
+      state.careerResult={icon:'🚀',title:'创业，赌对了！',text:'你all-in的那个项目，跑通了。第一笔融资到账那天，你在空荡荡的办公室里坐了很久——从打工人到老板，你只用了两年。',nextNode:15};
+    }else{state.wealth=Math.max(0,Math.round(state.wealth/2));state.stability=20;state.stress+=25;addHistory('第10年：创业失败');
+      state.careerResult={icon:'💸',title:'创业，赌输了',text:'两年时间烧光了积蓄，团队散了，办公室退了。你回到出租屋打开招聘App，发现市场价已经跌回了毕业那年。',nextNode:15};
+    }render();
+  });
+  document.getElementById('btn-crisis-freelance')?.addEventListener('click',()=>{
+    const ok=Math.random()<0.4;state.choices.freelance=true;state.choices.node10='freelance';
+    if(ok){state.wealth+=25;state.stability=30;state.stress-=15;addHistory('第10年：自由职业起步');
+      state.careerResult={icon:'🆓',title:'自由了',text:'你接了几个项目，收入竟然不比上班少。虽然不稳定，但时间是你自己的。周日的晚上，你不再焦虑周一了。',nextNode:15};
+    }else{state.wealth-=5;state.stability=25;state.stress+=5;addHistory('第10年：自由职业艰难');
+      state.careerResult={icon:'😮‍💨',title:'不太顺利',text:'自由职业比想象中难。项目断断续续，收入不稳定。你发现"为自己工作"需要比上班更强的自律。但你不后悔这个选择。',nextNode:15};
+    }render();
+  });
+  document.getElementById('btn-crisis-stay')?.addEventListener('click',()=>{
+    state.stress+=10;state.stability+=5;state.choices.node10='stay';addHistory('选择继续熬');
+    state.careerResult={icon:'😐',title:'继续熬',text:'你没有做任何改变。也许风暴会过去，也许不会。但改变本身也需要勇气，而你还没准备好。',nextNode:15};render();
+  });
+
+  // 第15年
+  document.getElementById('btn-y15-fight')?.addEventListener('click',()=>{
+    const ok=Math.random()<0.55;state.choices.node15='fight';
+    if(ok){state.wealth+=Math.round(18*pgBonus());state.stability+=5;state.stress+=10;addHistory('第15年：杀出血路（成功）');
+      state.careerResult={icon:'💪',title:'杀出来了！',text:'绝地反击。你用十五年积累的经验和人脉，硬生生在夹缝中辟出一条路。新项目拿到了投资人的青睐。',nextNode:20};
+    }else{state.wealth=Math.max(0,Math.round(state.wealth/2));state.stress+=20;addHistory('第15年：杀出血路（失败）');
+      state.careerResult={icon:'💸',title:'没能杀出去',text:'你拼尽全力，但行业的大势已去。挣扎了半年，积蓄烧掉大半，只能接受降薪从头来过。',nextNode:20};
+    }render();
+  });
+  document.getElementById('btn-y15-accept')?.addEventListener('click',()=>{
+    state.stress-=10;state.stability+=5;state.choices.node15='accept';addHistory('第15年：接受现实');
+    state.careerResult={icon:'🧘',title:'与自己和解',text:'你不再和年轻人卷了。维持现状没什么不好。人生不止工作，周末钓钓鱼、陪陪家人，也是一种成功。',nextNode:20};render();
+  });
+  document.getElementById('btn-y15-change')?.addEventListener('click',()=>{
+    const ok=Math.random()<0.45;state.choices.changedCareer=true;state.choices.changedCareerSuccess=ok;state.choices.node15='change';
+    if(ok){state.wealth+=18;state.stability+=8;state.stress-=15;addHistory('第15年转行成功');
+      state.careerResult={icon:'🎉',title:'中年转型成功！',text:'谁说35岁不能转行？你用半年时间啃下了新领域，凭着丰富的职场经验弯道超车。新工作比之前更体面。',nextNode:20};
+    }else{state.wealth=Math.max(0,Math.round(state.wealth/2));state.stress+=20;state.stability-=15;addHistory('第15年转行失败');
+      state.careerResult={icon:'💸',title:'转型受挫',text:'中年转型比想象中难得多。几个月的努力没有结果，存款烧掉大半，你只能灰头土脸地回到老路上。',nextNode:20};
+    }render();
+  });
+  document.getElementById('btn-y15-jump')?.addEventListener('click',()=>{
+    const ok=Math.random()<0.55;state.choices.node15='jump';
+    if(ok){state.wealth+=25;state.stability-=5;state.stress+=5;addHistory('第15年：抓住机会（成功）');
+      state.careerResult={icon:'🎉',title:'跳槽成功！',text:'新公司给你开了三倍薪资。十五年的经验在这一刻终于得到了应有的回报。',nextNode:20};
+    }else{state.wealth=Math.max(0,Math.round(state.wealth/2));state.stress+=20;state.stability-=20;addHistory('第15年：抓住机会（失败）');
+      state.careerResult={icon:'💸',title:'看走眼了',text:'高薪挖你的公司在半年后资金链断裂。你成了裁员名单上的第一批。薪资腰斩，重新开始投简历。',nextNode:20};
+    }render();
+  });
+  document.getElementById('btn-y15-steady')?.addEventListener('click',()=>{
+    state.stability+=10;state.choices.node15='steady';addHistory('第15年：稳扎稳打');
+    state.careerResult={icon:'🛡️',title:'稳如磐石',text:'你不为所动。风口来了又走，你始终做自己擅长的事。也许不够精彩，但足够安全。',nextNode:20};render();
+  });
+  document.getElementById('btn-y15-biz')?.addEventListener('click',()=>{
+    const ok=Math.random()<0.4;state.choices.startedBusiness=true;state.choices.node15='biz';
+    if(ok){state.wealth+=40;state.stability=25;state.stress+=10;addHistory('第15年：创业成功');
+      state.careerResult={icon:'🚀',title:'创业成功！',text:'你的项目拿到了A轮融资。那些曾经质疑你的人，现在都叫你"老板"。人生的第二曲线，从这里开始。',nextNode:20};
+    }else{state.wealth=Math.max(0,Math.round(state.wealth/2));state.stability=15;state.stress+=25;addHistory('第15年：创业失败');
+      state.careerResult={icon:'💸',title:'创业失败',text:'两年时间烧光了积蓄，团队也散了。你回到出租屋，打开招聘App，发现自己的市场价已经跌回了十年前。',nextNode:20};
+    }render();
+  });
+
+  // 第25年
+  document.getElementById('btn-y25-side')?.addEventListener('click',()=>{
+    const ok=Math.random()<0.4;state.choices.sideHustle=true;
+    if(ok){state.wealth+=20;state.stress+=5;addHistory('第25年：副业有起色');
+      state.careerResult={icon:'💡',title:'副业开花',text:'你没想到，当初只是补贴家用的副业，收入渐渐超过了工资。虽然累，但多了一条退路的感觉真好。',nextNode:30};
+    }else{state.wealth+=5;state.stress+=5;addHistory('第25年：尝试副业');
+      state.careerResult={icon:'💡',title:'聊胜于无',text:'副业没有想象中赚钱，但至少每个月多了一份买菜钱。你觉得这条路可以继续试试。',nextNode:30};
+    }render();
+  });
+  document.getElementById('btn-y25-cut')?.addEventListener('click',()=>{
+    state.stress+=10;state.wealth-=3;addHistory('第25年：节衣缩食');
+    state.careerResult={icon:'📉',title:'勒紧裤腰带',text:'你取消了所有不必要的开支。孩子的补习班换成了自己辅导，周末的聚餐变成了在家做饭。日子紧巴巴的，但还能过。',nextNode:30};render();
+  });
+  document.getElementById('btn-y25-risk')?.addEventListener('click',()=>{
+    const ok=Math.random()<0.35;
+    if(ok){state.wealth+=35;state.stress-=10;addHistory('第25年：赌对了');
+      state.careerResult={icon:'🎲',title:'赌对了！',text:'你all-in的那个机会，真的成了。可能是投资，可能是跳到了一个冷门赛道——总之，命运这次站在了你这边。',nextNode:30};
+    }else{state.wealth-=20;state.stress+=25;addHistory('第25年：赌输了');
+      state.careerResult={icon:'💸',title:'赌输了',text:'这一次，运气没有站在你这边。积蓄大幅缩水，你不得不面对一个残酷的现实：五十岁左右的年纪，已经没有多少试错的机会了。',nextNode:30};
+    }render();
+  });
+
+  // 第30年——最终抉择
+  document.getElementById('btn-y30-retire')?.addEventListener('click',()=>{
+    state.stress-=30;state.wealth-=5;state.stability-=10;addHistory('第30年：提前退休');
+    state.careerResult={icon:'🏖️',title:'退休了',text:'你终于放下了所有。不再有KPI，不再有周报，不再有凌晨的工作消息。剩下的日子，是你自己的。',nextNode:'ending'};render();
+  });
+  document.getElementById('btn-y30-keep')?.addEventListener('click',()=>{
+    state.wealth+=10;state.stress+=15;state.stability+=5;addHistory('第30年：继续工作');
+    state.careerResult={icon:'💼',title:'做到做不动',text:'你选择了继续。不是为了钱——只是你已经习惯了工作的节奏。闲下来反而不知道该干什么。',nextNode:'ending'};render();
+  });
+  document.getElementById('btn-y30-consult')?.addEventListener('click',()=>{
+    state.wealth+=5;state.stress-=10;state.stability+=5;addHistory('第30年：转型顾问');
+    state.careerResult={icon:'🎓',title:'传道授业',text:'你转型做了顾问。不用坐班，每周讲讲课、做做咨询。年轻人叫你"老师"，这感觉不坏。',nextNode:'ending'};render();
+  });
+
+  // 结局
+  document.getElementById('btn-to-ending')?.addEventListener('click',()=>{state.chapter='ending';render()});
+
+  // 转行
+  document.querySelectorAll('#btn-change-opt').forEach(b=>{b.addEventListener('click',function(){
+    const r=parseInt(this.dataset.rate);const ok=Math.random()*100<r;
+    state.choices.changedCareer=true;state.choices.changedCareerSuccess=ok;state.choices.node10='change';
+    if(ok){state.wealth+=20;state.stability+=10;state.stress-=20;addHistory(`转行成功：${this.dataset.career}`);
+      state.careerResult={icon:'🎉',title:'转行成功！',text:`你成功转型为${this.dataset.career}。新赛道里你的旧经验成了独特优势，薪资不降反升。`,nextNode:15};
+    }else{state.wealth=Math.max(0,Math.round(state.wealth/2));state.stress+=20;state.stability-=20;addHistory(`转行失败：${this.dataset.career}`);
+      state.careerResult={icon:'💸',title:'转行失败',text:`尝试转型${this.dataset.career}未果。几个月的努力打了水漂，你只能回到老本行，薪资腰斩。`,nextNode:15};
+    }
+    render();
+  })});
+  document.getElementById('btn-change-cancel')?.addEventListener('click',()=>{state.choices.changedCareer=false;state.stress+=10;addHistory('放弃转行');advanceTo(15)});
+
+  // 重新开始
+  document.getElementById('btn-restart')?.addEventListener('click',()=>{reset();render()});
+
+  // 历史
+  document.getElementById('history-toggle')?.addEventListener('click',function(){
+    const l=document.getElementById('history-list');l.classList.toggle('open');
+    this.textContent=l.classList.contains('open')?`📋 人生轨迹（${state.history.length}条）▴`:`📋 人生轨迹（${state.history.length}条）▾`;
+  });
+}
+
+function reset(){
+  Object.assign(state,{
+    chapter:'prologue',age:18,year:2018,score:0,majorCat:null,majorName:null,scorePenalty:false,hasPostgrad:false,
+    path:null,gapYears:0,gapAttempts:0,gapResult:null,careerYear:0,careerDirection:null,careerNode:1,careerEvent:null,careerResult:null,
+    wealth:50,stability:50,stress:20,economy:'stable',economyLabel:'平稳',history:[],
+    choices:{node1:null,node2:null,node3:null,node7:null,node10:null,node15:null,node20:null,changedCareer:false,changedCareerSuccess:false,startedBusiness:false,freelance:false,sideHustle:false,civilSuccess:false,postgradSuccess:false},
+    endingType:null,eventQueue:[],
+  });
+}
+
+render();
+</script>
+</body>
+</html>

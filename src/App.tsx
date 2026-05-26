@@ -634,6 +634,7 @@ const About = () => {
     "AI Startup Survival": { link: "/startup-survival.html" },
     "Workshop Manager": { link: "/workshop.html" },
     "knowledge linker": { link: "/knowledge-linker.html" },
+    "Career Life Survival": { link: "/career-life.html" },
   };
 
   return (
@@ -663,6 +664,7 @@ const About = () => {
                 "AI Startup Survival",
                 "Workshop Manager",
                 "knowledge linker",
+                "Career Life Survival",
               ].map((name, i) => {
                 const handler = projectActions[name];
                 const isClickable = !!handler;
