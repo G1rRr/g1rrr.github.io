@@ -629,12 +629,13 @@ const CrabWalker = () => {
 // --- 关于：G1rRr + 项目名录 ---
 const About = () => {
   const projectActions: Record<string, { action?: () => void; link?: string }> = {
+    "Career Life Survival": { link: "/career-life.html" },
+    "AI Startup Survival": { link: "/startup-survival.html" },
+    "灵感引擎Agent": { link: "" },
+    "知识链接机Agent": { link: "/knowledge-linker.html" },
     MeihuaBOT: { link: "/meihua.html" },
     JanusBOT: { link: "/janus.html" },
-    "AI Startup Survival": { link: "/startup-survival.html" },
     "Workshop Manager": { link: "/workshop.html" },
-    "knowledge linker": { link: "/knowledge-linker.html" },
-    "Career Life Survival": { link: "/career-life.html" },
   };
 
   return (
@@ -659,12 +660,13 @@ const About = () => {
           <Reveal delay={200}>
             <div className="space-y-4">
               {[
+                "Career Life Survival",
+                "AI Startup Survival",
+                "灵感引擎Agent",
+                "知识链接机Agent",
                 "MeihuaBOT",
                 "JanusBOT",
-                "AI Startup Survival",
                 "Workshop Manager",
-                "knowledge linker",
-                "Career Life Survival",
               ].map((name, i) => {
                 const handler = projectActions[name];
                 const isClickable = !!handler;
