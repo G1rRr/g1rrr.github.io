@@ -642,7 +642,7 @@ const About = () => {
   };
 
   return (
-    <section className="relative bg-white text-black py-20 md:py-32 px-4 md:px-6 overflow-hidden">
+    <section className="relative bg-white text-black pt-20 md:pt-32 pb-8 md:pb-12 px-4 md:px-6 overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.04]">
         <span className="text-[18vw] font-syne font-black text-[#0000FF] leading-none">G1rRr</span>
       </div>
@@ -733,7 +733,7 @@ const Showcase = () => {
   ];
 
   return (
-    <section className="bg-white py-20 md:py-28 px-6 relative z-10">
+    <section className="bg-white pt-8 md:pt-12 pb-20 md:pb-28 px-6 relative z-10">
       <div className="max-w-5xl mx-auto">
         <Reveal>
           <div className="mb-12 border-b border-black/10 pb-6">
