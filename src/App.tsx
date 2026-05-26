@@ -634,7 +634,7 @@ const About = () => {
   const projectActions: Record<string, { action?: () => void; link?: string }> = {
     "Career Life Survival": { link: "/career-life.html" },
     "AI Startup Survival": { link: "/startup-survival.html" },
-    "inspiration linker": { link: "" },
+    "inspiration linker": { link: "/inspiration-linker.html" },
     "Knowledge Linker": { link: "/knowledge-linker.html" },
     MeihuaBOT: { link: "/meihua.html" },
     JanusBOT: { link: "/janus.html" },
@@ -720,7 +720,7 @@ const Showcase = () => {
       { name: 'AI Startup Survival', desc: 'AI 公司生存模拟', link: '/startup-survival.html' },
     ]},
     { label: 'AGENT', items: [
-      { name: 'inspiration linker', desc: '灵感链接机', link: '' },
+      { name: 'inspiration linker', desc: '灵感链接机', link: '/inspiration-linker.html' },
       { name: 'Knowledge Linker', desc: '知识链接机', link: '/knowledge-linker.html' },
     ]},
     { label: 'BOT', items: [
