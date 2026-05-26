@@ -713,9 +713,9 @@ const About = () => {
 const Showcase = () => {
   const cats = [
     { label: 'GAME', items: ['Career Life Survival', 'AI Startup Survival'], links: ['/career-life.html', '/startup-survival.html'] },
+    { label: 'AGENT', items: ['inspiration linker', 'Knowledge Linker'], links: ['', '/knowledge-linker.html'] },
     { label: 'BOT', items: ['MeihuaBOT', 'JanusBOT'], links: ['/meihua.html', '/janus.html'] },
-    { label: 'AGENT', items: ['knowledge linker'], links: ['/knowledge-linker.html'] },
-    { label: '工具', items: ['Workshop Manager'], links: ['/workshop.html'] },
+    { label: 'TOOL', items: ['Workshop Manager'], links: ['/workshop.html'] },
   ];
 
   return (
