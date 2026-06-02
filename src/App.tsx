@@ -770,7 +770,7 @@ const Showcase = () => {
       { name: 'Knowledge Linker', desc: '知识链接机', link: '/knowledge-linker.html' },
     ]},
     { label: 'BOT', items: [
-      { name: 'MeihuaBOT', desc: 'AI 决策助手', link: '/meihua.html' },
+      { name: 'MeihuaBOT', desc: 'AI 决策陪伴产品', link: '/meihua.html' },
       { name: 'JanusBOT', desc: '自我挖掘助手', link: '/janus.html' },
     ]},
     { label: 'TOOL', items: [
@@ -1107,7 +1107,7 @@ const MeihuaDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           MeihuaBOT
         </h2>
 
-        <p className="font-mono text-[#FF0080] text-xs md:text-sm uppercase tracking-[0.3em]">AI 决策助手</p>
+        <p className="font-mono text-[#FF0080] text-xs md:text-sm uppercase tracking-[0.3em]">AI 决策陪伴产品</p>
         <a
           href="https://www.coze.cn/s/SNzo0AZVc6o/"
           target="_blank"
