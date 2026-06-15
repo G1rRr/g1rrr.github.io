@@ -798,7 +798,7 @@ const Showcase = () => {
                   <span className="inline-flex w-3.5 h-3.5 rounded-full bg-[#0000FF] breathe-dot flex-shrink-0" />
                   {cat.label}
                 </span>
-                <div className="flex flex-col gap-y-3 flex-1 md:ml-[10%]">
+                <div className="flex flex-col gap-y-3 flex-1 ml-[120px] md:ml-[10%]">
                   {cat.items.map((item, j) => (
                     <a
                       key={j}
