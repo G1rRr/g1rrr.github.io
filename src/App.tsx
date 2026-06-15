@@ -803,7 +803,7 @@ const Showcase = () => {
                     <a
                       key={j}
                       href={item.link || '#'}
-                      className="group/item flex flex-row md:flex-col"
+                      className="group/item flex flex-col"
                     >
                       <span className="font-syne font-bold text-base md:text-xl uppercase text-[#0000FF] group-hover/item:text-[#FF0080] transition-colors duration-300 leading-tight">
                         {item.name}
